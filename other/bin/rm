@@ -1,0 +1,22 @@
+#! /bin/sh
+# -----------------------------------------------------------------------
+# Apk Manager OS X v3.0+
+# "Safe" rm function
+#
+# by Jocelyn Mallon CC by-nc-sa 2012
+# http://girlintroverted.wordpress.com
+#
+# version: 3.0b
+# Fri. May 11, 2012
+# -----------------------------------------------------------------------
+
+for path in "$@"; do
+    if [[ "$path" = -* ]]; then :
+    else
+        dst=${path##*/}
+        while [[ -e ~/.Trash/"$dst" ]]; do
+            dst="$dst "$(date +%H-%M-%S)
+        done
+    mv "$path" ~/.Trash/"$dst" &>/dev/null
+    fi
+done

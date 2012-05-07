@@ -1,0 +1,59 @@
+#!/bin/sh
+# -----------------------------------------------------------------------
+# Apk Manager OS X v3.0+
+# Open new terminal tab script
+#
+# by Jocelyn Mallon CC by-nc-sa 2012
+# http://girlintroverted.wordpress.com
+#
+# version: 3.0b
+# Fri. May 11, 2012
+# -----------------------------------------------------------------------
+
+red='\033[0;31m'
+bred='\033[1;31m'
+
+# Set up prog to be the path of this script, including following symlinks,
+# and set up progdir to be the fully-qualified pathname of its directory.
+prog="$0"
+while [ -h "${prog}" ]; do
+    newProg="$(/bin/ls -ld "${prog}")"
+    newProg="$(expr "${newProg}" : ".* -> \(.*\)$")"
+    if expr "x${newProg}" : 'x/' >/dev/null; then
+        prog="${newProg}"
+    else
+        progdir="$(dirname "${prog}")"
+        prog="${progdir}/${newProg}"
+    fi
+done
+oldwd="$(pwd)"
+progdir="$(dirname "${prog}")"
+cd "${progdir}"
+progdir="$(pwd)"
+prog="${progdir}"/"$(basename "${prog}")"
+cd "${oldwd}"
+
+apkmopt="$1"
+shift;
+log="$1"
+shift;
+
+if [[ -z $apkmopt ]]; then
+    echo $bred"Something went wrong... please try again."; $rclr;
+    read -n 1 -s
+    exit 1
+else
+set -e
+echo "newttab (open new terminal tab, through applescript) function" 1>> "$log"
+apkmdir="cd ${oldwd}"
+osascript <<-EOF
+    tell application "System Events"
+        tell process "Terminal" to keystroke "t" using command down
+    end
+    tell application "Terminal"
+        activate
+        do script with command "$apkmdir; $apkmopt" in window 1
+    end tell
+EOF
+set +e
+fi

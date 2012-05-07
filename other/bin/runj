@@ -1,0 +1,51 @@
+#!/bin/sh
+# -----------------------------------------------------------------------
+# Apk Manager OS X v3.0+
+# Java app wrapper script
+#
+# by Jocelyn Mallon CC by-nc-sa 2012
+# http://girlintroverted.wordpress.com
+#
+# version: 3.0b
+# Fri. May 11, 2012
+# -----------------------------------------------------------------------
+
+# Set up prog to be the path of this script, including following symlinks,
+# and set up progdir to be the fully-qualified pathname of its directory.
+prog="$0"
+while [ -h "${prog}" ]; do
+    newProg="$(/bin/ls -ld "${prog}")"
+    newProg="$(expr "${newProg}" : ".* -> \(.*\)$")"
+    if expr "x${newProg}" : 'x/' >/dev/null; then
+        prog="${newProg}"
+    else
+        progdir="$(dirname "${prog}")"
+        prog="${progdir}/${newProg}"
+    fi
+done
+
+oldwd="$(pwd)"
+progdir="$(dirname "${prog}")"
+cd "${progdir}"
+progdir="$(pwd)"
+prog="${progdir}"/"$(basename "${prog}")"
+cd "${oldwd}"
+
+jarfile="$1".jar
+shift;
+libdir="$(dirname $progdir)/lib"
+if [ ! -r "$libdir/$jarfile" ]
+then
+    echo $(basename "$prog")": can't find $libdir/$jarfile"
+    exit 1
+fi
+
+while expr "x$1" : 'x-J' >/dev/null; do
+    opt="$(expr "$1" : '-J\(.*\)')"
+    javaOpts="${javaOpts} -${opt}"
+    shift
+done
+
+jarpath="$libdir/$jarfile"
+
+exec java $javaOpts -jar "$jarpath" "$@"

@@ -1,0 +1,59 @@
+#! /bin/sh
+# -----------------------------------------------------------------------
+# Apk Manager OS X v3.0+
+# User preferences utility functions
+#
+# by Jocelyn Mallon CC by-nc-sa 2012
+# http://girlintroverted.wordpress.com
+#
+# version: 3.0b
+# Fri. May 11, 2012
+# -----------------------------------------------------------------------
+
+
+# Write 'string' type user preferences
+write_string () {
+    defaults write $plist $key $value 2>/dev/null
+}
+
+# Write 'boolean' type user preferences
+write_boolean () {
+    defaults write $plist $key -bool $value 2>/dev/null
+}
+
+# Check the type of pref to write
+check_type () {
+    if [[ $pref = string ]]; then
+        write_string
+    elif [[ $pref = bool ]]; then
+        write_boolean
+    else
+        exit 1
+    fi
+}
+
+# parse options and set vars if necessary
+main () {
+    if [[ $# -lt 3 ]]; then
+        exit 1
+    else
+        while getopts 'b' OPTION
+        do
+            case "$OPTION" in
+            b) pref="bool" ;;
+            esac
+            shift $(($OPTIND - 1))
+        done
+        if [[ -z $pref ]]; then
+            pref="string"
+        fi
+        plist="$1"; shift
+        key="$1"; shift
+        value="$1"
+        check_type
+    fi
+}
+
+# Start
+main $*
+exit 0
