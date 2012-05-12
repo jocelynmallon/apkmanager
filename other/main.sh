@@ -7,7 +7,7 @@
 # http://girlintroverted.wordpress.com
 #
 # version: 3.0b
-# Fri. May 11, 2012
+# Sat. May 12, 2012
 # -----------------------------------------------------------------------
 
 # define default directories to function
@@ -540,6 +540,14 @@ comp_level () {
     unset input
 }
 
+# trap handler for non-zero exit/return codes
+err_trap_handler () {
+    errline="$1"
+    errfunc="$2"
+    errcode="$3"
+    echo "==> ERROR: ${errfunc} code: ${errcode} line: ${errline}" 1>> "$log" 2>&1
+}
+
 # Write message to log if user hits control+c
 control_c () {
     echo $blue"\nAwwww, user interrupt makes APK Manager sad panda :("
@@ -660,6 +668,9 @@ set_current_pid
 # startup complete, write divider to log
 echo "$logspcr" 1>> "$log" 2>&1
 
+# trap error codes and line number of errors
+trap 'err_trap_handler ${LINENO} ${FUNCNAME} $?' ERR
+
 # trap keyboard interrupt (control-c)
 trap control_c SIGINT
 
@@ -680,6 +691,7 @@ fi
 # main loop, check options and show main menu
 while [[ 1 = 1 ]];
 do
+    set -o errtrace
     if [[ $v_mode -ne 0 ]]; then
         set -v
     fi
