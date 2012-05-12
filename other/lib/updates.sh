@@ -285,8 +285,6 @@ update_branch_check () {
 # Actually checking for updates now
 update_apkm () {
     echo "update_apkm (actually checking for updates now)" 1>> "$log"
-    old_commit="$(get_commit_ver)"
-    old_commit="${old_commit:0:8}"
     cd $maindir
     echo "==> git config core.autocrlf false ..." 1>> "$log"
     git config core.autocrlf false
@@ -311,6 +309,8 @@ update_apkm () {
             return 1
         fi
     fi
+    old_commit="$(get_commit_ver)"
+    old_commit="${old_commit:0:8}"
     echo "==> git pull -q origin ${saved_channel} ..." 1>> "$log"
     git pull -q origin refs/heads/$saved_channel:refs/remotes/origin/$saved_channel 2>> "$log"
     if [[ $? -ne 0 ]]; then
