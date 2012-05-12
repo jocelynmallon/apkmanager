@@ -67,15 +67,25 @@ menu_header () {
         fi
         local trunc_symbol="..."
         local pidw="$$"
-        local retw="$?"
-        local maxlength="$((100 - ((((${#retw} + ${#pidw}) + ${#trunc_symbol}) + ${emode} ) + 28)))"
+        if [[ -z $errcode ]]; then
+            errcode=0
+            local err_string="${white}| \$?: ${bred}$errcode"
+            local pwdfill=28
+        else
+            local err_string="${white}| ${bred}${errfunc} ${white}\$?: ${bred}$errcode ${white}line: ${bred}$errline"
+            local pwdfill=36
+        fi
+        local maxlength="$((100 - (((((${#errfunc} + ${#errcode}) + ${#errline}) + ${#pidw}) + $emode ) + $pwdfill )))"
         if [[ ${#PWD} -gt $maxlength ]]; then
-            local pwdoffset="$(( ${#PWD} - $maxlength ))"
+            local pwdoffset="$(( ${#PWD} - $((maxlength - ${#trunc_symbol})) ))"
             local newpwd="${trunc_symbol}${PWD:$pwdoffset:$maxlength}"
         else
             newpwd="$(pwd)"
         fi
-        printf "$white%s"" PID: "$red"$$"$white" | \$: "$red"$?"$white" | Last 'cd': "$red"${newpwd}\n"; $rclr;
+        printf "$white%s"" PID: "$bred"$$"$white" ${err_string}"$white" | Last 'cd': "$bred"${newpwd}\n"; $rclr;
+        unset errcode
+        unset errline
+        unset errfunc
     else
         echo ""
     fi
