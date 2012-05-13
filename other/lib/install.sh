@@ -148,6 +148,12 @@ finish_setup () {
     fi
 }
 
+# simple finish function for homebrew setup
+homebrew_finish () {
+    installtype="homebrew"
+    setinstallstatus
+}
+
 # install programs with homebrew
 setup_homebrew () {
     clear
@@ -172,6 +178,7 @@ setup_homebrew () {
             echo $green" brew install ${missing[$count]} "$blue"(opens a new terminal tab)"
             soxdeps="1"
             unset missing[$count]
+            count=$((count-1))
         else
             echo $green" brew install ${missing[$count]}"
         fi
@@ -190,11 +197,11 @@ setup_homebrew () {
     fi
     if [[ $soxdeps -ne 0 ]]; then
         echo ""
-        echo $bwhite" APK Manager needs to install \"sox\" in order to be able to"; $rclr;
-        echo $bwhite" optimize .ogg files. However, installing sox will fail if run"; $rclr;
-        echo $bwhite" inside this script. Instead, APK Manager will open a new tab"; $rclr;
-        echo $bwhite" and run: "$bgreen"brew install sox; exit"; $rclr;
-        echo $bwhite" once the new tab closes, come back to this script and press enter.\n"; $rclr;
+        echo $white" APK Manager needs to install \"sox\" in order to be able to"; $rclr;
+        echo $white" optimize .ogg files. However, installing sox will fail if run"; $rclr;
+        echo $white" inside this script. Instead, APK Manager will open a new tab"; $rclr;
+        echo $white" and run: "$bgreen"brew install sox; exit"; $rclr;
+        echo $white" once the new tab closes, come back to this script and press enter.\n"; $rclr;
     fi
     echo $bgreen"$apkmspr"
     genericpanykey
@@ -219,22 +226,26 @@ setup_homebrew () {
             unset soxdeps
         fi
     fi
-    brew install ${missing[*]}
-    if [[ $? -ne 0 ]]; then
-        brew_install_error
-    else
-        if [[ $needsdk -ne 0 ]]; then
-            echo ""
-            echo $bgreen" Launching the Android SDK Manager..."
-            android
-            unset needsdk
-        fi
-        echo ""
-        echo $bgreen"$apkmftr";
-        installtype="homebrew"
-        setinstallstatus
-        genericpanykey
+    if [[ $count -eq 1 ]]; then
+        homebrew_finish
         finish_setup
+    else
+        brew install ${missing[*]}
+        if [[ $? -ne 0 ]]; then
+            brew_install_error
+        else
+            if [[ $needsdk -ne 0 ]]; then
+                echo ""
+                echo $bgreen" Launching the Android SDK Manager..."
+                android
+                unset needsdk
+            fi
+            homebrew_finish
+            echo ""
+            echo $bgreen"$apkmftr";
+            genericpanykey
+            finish_setup
+        fi
     fi
 }
 
