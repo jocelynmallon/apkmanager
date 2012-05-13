@@ -168,6 +168,10 @@ setup_homebrew () {
         elif [[ ${missing[$count]} = android-sdk ]]; then
             needsdk="1"
             echo $green" brew install ${missing[$count]}"
+        elif [[ ${missing[$count]} = sox ]]; then
+            echo $green" brew install ${missing[$count]} "$blue"(opens a new terminal tab)"
+            soxdeps="1"
+            unset missing[$count]
         else
             echo $green" brew install ${missing[$count]}"
         fi
@@ -184,6 +188,14 @@ setup_homebrew () {
         echo $white" any other components or SDK revisions you'd like. I suggest"
         echo $white" installing the SDK API's and Google API's for levels 10-15."
     fi
+    if [[ $soxdeps -ne 0 ]]; then
+        echo ""
+        echo $bwhite" APK Manager needs to install \"sox\" in order to be able to"; $rclr;
+        echo $bwhite" optimize .ogg files. However, installing sox will fail if run"; $rclr;
+        echo $bwhite" inside this script. Instead, APK Manager will open a new tab"; $rclr;
+        echo $bwhite" and run: "$bgreen"brew install sox; exit"; $rclr;
+        echo $bwhite" once the new tab closes, come back to this script and press enter.\n"; $rclr;
+    fi
     echo $bgreen"$apkmspr"
     genericpanykey
     echo ""
@@ -194,6 +206,17 @@ setup_homebrew () {
         else
             echo ""
             unset btap
+        fi
+    fi
+    if [[ $soxdeps -ne 0 ]]; then
+        local apkmopt="brew install sox; exit"
+        newttab "$apkmopt" "$log"
+        genericpanykey
+        if [[ $? -ne 0 ]]; then
+            brew_install_error
+        else
+            echo ""
+            unset soxdeps
         fi
     fi
     brew install ${missing[*]}
@@ -422,7 +445,7 @@ installcheck () {
                         pngout_error
                     fi
                 elif [[ $p = 7za ]]; then
-                    $p="p7zip"
+                    p="p7zip"
                     missing[$count]="$p"
                 else
                     missing[$count]="$p"
