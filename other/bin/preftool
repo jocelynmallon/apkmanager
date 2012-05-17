@@ -7,18 +7,18 @@
 # http://girlintroverted.wordpress.com
 #
 # version: 3.0b
-# Fri. May 11, 2012
+# Wed. May 16, 2012
 # -----------------------------------------------------------------------
 
 
 # Write 'string' type user preferences
 write_string () {
-    defaults write $plist $key $value 2>/dev/null
+    defaults write "$plist" "$key" "$value" 2>/dev/null
 }
 
 # Write 'boolean' type user preferences
 write_boolean () {
-    defaults write $plist $key -bool $value 2>/dev/null
+    defaults write "$plist" "$key" -bool "$value" 2>/dev/null
 }
 
 # Check the type of pref to write

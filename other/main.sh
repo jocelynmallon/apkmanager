@@ -6,8 +6,8 @@
 # by Jocelyn Mallon CC by-nc-sa 2012
 # http://girlintroverted.wordpress.com
 #
-# version: 3.0b
-# Fri. May 11, 2012
+# version: 3.0b2
+# Wed. May 16, 2012
 # -----------------------------------------------------------------------
 
 # define default directories to function
@@ -24,10 +24,10 @@ wait () {
 
 # Write user preferences to .plist
 write_preference () {
-    if [[ $value = true ]] || [[ $value = false ]]; then
+    if [[ ${value} = true ]] || [[ ${value} = false ]]; then
         local bflag="-b"
     fi
-    preftool $bflag $plist $key $value
+    preftool "$bflag" "$plist" "$key" "$value"
 }
 
 # simple date formatting function
@@ -55,8 +55,8 @@ startup_fatal_err () {
 
 # In-depth startup necessary file check
 sourced_files_check () {
-    files=( "$bindir/rm" "$bindir/runj" "$bindir/newttab" "$bindir/preftool" "$bindir/timeout" "$bindir/JD-GUI.app" "$aptdir/apktool_143.jar" )
-    files+=( $(awk '/source\ / { print $0}' $maindir/other/main.sh | sed 's/^[ \t]*//;s/[ \t]*$//' | sed 's/source\ //g' | sed 's/\"//g' | sed "s,\$libdir,${libdir},g") )
+    files=( "${bindir}/rm" "${bindir}/runj" "${bindir}/newttab" "${bindir}/preftool" "${bindir}/timeout" "${bindir}/JD-GUI.app" "${aptdir}/apktool_143.jar" )
+    files+=( $(awk '/source\ / { print $0}' "${maindir}/other/main.sh" | sed 's/^[ \t]*//;s/[ \t]*$//' | sed 's/source\ //g' | sed 's/\"//g' | sed "s,\$libdir,${libdir},g") )
     local i
     for ((i=0; i < ${#files[*]}; i++)); do
         if [[ ! ${files[$i]} ]]; then
@@ -69,13 +69,13 @@ sourced_files_check () {
         startup_fatal_err
         local key="maindir"
         local value="ERROR"
-        defaults write $plist $key $value
+        defaults write "${plist}" "${key}" "${value}"
         wait
         exit 1
     else
         local key="maindir"
-        local value="$maindir"
-        defaults write $plist $key $value
+        local value="${maindir}"
+        defaults write "${plist}" "${key}" "${value}"
     fi
     unset files
 }
@@ -97,16 +97,16 @@ maindir_setup () {
     local oldwd="$(pwd)"
     local progdir="$(dirname "${prog}")"
     cd "${progdir}"
-    maindir="$(dirname $(pwd))"
+    maindir="$(dirname "$(pwd)")"
 }
 
 # Setup root 'apkmanager' directory path
 maindir_check () {
-    maindir="$(defaults read $plist maindir 2>/dev/null)"
+    maindir="$(defaults read "${plist}" maindir 2>/dev/null)"
     if [[ $? -ne 0 ]]; then
         maindir_setup
     else
-        cd "$maindir" &>/dev/null
+        cd "${maindir}" &>/dev/null
         if [[ $? -ne 0 ]]; then
             maindir_setup
         fi
@@ -117,16 +117,16 @@ maindir_check () {
 # Check for directories necessary to function
 dircheck () {
     maindir_check
-    if [[ ! $maindir = "$(PWD -P)" ]]; then
-        cd "$maindir"
+    if [[ ! ${maindir} = "$(pwd)" ]]; then
+        cd "${maindir}"
     fi
-    bindir="$maindir/other/bin"
-    libdir="$maindir/other/lib"
-    aptdir="$maindir/other/apktool"
-    d2jdir="$maindir/other/dex2jar"
-    if [[ ! -d $bindir ]] || [[ ! -d $libdir ]] || [[ ! -d $aptdir ]]; then
+    bindir="${maindir}/other/bin"
+    libdir="${maindir}/other/lib"
+    aptdir="${maindir}/other/apktool"
+    d2jdir="${maindir}/other/dex2jar"
+    if [[ ! -d "${bindir}" ]] || [[ ! -d "${libdir}" ]] || [[ ! -d "${aptdir}" ]]; then
         echo "${maindir}"
-        echo "$(PWD -P)"
+        echo "$(pwd)"
         startup_fatal_err
         wait
         exit 1
@@ -139,10 +139,10 @@ dircheck () {
 folderscheck () {
     echo "folderscheck (check for/create modding, projects, etc. folders)" 1>> "$log" 2>&1
     local dir
-    for dir in "$prj_dir" "$mod_dir" "$ogg_dir" "$bat_dir" "$sig_dir"
+    for dir in "${prj_dir}" "${mod_dir}" "${ogg_dir}" "${bat_dir}" "${sig_dir}"
     do
-        if [[ ! -d $maindir/$dir ]]; then
-            mkdir -p "$maindir/$dir"
+        if [[ ! -d ${maindir}/${dir} ]]; then
+            mkdir -p "${maindir}/${dir}"
         fi
     done
 }
@@ -165,7 +165,7 @@ startup_check () {
                     echo "\"optipng\", \"pngcrush\" & \"pngout\" missing; png options disabled" 1>> "$log" 2>&1
                 fi
             elif [[ $prg = aapt ]]; then
-                if [[ $(command -v brew) ]] && [[ $(dirname $(command -v android)) = /usr/local/bin ]]; then
+                if [[ $(command -v brew) ]] && [[ $(dirname "$(command -v android)") = /usr/local/bin ]]; then
                     local sdkrev="$(brew list -v android-sdk | sed s/android-sdk\ //g)"
                     ln -s "/usr/local/Cellar/android-sdk/${sdkrev}/platform-tools/aapt" /usr/local/bin/aapt
                 fi
@@ -187,19 +187,18 @@ startup_check () {
 and_sdk_check () {
     if [[ -z $ANDROID_SDK_ROOT ]]; then
         if [[ $(command -v brew) ]]; then
-            if [[ $(dirname $(command -v android)) = /usr/local/bin ]]; then
+            if [[ $(dirname "$(command -v android)") = /usr/local/bin ]]; then
                 local sdkrev="$(brew list -v android-sdk | sed s/android-sdk\ //g)"
                 export "ANDROID_SDK_ROOT=/usr/local/Cellar/android-sdk/${sdkrev}"
             fi
         else
-            echo $bred"WARNING: ANDROID_SDK_ROOT is not set. This"
-            echo $bred"\"might\" cause problems for APK Manager."
-            echo $bred"If you have the Android SDK installed, please"
-            echo $bred"add the following to your .bashrc/.zshrc/etc."
-            echo ""
-            echo $bred"export \"ANDROID_SDK_ROOT=/path/to/sdk/root\""
-            echo ""
-            pressanykey
+            defaults read "${plist}" "and_sdk_err" &>/dev/null
+            if [[ $? -ne 0 ]]; then
+                android_sdk_root_err
+                local key="and_sdk_err"
+                local value="true"
+                write_preference
+            fi
         fi
     fi
 }
@@ -214,39 +213,39 @@ archtest () {
             wait
             exit 1
         elif [[ $installtype = homebrew ]]; then
-            echo "archtest (running on $arch_ver machine)" 1>> "$log" 2>&1
+            echo "archtest (running on ${arch_ver} machine)" 1>> "$log" 2>&1
             return 0
         elif [[ $installtype = preconfigured ]]; then
-            echo "archtest (running on $arch_ver machine)" 1>> "$log" 2>&1
+            echo "archtest (running on ${arch_ver} machine)" 1>> "$log" 2>&1
             return 0
-        elif [[ $arch_ver = "x86_64" ]]; then
-            cd "$bindir"
+        elif [[ ${arch_ver} = "x86_64" ]]; then
+            cd "${bindir}"
             local f
             ls 64_* | while read f
             do
-                ln -s -F "$f" "${f:3}" 1>> "$log" 2>&1
+                ln -s -F "${f}" "${f:3}" 1>> "$log" 2>&1
             done
         else
-            cd "$bindir"
+            cd "${bindir}"
             local f
             ls 32_* | while read f
             do
-                ln -s -F "$f" "${f:3}" 1>> "$log" 2>&1
+                ln -s -F "${f}" "${f:3}" 1>> "$log" 2>&1
             done
         fi
     fi
-    echo "archtest (running on $arch_ver machine)" 1>> "$log" 2>&1
+    echo "archtest (running on ${arch_ver} machine)" 1>> "$log" 2>&1
     echo "==> Linking correct binaries in ./other" 1>> "$log" 2>&1
-    cd "$maindir"
+    cd "${maindir}"
 }
 
 # Check for existing user color choice
 colorcheck () {
     echo "colorsetup (set apk manager color theme)" 1>> "$log" 2>&1
-    colorchoice="$(defaults read $plist color 2>/dev/null)"
+    colorchoice="$(defaults read "${plist}" color 2>/dev/null)"
     if [[ $? -ne 0 ]]; then
         echo "color setup undefined, launching colorcheck..." 1>> "$log" 2>&1
-        source "$libdir/colorsetup.sh"
+        source "${libdir}/colorsetup.sh"
     elif [[ $colorchoice = alternate ]]; then
         white='\033[0;30m'
         bwhite='\033[1;30m'
@@ -266,11 +265,11 @@ user_dir_check () {
 # Check status of v3.0+ installation/setup
 installcheck () {
     echo "installcheck (check v3.0+ installation status)" 1>> "$log"
-    installtype="$(defaults read $plist install 2>/dev/null)"
+    installtype="$(defaults read "${plist}" install 2>/dev/null)"
     if [[ $? -ne 0 ]]; then
         user_dir_check
         echo "launching installation script..." 1>> "$log"
-        source "$libdir/install.sh"
+        source "${libdir}/install.sh"
         if [[ $? -ne 0 ]]; then
             echo $bred"ERROR: APK Manager installation failed"
             echo $bred"Please check log for details, and try again."
@@ -278,8 +277,6 @@ installcheck () {
             wait
             exit 1
         fi
-    elif [[ $installtype = "homebrew" ]]; then
-        echo "APK Manager install type: $installtype" 1>> "$log"
     else
         echo "APK Manager install type: $installtype" 1>> "$log"
     fi
@@ -288,10 +285,10 @@ installcheck () {
 # Check status of v2.1+/v3.0+ migration
 migratecheck () {
     echo "migratecheck (check user settings & keys migration status)" 1>> "$log"
-        migratecheck="$(defaults read $plist migration 2>/dev/null)"
+        migratecheck="$(defaults read "${plist}" migration 2>/dev/null)"
         if [[ $? -ne 0 ]] || [[ $migratecheck -ne 1 ]]; then
             echo "launching migration script..." 1>> "$log"
-            source "$libdir/migrate.sh"
+            source "${libdir}/migrate.sh"
             if [[ $? -ne 0 ]]; then
                 echo $bred"ERROR: APK Manager v3.0+ migration failed."
                 echo $bred"Please check log for details, and try again."
@@ -306,7 +303,7 @@ migratecheck () {
 
 # Check if automatic updates enabled
 auto_update_check () {
-    local updatestate="$(defaults read $plist updates 2>/dev/null)"
+    local updatestate="$(defaults read "${plist}" updates 2>/dev/null)"
     if [[ $? -ne 0 ]]; then
         disable_auto_updates
         echo "Automatic updates: OFF" 1>> "$log"
@@ -326,15 +323,15 @@ auto_update_check () {
 # Check for apktool.jar symlink
 apktcheck () {
     echo "apktcheck (checking for apktool.jar symlink)" 1>> "$log" 2>&1
-    if [[ ! -e $(readlink $libdir/apktool.jar) ]]; then
-        rm $libdir/apktool.jar
+    if [[ ! -e $(readlink ${libdir}/apktool.jar) ]]; then
+        rm ${libdir}/apktool.jar
     fi
-    if [[ ! -L $libdir/apktool.jar ]]; then
+    if [[ ! -L ${libdir}/apktool.jar ]]; then
         local jarfile
-        jarfile="$(ls $aptdir | sed -n "/apktool_...\.jar/h;$ {x;p;}")"
-        echo "No apktool.jar symlink found in $libdir" 1>> "$log" 2>&1
-        echo "==> Linking $jarfile > apktool.jar" 1>> "$log" 2>&1
-        ln -s -f -F "$aptdir/$jarfile" "$libdir/apktool.jar"
+        jarfile="$(ls ${aptdir} | sed -n "/apktool_...\.jar/h;$ {x;p;}")"
+        echo "No apktool.jar symlink found in ${libdir}" 1>> "$log" 2>&1
+        echo "==> Linking ${jarfile} > apktool.jar" 1>> "$log" 2>&1
+        ln -s -f -F "${aptdir}/${jarfile}" "${libdir}/apktool.jar"
         getapktver
     fi
 }
@@ -348,7 +345,7 @@ set_current_pid () {
 
 # Toggle utterly basic debug info in menu_header
 basic_debug () {
-    debugstate="$(defaults read $plist debug 2>/dev/null)"
+    debugstate="$(defaults read "${plist}" debug 2>/dev/null)"
     if [[ $? -ne 0 ]] || [[ $debugstate -eq 0 ]]; then
         local key="debug"
         local value="true"
@@ -364,7 +361,7 @@ basic_debug () {
 
 # Check for persistent java heap setting
 jvheapck () {
-    heapy="$(defaults read $plist heap 2>/dev/null)"
+    heapy="$(defaults read "${plist}" heap 2>/dev/null)"
     if [[ $? -ne 0 ]]; then
         heapy=64
     fi
@@ -373,7 +370,7 @@ jvheapck () {
 
 # Check for persistent compression level
 complvlck () {
-    uscr="$(defaults read $plist complvl 2>/dev/null)"
+    uscr="$(defaults read "${plist}" complvl 2>/dev/null)"
     if [[ $? -ne 0 ]]; then
         uscr=9
     fi
@@ -404,21 +401,21 @@ logvreset () {
 
 # Check for logviewing app command line support
 logvset () {
-    logapp="$(grep "|$logviewer" "$libdir/logapps" | cut -d\| -f1)"
-    if [[ ! $(command -v $logviewer)  ]]; then
+    logapp="$(grep "|${logviewer}" "${libdir}/logapps" | cut -d\| -f1)"
+    if [[ ! $(command -v ${logviewer})  ]]; then
         logvreset
     else
         local key="logviewapp"
-        local value="$logviewer"
+        local value="${logviewer}"
         write_preference
-        echo "log viewing app set to: $logapp" 1>> "$log" 2>&1
+        echo "log viewing app set to: ${logapp}" 1>> "$log" 2>&1
     fi
 }
 
 # Check for user logviewing app preference
 logvchk () {
     if [[ -z $logviewer ]]; then
-        logviewer="$(defaults read $plist logviewapp 2>/dev/null)"
+        logviewer="$(defaults read "${plist}" logviewapp 2>/dev/null)"
         if [[ $? -ne 0 ]]; then
             logvreset
         fi
@@ -438,20 +435,20 @@ pngtoolset () {
     if [[ $pngopts = disabled ]]; then
         pngtool="NONE - DISABLED"
     else
-        pngtool="$(defaults read $plist pngtool 2>/dev/null)"
+        pngtool="$(defaults read "${plist}" pngtool 2>/dev/null)"
         if [[ $? -ne 0 ]] || [[ ! $(command -v $pngtool) ]]; then
             defpngtool
         fi
     fi
-    echo "png optimization tool set to: $pngtool" 1>> "$log" 2>&1
+    echo "png optimization tool set to: ${pngtool}" 1>> "$log" 2>&1
 }
 
 # Check for files in modding directory
 project_test () {
     echo "project_test (checking number of project files in modding folder)" 1>> "$log"
-    local prjnum="$(ls "$maindir/$mod_dir" | wc -l)"
+    local prjnum="$(ls "${maindir}/${mod_dir}" | wc -l)"
     if [[ $prjnum -gt 1 ]]; then
-        echo "==>$prjnum project files found in modding folder" 1>> "$log"
+        echo "==>${prjnum} project files found in modding folder" 1>> "$log"
         capp="None"
         prjext=""
     elif [[ $prjnum -eq 0 ]]; then
@@ -459,14 +456,16 @@ project_test () {
         capp="None"
         prjext=""
     else
+        cd "${maindir}/${mod_dir}"
         local apptmp=$(find . -type f \( -iname "*.apk" -o -iname "*.jar" \))
-        capp="$(basename $apptmp)"
+        capp="$(basename "${apptmp}")"
         prjext="${capp##*.}"
         echo "$logspr2" 1>> "$log" 2>&1
         echo "Only one project file in modding folder..." 1>> "$log"
-        echo "==> Selected Project file: $capp" 1>> "$log" 2>&1
-        echo "==> Selected Project is an $prjext file" 1>> "$log" 2>&1
+        echo "==> Selected Project file: ${capp}" 1>> "$log" 2>&1
+        echo "==> Selected Project is an ${prjext} file" 1>> "$log" 2>&1
         echo "$logspr2" 1>> "$log" 2>&1
+        cd "${maindir}"
     fi
 }
 
@@ -485,18 +484,18 @@ capp_test () {
 heap_size () {
     printf "$white%s""Enter max size for java heap memory in megabytes ("$bgreen"eg 512"$white"): "; $rclr;
     read input
-    if [[ ! $input =~ ^[0-9]+$ ]]; then
-        echo $bred"Error: $input is not a number, press any key to try again"; $rclr;
+    if [[ ! ${input} =~ ^[0-9]+$ ]]; then
+        echo $bred"Error: ${input} is not a number, press any key to try again"; $rclr;
         wait
         heap_size
     else
-        heapy="$input"
-        if [[ $(defaults read $plist heap 2>/dev/null) ]]; then
+        heapy="${input}"
+        if [[ $(defaults read "${plist}" heap 2>/dev/null) ]]; then
             local key="heap"
-            local value="$input"
+            local value="${input}"
             write_preference
         fi
-        echo "==> Jave Heap Size set to: $heapy" 1>> "$log" 2>&1
+        echo "==> Jave Heap Size set to: ${heapy}" 1>> "$log" 2>&1
     fi
     unset input
 }
@@ -524,18 +523,18 @@ comp_level () {
     echo $bgreen"$apkmftr";
     printf "$white%s""Enter Maximum Compression Level ("$bgreen"0-9"$white"): "; $rclr;
     read input
-    if [[ ! $input =~ ^[0-9]$ ]]; then
-        echo $bred"Error: $input is not a valid compression level, press any key to try again."; $rclr;
+    if [[ ! ${input} =~ ^[0-9]$ ]]; then
+        echo $bred"Error: ${input} is not a valid compression level, press any key to try again."; $rclr;
         wait
         comp_level
     else
-        uscr="$input"
-        if [[ $(defaults read $plist complvl 2>/dev/null) ]]; then
+        uscr="${input}"
+        if [[ $(defaults read "${plist}" complvl 2>/dev/null) ]]; then
             local key="complvl"
-            local value="$input"
+            local value="${input}"
             write_preference
         fi
-        echo "==> 7zip Compression Level set to: $uscr" 1>> "$log" 2>&1
+        echo "==> 7zip Compression Level set to: ${uscr}" 1>> "$log" 2>&1
     fi
     unset input
 }
@@ -561,53 +560,53 @@ dircheck
 # set path for other, other/bin, and other/lib
 # and ensure usr/bin is before usr/local/bin
 # so we always use default OSX tools
-PATH="$maindir/other:$bindir:$libdir:$d2jdir:/usr/bin:$PATH"
+PATH="${maindir}/other:${bindir}:${libdir}:${d2jdir}:/usr/bin:${PATH}"
 export PATH
 
 # include common graphics library
-source "$libdir/graphics.sh"
+source "${libdir}/graphics.sh"
 
 # include automatic update functions
-source "$libdir/updates.sh"
+source "${libdir}/updates.sh"
 
 # include common/static menus
-source "$libdir/menus.sh"
+source "${libdir}/menus.sh"
 
 # include multi/dynamic menus
-source "$libdir/multimenu.sh"
+source "${libdir}/multimenu.sh"
 
 # include common error strings library
-source "$libdir/errors.sh"
+source "${libdir}/errors.sh"
 
 # include 'cleaning' functions
-source "$libdir/clean_funcs.sh"
+source "${libdir}/clean_funcs.sh"
 
 # include 'debug' info functions
-source "$libdir/debug_funcs.sh"
+source "${libdir}/debug_funcs.sh"
 
 # include decompile & extract functions
-source "$libdir/decext_funcs.sh"
+source "${libdir}/decext_funcs.sh"
 
 # include misc (png, zipalign, adb) functions
-source "$libdir/misc_funcs.sh"
+source "${libdir}/misc_funcs.sh"
 
 # include compile & all-in-one functions
-source "$libdir/zipcmp_funcs.sh"
+source "${libdir}/zipcmp_funcs.sh"
 
 # include basic "batch" functions
-source "$libdir/batch_funcs.sh"
+source "${libdir}/batch_funcs.sh"
 
 # include advanced signing functions
-source "$libdir/sign_funcs.sh"
+source "${libdir}/sign_funcs.sh"
 
 # include pngout check/install functions
-source "$libdir/png_out.sh"
+source "${libdir}/png_out.sh"
 
 # set path to log file
-log="$maindir/LOG.txt"
+log="${maindir}/LOG.txt"
 
 # check if basic debugging enabled
-debugstate="$(defaults read $plist debug 2>/dev/null)"
+debugstate="$(defaults read "${plist}" debug 2>/dev/null)"
 
 # start log output for current session
 logstart

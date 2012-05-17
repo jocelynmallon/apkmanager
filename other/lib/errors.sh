@@ -7,7 +7,7 @@
 # http://girlintroverted.wordpress.com
 #
 # version: 3.0b
-# Fri. May 11, 2012
+# Wed. May 16, 2012
 # -----------------------------------------------------------------------
 
 # Unknown input error string
@@ -190,4 +190,16 @@ no_branches_err () {
 git_branch_change () {
         echo $bgreen"APK Manager had to switch branches"; $rclr;
         echo $bgreen"during the update, and will now exit."; $rclr;
+}
+
+# ANDROID_SDK_ROOT unset, error message
+android_sdk_root_err () {
+    echo $bred"WARNING: ANDROID_SDK_ROOT is not set. This"
+    echo $bred"\"might\" cause problems for APK Manager."
+    echo $bred"If you have the Android SDK installed, please"
+    echo $bred"add the following to your .bashrc/.zshrc/etc."
+    echo ""
+    echo $bred"export \"ANDROID_SDK_ROOT=/path/to/sdk/root\""
+    echo ""
+    pressanykey
 }

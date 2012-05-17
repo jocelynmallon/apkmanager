@@ -7,7 +7,7 @@
 # http://girlintroverted.wordpress.com
 #
 # version: 3.0b
-# Fri. May 11, 2012
+# Wed. May 16, 2012
 # -----------------------------------------------------------------------
 
 debug_cleanup () {
@@ -314,12 +314,12 @@ getdebuginfo () {
 debug_check () {
     osx_ver="$(sw_vers | awk '/ProductVersion/ {print $2}')"
     osx_bld="$(sw_vers | awk '/BuildVersion/ {print $2}')"
-    debugset="$(defaults read $plist debugset 2>/dev/null)"
+    debugset="$(defaults read "${plist}" debugset 2>/dev/null)"
     if [[ $? -ne 0 ]] || [[ $debugset -ne 1 ]] || [[ -z $debugset ]]; then
         getdebuginfo
         return 1
     fi
-    arch_ver="$(defaults read $plist arch 2>/dev/null)"
+    arch_ver="$(defaults read "${plist}" arch 2>/dev/null)"
     if [[ $? -ne 0 ]] || [[ ! $arch_ver = "$(uname -m)" ]] || [[ -z $arch_ver ]]; then
         getdebuginfo
         return 1
@@ -328,7 +328,7 @@ debug_check () {
     local v
     for p in "p7zip" "optipng" "pngcrush" "pngout" "sox" "smali" "baksmali" "adb" "aapt" "dex2jar" "apktool"
     do
-        v="$(defaults read $plist $p 2>/dev/null)"
+        v="$(defaults read "${plist}" ${p} 2>/dev/null)"
         if [[ $? -ne 0 ]];then
             getdebuginfo
         else

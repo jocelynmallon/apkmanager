@@ -7,7 +7,7 @@
 # http://girlintroverted.wordpress.com
 #
 # version: 3.0b
-# Fri. May 11, 2012
+# Wed. May 16, 2012
 # -----------------------------------------------------------------------
 
 # Prompt user for android.jar location
@@ -40,12 +40,12 @@ and_sdk_err () {
 # Try to locate android.jar
 andsdk_check () {
     echo "andsdk_check (check for android sdk) function" 1>> "$log"
-    if [[ $(command -v brew) ]] && [[ $(dirname $(command -v android)) = /usr/local/bin ]]; then
+    if [[ $(command -v brew) ]] && [[ $(dirname "$(command -v android)") = /usr/local/bin ]]; then
         local sdkrev="/usr/local/var/lib/android-sdk/platforms"
         sdkrev="$sdkrev/$(ls -1 "$sdkrev" | sort -n -r -t - -k 2 | head -n 1)"
         andjar="$sdkrev/android.jar"
-    elif [[ $(command -v android) ]] && [[ ! $(dirname $(command -v android)) = /usr/local/bin ]]; then
-        local sdkrev="$(dirname $(dirname $(command -v android)))"
+    elif [[ $(command -v android) ]] && [[ ! $(dirname "$(command -v android)") = /usr/local/bin ]]; then
+        local sdkrev="$(dirname "$(dirname "$(command -v android)")")"
         sdkrev="$sdkrev/platforms/$(ls -1 "$sdkrev" | sort -n -r -t - -k 2 | head -n 1)"
         andjar="$sdkrev/android.jar"
     else
@@ -89,26 +89,26 @@ compile_9png_sub () {
         return 1
     fi
     echo $bgreen" Using android.jar found here:"
-    echo $green" $andjar"; $rclr;
+    echo $green" ${andjar}"; $rclr;
     echo $bgreen" generating temporary AndroidManifest.xml file..."
     gen_temp_manifest
-    local tmp_zip="$(mktemp -u $maindir/temp/res-XXXXXX).zip"
+    local tmp_zip="$(mktemp -u "${maindir}"/temp/res-XXXXXX).zip"
     echo $bgreen" compiling resources now..."
-    aapt package -v -f -M "$maindir/temp/AndroidManifest.xml" -F "$tmp_zip" -S "$maindir/temp/res" -I "$andjar" 1>> "$log" 2>&1
+    aapt package -v -f -M "${maindir}/temp/AndroidManifest.xml" -F "${tmp_zip}" -S "${maindir}/temp/res" -I "${andjar}" 1>> "$log" 2>&1
     if [[ $? -ne 0 ]]; then
         return 1
     fi
     echo $bgreen" extracting compiled files to temp/compiled..."
-    7za x -o"$maindir/temp/compiled" "$tmp_zip" -y 1>> "$log" 2>&1
+    7za x -o"${maindir}/temp/compiled" "${tmp_zip}" -y 1>> "$log" 2>&1
     if [[ $? -ne 0 ]]; then
-        echo "cannot extract $tmp_zip, aborting." 1>> "$log"
+        echo "cannot extract ${tmp_zip}, aborting." 1>> "$log"
         return 1
     else
         echo $bgreen" removing termporary files..."
-        rm -r "$tmp_zip"
-        rm -r "$maindir/temp/AndroidManifest.xml"
-        rm -r "$maindir/temp/compiled/AndroidManifest.xml"
-        rm -r "$maindir/temp/compiled/resources.arsc"
+        rm -r "${tmp_zip}"
+        rm -r "${maindir}/temp/AndroidManifest.xml"
+        rm -r "${maindir}/temp/compiled/AndroidManifest.xml"
+        rm -r "${maindir}/temp/compiled/resources.arsc"
     fi
     echo $bgreen" Resources compiled succesfully!"
     pressanykey
@@ -156,10 +156,10 @@ adb_pull () {
     read input
     if [[ -z $input ]]; then :
     else
-        local outfile="$(basename $input)"
-        adb pull "$input" "$maindir/$mod_dir/$outfile"
+        local outfile="$(basename "${input}")"
+        adb pull "$input" "${maindir}/${mod_dir}/${outfile}"
         if [[ $? -ne 0 ]]; then
-            echo $bred"Error: while pulling $outfile"; $rclr;
+            echo $bred"Error: while pulling ${outfile}"; $rclr;
             pressanykey
         fi
     fi
@@ -179,25 +179,25 @@ opt_apk_png () {
         pressanykey
     elif [[ ! $prjext = [Aa][Pp][Kk] ]]; then
         jarext_err
-    elif [[ ! -d "$maindir/$prj_dir/$capp" ]]; then
+    elif [[ ! -d "${maindir}/${prj_dir}/${capp}" ]]; then
         nodir_err
-    elif [[ "$(ls -1 $maindir/$prj_dir/$capp | wc -l)" -eq 0 ]]; then
+    elif [[ "$(ls -1 ${maindir}/${prj_dir}/${capp} | wc -l)" -eq 0 ]]; then
         nodir_err
     else
         if [[ -z $pngtool ]]; then
             pngtool="optipng"
         fi
         local png_file
-        cd "$maindir/$prj_dir/$capp"
+        cd "${maindir}/${prj_dir}/${capp}"
         find "./res" -iname "*.png" | while read png_file ;
         do
-            if [[ $(echo "$png_file" | grep -c "\.9\.png$") -eq 0 ]]; then
+            if [[ $(echo "${png_file}" | grep -c "\.9\.png$") -eq 0 ]]; then
                 if [[ $pngtool = optipng ]]; then
-                    optipng -o99 "$png_file"
+                    optipng -o99 "${png_file}"
                 elif [[ $pngtool = pngcrush ]]; then
-                    pngcrush -reduce -brute -ow "$png_file"
+                    pngcrush -reduce -brute -ow "${png_file}"
                 elif [[ $pngtool = pngout ]]; then
-                    pngout "$png_file"
+                    pngout "${png_file}"
                 fi
             fi
         done
@@ -215,13 +215,13 @@ zalign_file () {
         local string
         for string in "signed" "unsigned"
         do
-            if [[ -e $maindir/$mod_dir/$string-$capp ]]; then
-                zipalign -fv 4 "$maindir/$mod_dir/$string-$capp" "$maindir/$mod_dir/$string-aligned-$capp"  1>> "$log" 2>&1
+            if [[ -e ${maindir}/${mod_dir}/${string}-${capp} ]]; then
+                zipalign -fv 4 "${maindir}/${mod_dir}/${string}-${capp}" "${maindir}/${mod_dir}/${string}-aligned-${capp}"  1>> "$log" 2>&1
                 if [[ $? -eq 0 ]]; then
-                    mv -f "$maindir/$mod_dir/$string-aligned-$capp" "$maindir/$mod_dir/$string-$capp"
+                    mv -f "${maindir}/${mod_dir}/${string}-aligned-${capp}" "${maindir}/${mod_dir}/${string}-${capp}"
                 fi
             else
-                echo "zipalign: cannot find file $mod_dir/$string-$capp" 1>> "$log" 2>&1
+                echo "zipalign: cannot find file ${mod_dir}/${string}-${capp}" 1>> "$log" 2>&1
             fi
         done
     fi
@@ -230,7 +230,7 @@ zalign_file () {
 
 # Normal adb push
 norm_push () {
-    adb push "$maindir/$mod_dir/unsigned-$capp" "$input"
+    adb push "${maindir}/${mod_dir}/unsigned-${capp}" "${input}"
     printf "$bwhite%s""Press any key to continue "; $rclr;
     wait
 }
