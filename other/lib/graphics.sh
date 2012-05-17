@@ -7,7 +7,7 @@
 # http://girlintroverted.wordpress.com
 #
 # version: 3.0b
-# Sat. May 12, 2012
+# Wed. May 16, 2012
 # -----------------------------------------------------------------------
 
 # define colors for pretty output
@@ -31,7 +31,7 @@ version_banner () {
     local apkstring
     local title_len
     local title_fill
-    vernum="$(awk '/# version:/ { print $3; exit}' "$maindir/other/main.sh")"
+    vernum="$(awk '/# version:/ { print $3; exit}' "${maindir}/other/main.sh")"
     if [[ $(( ${#vernum} % 2)) -eq '0' ]]; then
         apkstring="APK Manager Mac OS X v${vernum}"
     else
@@ -100,13 +100,13 @@ debug_header () {
     echo $white" ANDROID_SDK_ROOT: "$green"$ANDROID_SDK_ROOT";
     echo $white" Current log viewer: "$green"$logapp";
     echo $white" Current \"png\" tool: "$green"$pngtool";
-    echo $white" Current APKtool: "$green"$apktool_ver"$blue" ($(basename $(readlink "$libdir/apktool.jar")))";
+    echo $white" Current APKtool: "$green"$apktool_ver"$blue" ($(basename "$(readlink "$libdir/apktool.jar")"))";
 }
 
 # automatic updates menu header
 updates_header () {
     echo $bgreen"-------------------------------------Automatic Updates Settings-------------------------------------";
-    local updatestate="$(defaults read $plist updates 2>/dev/null)"
+    local updatestate="$(defaults read "${plist}" updates 2>/dev/null)"
     if [[ $? -ne 0 ]]; then
         updatestate=0
         local key="updates"
@@ -133,10 +133,10 @@ updates_header () {
         fi
         echo $white" Updates status: "$green"ON"; $rclr;
         echo $white" Updates prompt: $uprompt"; $rclr;
-        echo $white" Current branch: "$green"$saved_channel"; $rclr;
-        echo $white" Current commit: "$green"$commit"; $rclr;
-        echo $white" Update frequency: "$green"$updfreq"; $rclr;
-        echo $white" Last update check: "$green"$last_check"; $rclr;
+        echo $white" Current branch: "$green"${saved_channel}"; $rclr;
+        echo $white" Current commit: "$green"${commit}"; $rclr;
+        echo $white" Update frequency: "$green"${updfreq}"; $rclr;
+        echo $white" Last update check: "$green"${last_check}"; $rclr;
     else
         echo $white" Updates status: "$bred"OFF"; $rclr;
     fi

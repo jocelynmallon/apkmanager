@@ -7,7 +7,7 @@
 # http://girlintroverted.wordpress.com
 #
 # version: 3.0b
-# Fri. May 11, 2012
+# Wed. May 16, 2012
 # -----------------------------------------------------------------------
 
 # Advanced signing menu
@@ -15,19 +15,19 @@ sign_menu () {
     if [[ -z $keystore ]]; then
         storecheck
     fi
-    cd "$maindir"
+    cd "${maindir}"
     clear
     menu_header
     echo $bgreen"--------------------------------------Advanced Signing Options--------------------------------------"
-    echo $white" Current Keystore: "$bgreen"$keystore"; $rclr;
+    echo $white" Current Keystore: "$bgreen"${keystore}"; $rclr;
     echo $green" (if \"None\" displayed, please use create new private key option first)"
     echo $bgreen"$apkmspr"
     echo $bgreen"  1   "$white"Create a new private key "$blue"(Will be stored in \$HOME/.apkmanager/.keystores)";
     echo $bgreen"  2   "$white"Select an existing keystore to use";
     echo $bgreen"  3   "$white"Sign an apk/jar file with private key";
     echo $bgreen"  4   "$white"Verify signed apk/jar";
-    echo $bgreen"  5   "$white"Batch sign with private key "$blue"(Inside $sig_dir folder)";
-    echo $bgreen"  6   "$white"Batch Verify signed apk/jar files "$blue"(Inside $sig_dir folder)";
+    echo $bgreen"  5   "$white"Batch sign with private key "$blue"(Inside ${sig_dir} folder)";
+    echo $bgreen"  6   "$white"Batch Verify signed apk/jar files "$blue"(Inside ${sig_dir} folder)";
     echo $bgreen"  7   "$white"Save default keystore selection "$blue"(If you have multiple keystores)";
     echo $bgreen"  8   "$white"Delete selected keystore and private key "$bred"(PLEASE USE WITH CAUTION)";
     echo $bgreen"  Q   "$white"Return to main menu";
@@ -54,7 +54,7 @@ sign_menu () {
 
 # Clean files/folders menu
 clean_menu () {
-    cd "$maindir"
+    cd "${maindir}"
     clear
     menu_header
     echo $bgreen"---------------------------------------Clean Files or Folders---------------------------------------";
@@ -109,7 +109,7 @@ clean_menu () {
 
 # Text app/editor menu
 textapp_menu () {
-    cd "$maindir"
+    cd "${maindir}"
     clear
     menu_header
     debug_header
@@ -200,7 +200,7 @@ debug_menu () {
     if [[ -z $apktool_ver ]]; then
         getapktver
     fi
-    cd "$maindir"
+    cd "${maindir}"
     clear
     menu_header
     debug_header
@@ -260,10 +260,10 @@ debug_menu () {
 
 # Main Menu
 restart () {
-    cd "$maindir"
+    cd "${maindir}"
     menu_header
     echo $bgreen"---------------------------------Simple Tasks Such As Image Editing---------------------------------";
-    echo $bgreen"  1   "$white"Adb pull "$blue"(Pulls file into \"$mod_dir\" folder)";
+    echo $bgreen"  1   "$white"Adb pull "$blue"(Pulls file into \"${mod_dir}\" folder)";
     echo $bgreen"  2   "$white"Extract apk ";
     echo $bgreen"  3   "$white"Optimize images inside "$blue"(Only if \"Extract Apk\" was selected)";
     echo $bgreen"  4   "$white"Compile \".9.png\" and/or binary xml files";
@@ -283,9 +283,9 @@ restart () {
     echo $bgreen"  17  "$white"View Java Source "$blue"(apk and jar support) "$bred"(CANNOT be recompiled)";
     echo $bgreen"-------------------------------------------Other Options--------------------------------------------";
     echo $bgreen"  18  "$white"Advanced signing options "$blue"(Use your own keystore, verify signatures, etc.)";
-    echo $bgreen"  19  "$white"Batch Optimize files "$blue"(Inside \"$bat_dir\" folder)";
-    echo $bgreen"  20  "$white"Batch Sign apk files "$blue"(With test keys, inside \"$sig_dir\" folder)";
-    echo $bgreen"  21  "$white"Batch optimize ogg files "$blue"(Inside \"$ogg_dir\" only)";
+    echo $bgreen"  19  "$white"Batch Optimize files "$blue"(Inside \"${bat_dir}\" folder)";
+    echo $bgreen"  20  "$white"Batch Sign apk files "$blue"(With test keys, inside \"${sig_dir}\" folder)";
+    echo $bgreen"  21  "$white"Batch optimize ogg files "$blue"(Inside \"${ogg_dir}\" only)";
     echo $bgreen"  22  "$white"Select compression level for zipping files";
     echo $bgreen"  23  "$white"Set max Java heap memory size "$blue"(If getting stuck at decompiling/compiling)";
     echo $bgreen"  24  "$white"Debug Info and Misc Settings "$blue"(Persistent heap, set log viewing app, etc.)";

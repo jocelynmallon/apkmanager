@@ -7,7 +7,7 @@
 # http://girlintroverted.wordpress.com
 #
 # version: 3.0b
-# Fri. May 11, 2012
+# Wed. May 16, 2012
 # -----------------------------------------------------------------------
 
 # cleanup variables used during installation
@@ -438,7 +438,7 @@ installcheck () {
                 if [[ $p = adb ]] || [[ $p = aapt ]] || [[ $p = zipalign ]]; then
                     if [[ $p = aapt ]]; then
                         if [[ $(command -v android) ]] && [[ $(command -v brew) ]]; then
-                            if [[ $(dirname $(command -v android)) = /usr/local/bin ]]; then
+                            if [[ $(dirname "$(command -v android)") = /usr/local/bin ]]; then
                                 local sdkrev="$(brew list -v android-sdk | sed s/android-sdk\ //g)"
                                 ln -s "/usr/local/Cellar/android-sdk/${sdkrev}/platform-tools/aapt" /usr/local/bin/aapt
                                 count=$((count-1))

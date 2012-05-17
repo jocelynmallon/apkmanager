@@ -157,22 +157,22 @@ force_update_check () {
 
 # get the date and time of the last update check
 build_last_date_time () {
-    last_check="$(defaults read $plist updates_last_date 2>/dev/null)"
+    last_check="$(defaults read "${plist}" updates_last_date 2>/dev/null)"
     if [[ $? -ne 0 ]]; then
         last_check="Never"
     else
-        last_check="$(echo $last_check | sed 's/_/\ /g')"
-        last_time="$(defaults read $plist updates_last_time 2>/dev/null)"
-        last_time="$(echo $last_time | sed 's/_/\ /g')"
+        last_check="$(echo "${last_check}" | sed 's/_/\ /g')"
+        last_time="$(defaults read "${plist}" updates_last_time 2>/dev/null)"
+        last_time="$(echo "${last_time}" | sed 's/_/\ /g')"
         last_check="${last_check}${white} at: ${green}${last_time}"
     fi
 }
 
 # Initialize an empty repo if necessary
 updates_init_repo () {
-    if [[ ! -d $maindir/.git ]]; then
+    if [[ ! -d ${maindir}/.git ]]; then
         echo ".git repo not found, initializing repo" 1>> "$log"
-        cd "$maindir"
+        cd "${maindir}"
         echo "==> git init..." 1>> "$log"
         git init 2>> "$log"
         echo "==> git config core.autocrlf false..." 1>> "$log"
