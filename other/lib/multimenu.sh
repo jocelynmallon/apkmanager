@@ -7,7 +7,7 @@
 # http://girlintroverted.wordpress.com
 #
 # version: 3.0b
-# Fri. May 11, 2012
+# Sat. May 19, 2012
 # -----------------------------------------------------------------------
 
 # cleanup and unset all variables used
@@ -28,8 +28,8 @@ mmcleanup () {
 
 # keystore menu finish function
 sign_finish () {
-    keystore=${files[$input]}
-    echo "==> Selected Keystore is: $keystore" 1>> "$log" 2>&1
+    keystore="${files[$input]}"
+    echo "==> Selected Keystore is: ${keystore}" 1>> "$log" 2>&1
 }
 
 # branch menu finish function
@@ -39,16 +39,16 @@ gitb_finish () {
     local value="${files[$input]}"
     write_preference
     checkout_new_branch
-    echo "==> Selected update branch is: $saved_channel" 1>> "$log" 2>&1
+    echo "==> Selected update branch is: ${saved_channel}" 1>> "$log" 2>&1
 }
 
 # projects menu finish function
 proj_finish () {
-    capp=${files[$input]}
+    capp="${files[$input]}"
     prjext="${capp##*.}"
     echo "$logspr2" 1>> "$log" 2>&1
-    echo "==> Selected Project file: $capp" 1>> "$log" 2>&1
-    echo "==> Selected Project is an $prjext file" 1>> "$log" 2>&1
+    echo "==> Selected Project file: ${capp}" 1>> "$log" 2>&1
+    echo "==> Selected Project is an ${prjext} file" 1>> "$log" 2>&1
     echo "$logspr2" 1>> "$log" 2>&1
 }
 
@@ -58,56 +58,56 @@ apkt_finish () {
     echo "$logspcr" 1>> "$log" 2>&1
     echo "==> Selected APKtool version is: ${apktver[$input]}" 1>> "$log" 2>&1
     echo "$logspcr" 1>> "$log" 2>&1
-    ln -s -f -F "$aptdir/$apktjar" "$libdir/apktool.jar"
-    find "$HOME/apktool/framework/" -type f -name "*.apk" -exec rm -rf {} \;
+    ln -s -f -F "${aptdir}/${apktjar}" "${libdir}/apktool.jar"
+    find "${HOME}/apktool/framework/" -type f -name "*.apk" -exec rm -rf {} \;
     getapktver
 }
 
 # read and check user input
 get_mmenu_input () {
     read input
-    if [[ $input = [qQ] ]]; then
+    if [[ ${input} = [qQ] ]]; then
         mmcleanup
-    elif [[ $input = [nN] ]]; then
-        if [[ $pindex -lt $pages ]]; then
+    elif [[ ${input} = [nN] ]]; then
+        if [[ ${pindex} -lt ${pages} ]]; then
             pindex="$((pindex + 1))"
             buildmenu
         else
-            case $mkey in
+            case ${mkey} in
                 projects)  capp="None"; prjext=""; input_err; projects_menu ;;
                  apktool)  input_err; apktool_menu ;;
                  signing)  input_err; listpkeys ;;
                 branches)  input_err; git_branches_menu ;;
             esac
         fi
-    elif [[ $input = [bB] ]]; then
-        if [[ $pindex -gt 1 ]]; then
+    elif [[ ${input} = [bB] ]]; then
+        if [[ ${pindex} -gt 1 ]]; then
             pindex="$((pindex - 1))"
             buildmenu
         else
-            case $mkey in
+            case ${mkey} in
                 projects)  capp="None"; prjext=""; input_err; projects_menu ;;
                  apktool)  input_err; apktool_menu ;;
                  signing)  input_err; listpkeys ;;
                 branches)  input_err; git_branches_menu ;;
             esac
         fi
-    elif [[ ! $input =~ ^[0-9]+$ ]]; then
-        case $mkey in
+    elif [[ ! ${input} =~ ^[0-9]+$ ]]; then
+        case ${mkey} in
             projects)  capp="None"; prjext=""; input_err; projects_menu ;;
              apktool)  input_err; apktool_menu ;;
              signing)  input_err; listpkeys ;;
             branches)  input_err; git_branches_menu ;;
         esac
-    elif [[ $input -lt $scount ]] || [[ $input -gt $limit ]]; then
-        case $mkey in
+    elif [[ ${input} -lt ${scount} ]] || [[ ${input} -gt ${limit} ]]; then
+        case ${mkey} in
             projects)  capp="None"; prjext=""; input_err; projects_menu ;;
              apktool)  input_err; apktool_menu ;;
              signing)  input_err; listpkeys ;;
             branches)  input_err; git_branches_menu ;;
         esac
     else
-        case $mkey in
+        case ${mkey} in
             projects)  proj_finish ;;
              apktool)  apkt_finish ;;
              signing)  sign_finish ;;
@@ -119,19 +119,19 @@ get_mmenu_input () {
 # actually parse array items/files
 parse_files () {
     for ((count=${scount}; count <= ${limit}; count++)); do
-        if [[ $mkey = apktool ]]; then
-            local apktvtmp1="$(java -jar "$aptdir/${files[$count]}" | grep 'Apktool'| cut -d - -f1 | sed 's/^[ \t]*//;s/[ \t]*$//' | sed 's/\ /_/g')"
+        if [[ ${mkey} = apktool ]]; then
+            local apktvtmp1="$(java -jar "${aptdir}/${files[$count]}" | grep 'Apktool'| cut -d - -f1 | sed 's/^[ \t]*//;s/[ \t]*$//' | sed 's/\ /_/g')"
             apktver[$count]="${apktvtmp1%%-*}"
-            if [[ $count -le 9 ]]; then
-                echo $bgreen"  $count"$white"   ${files[$count]} "$blue"(${apktver[$count]})"; $rclr;
-            elif [[ $count -ge 10 ]]; then
-                echo $bgreen"  $count"$white"  ${files[$count]} "$blue"(${apktver[$count]})"; $rclr;
+            if [[ ${count} -le 9 ]]; then
+                echo $bgreen"  ${count}"$white"   ${files[$count]} "$blue"(${apktver[$count]})"; $rclr;
+            elif [[ ${count} -ge 10 ]]; then
+                echo $bgreen"  ${count}"$white"  ${files[$count]} "$blue"(${apktver[$count]})"; $rclr;
             fi
         else
-            if [[ $count -le 9 ]]; then
-                echo $bgreen"  $count"$white"   ${files[$count]}"; $rclr;
-            elif [[ $count -ge 10 ]]; then
-                echo $bgreen"  $count"$white"  ${files[$count]}"; $rclr;
+            if [[ ${count} -le 9 ]]; then
+                echo $bgreen"  ${count}"$white"   ${files[$count]}"; $rclr;
+            elif [[ ${count} -ge 10 ]]; then
+                echo $bgreen"  ${count}"$white"  ${files[$count]}"; $rclr;
             fi
         fi
     done
@@ -139,20 +139,20 @@ parse_files () {
 
 # set the range of items to show on the page
 setup_page () {
-    if [[ $pages -le 1 ]]; then
+    if [[ ${pages} -le 1 ]]; then
         pindex="${pages}"
         scount="1"
         limit="${total}"
     else
-        if [[ -z $pindex ]]; then
+        if [[ -z ${pindex} ]]; then
             pindex="1"
         fi
-        limit="$((pindex * $pnum))"
+        limit="$((pindex * ${pnum}))"
         scount="$((limit - $((pnum - 1))))"
-        if [[ $limit -ge $total ]]; then
-            if [[ $rem -ne 0 ]]; then
-                local ldiff="$((pnum - $rem))"
-                limit="$((limit - $ldiff))"
+        if [[ ${limit} -ge ${total} ]]; then
+            if [[ ${rem} -ne 0 ]]; then
+                local ldiff="$((pnum - ${rem}))"
+                limit="$((limit - ${ldiff}))"
             fi
         fi
     fi
@@ -162,16 +162,16 @@ setup_page () {
 page_check () {
     total="${#files[*]}"
     total="$((total -1))"
-    pages="$((total / $pnum))"
-    rem="$((total % $pnum))"
-    if [[ $rem -ne 0 ]]; then
+    pages="$((total / ${pnum}))"
+    rem="$((total % ${pnum}))"
+    if [[ ${rem} -ne 0 ]]; then
         pages="$((pages + 1))"
     fi
 }
 
 # check if menu type is set
 check_mkey_set () {
-    if [[ -z $mkey ]]; then
+    if [[ -z ${mkey} ]]; then
         return 1
     fi
 }
@@ -181,16 +181,16 @@ buildmenu () {
     check_mkey_set
     clear
     menu_header
-    if [[ $mkey = projects ]]; then
+    if [[ ${mkey} = projects ]]; then
         echo $bgreen"-----------------------------------Select project file to work on-----------------------------------";
-    elif [[ $mkey = apktool ]]; then
+    elif [[ ${mkey} = apktool ]]; then
         debug_header
         echo $bgreen"------------------------------------------APKtool Versions------------------------------------------";
-    elif [[ $mkey = signing ]]; then
+    elif [[ ${mkey} = signing ]]; then
         echo $bgreen"---------------------------------------Select a keystore menu---------------------------------------";
-        echo $white" Current Keystore: "$bgreen"$keystore"
+        echo $white" Current Keystore: "$bgreen"${keystore}"
         echo $bgreen"$apkmspr"
-    elif [[ $mkey = branches ]]; then
+    elif [[ ${mkey} = branches ]]; then
         updates_header
         echo $bgreen"----------------------------------------Select update branch----------------------------------------";
         echo $bred" Warning: APK Manager will automatically quit once the new branch has been checked out."
@@ -200,7 +200,7 @@ buildmenu () {
     setup_page
     parse_files
     echo $bgreen"$apkmftr";
-    if [[ $pages -ge 2 ]]; then
+    if [[ ${pages} -ge 2 ]]; then
         echo $white"(use "$bgreen"N"$white" to go to next page, "$bgreen"B"$white" to go back to previous page, or "$bgreen"Q"$white" to quit)"; $rclr;
     else
         echo $white"(use "$bgreen"Q"$white" to quit)"; $rclr;
@@ -220,7 +220,7 @@ check_files_set () {
 projects_menu () {
     check_files_set
     mkey="projects"
-    cd "$maindir/$mod_dir"
+    cd "${maindir}/${mod_dir}"
     files[0]="projects_menu - YOU SHOULD NOT SEE THIS"
     files+=( $(ls *.[aA][pP][kK] *.[jJ][aA][rR]) )
     pnum=28
@@ -232,7 +232,7 @@ projects_menu () {
 listpkeys () {
     check_files_set
     mkey="signing"
-    cd "$HOME/.apkmanager/.keystores"
+    cd "${HOME}/.apkmanager/.keystores"
     files[0]="listpkeys - YOU SHOULD NOT SEE THIS"
     files+=( $(ls *.[kK][eE][yY][sS][tT][oO][rR][eE]) )
     pnum=26
@@ -244,7 +244,7 @@ listpkeys () {
 apktool_menu () {
     check_files_set
     mkey="apktool"
-    cd "$aptdir"
+    cd "${aptdir}"
     files[0]="apktool_menu - YOU SHOULD NOT SEE THIS"
     files+=( $(ls [aA][pP][kK][tT][oO][oO][lL]_*.[jJ][aA][rR]) )
     pnum=20
@@ -256,7 +256,7 @@ apktool_menu () {
 git_branches_menu () {
     check_files_set
     mkey="branches"
-    cd "$maindir/.git/refs/remotes/origin"
+    cd "${maindir}/.git/refs/remotes/origin"
     files[0]="change_branch_menu - YOU SHOULD NOT SEE THIS"
     files+=( $(ls -1) )
     pnum=19

@@ -7,19 +7,19 @@
 # http://girlintroverted.wordpress.com
 #
 # version: 3.0b
-# Fri. May 11, 2012
+# Sat. May 19, 2012
 # -----------------------------------------------------------------------
 
 # Zip/compress a system apk file
 zip_sys_apk () {
     echo "zip_sys_apk (actually zipping apk now) function" 1>> "$log"
-    7za a -tzip "$maindir/$mod_dir/unsigned-$capp" "$maindir/$prj_dir/$capp/*" -mx$uscr 1>> "$log" 2>&1
+    7za a -tzip "${maindir}/${mod_dir}/unsigned-${capp}" "${maindir}/${prj_dir}/${capp}/*" -mx${uscr} 1>> "$log" 2>&1
 }
 
 # Zip/compress non-system apk file
 zip_nrm_apk () {
     echo "zip_nrm_apk (remove signature for non system-apk) function" 1>> "$log"
-    rm -rf "$maindir/$prj_dir/$capp/META-INF"
+    rm -rf "${maindir}/${prj_dir}/${capp}/META-INF"
     zip_sys_apk
 }
 
@@ -27,19 +27,20 @@ zip_nrm_apk () {
 zip_apk () {
     echo "zip_apk (main prompt) function" 1>> "$log"
     capp_test
-    if [[ $capp = "None" ]]; then
+    if [[ ${capp} = "None" ]]; then
         echo "no project selected, aborting" 1>> "$log"
-    elif [[ ! $prjext = [Aa][Pp][Kk] ]]; then
+        return 1
+    elif [[ ! ${prjext} = [Aa][Pp][Kk] ]]; then
         jarext_err
-    elif [[ ! -d "$maindir/$prj_dir/$capp" ]]; then
+    elif [[ ! -d "${maindir}/${prj_dir}/${capp}" ]]; then
         nodir_err
-    elif [[ $(ls -1 $maindir/$prj_dir/$capp | wc -l) -eq 0 ]]; then
+    elif [[ $(ls -1 "${maindir}/${prj_dir}/${capp}" | wc -l) -eq 0 ]]; then
         nodir_err
-    elif [[ ! -f "$maindir/$prj_dir/$capp/resources.arsc" ]]; then
+    elif [[ ! -f "${maindir}/${prj_dir}/${capp}/resources.arsc" ]]; then
         noex_err
     else
-        rm "$maindir/$mod_dir/signed-$capp"
-        rm "$maindir/$mod_dir/unsigned-$capp"
+        rm "${maindir}/${mod_dir}/signed-${capp}"
+        rm "${maindir}/${mod_dir}/unsigned-${capp}"
         echo $bgreen" 1"$white"    System  apk "$green"(Retains signature)";
         echo $bgreen" 2"$white"    Regular apk "$green"(Removes signature for re-signing)";
         printf "$bwhite%s""Please select an option: "; $rclr;
@@ -58,14 +59,15 @@ zip_apk () {
 install_apk () {
     echo "install_apk function" 1>> "$log"
     capp_test
-    if [[ $capp = "None" ]]; then
+    if [[ ${capp} = "None" ]]; then
         echo "no project selected, aborting" 1>> "$log"
-    elif [[ ! $prjext = [Aa][Pp][Kk] ]]; then
+        return 1
+    elif [[ ! ${prjext} = [Aa][Pp][Kk] ]]; then
         jarext_err
     else
-        if [[ ! -e "$maindir/$mod_dir/signed-$capp" ]]; then
-            echo $bred"Error, cannot find file: signed-$capp";
-            echo "Error, cannot find file: signed-$capp" 1>> "$log"
+        if [[ ! -e "${maindir}/${mod_dir}/signed-${capp}" ]]; then
+            echo $bred"Error, cannot find file: signed-${capp}";
+            echo "Error, cannot find file: signed-${capp}" 1>> "$log"
             echo $bred"Please use \"sign apk\" option first"; $rclr;
             pressanykey
         else
@@ -84,10 +86,10 @@ install_apk () {
 # Use "keep" process
 sys_yes_keep () {
     echo "sys_yes_keep (compile system apk, YES keep folder)" 1>> "$log"
-    if [[ ! -d "$maindir/keep" ]]; then
-        mkdir -p "$maindir/keep"
+    if [[ ! -d "${maindir}/keep" ]]; then
+        mkdir -p "${maindir}/keep"
     fi
-    7za x -o"$maindir/keep" "$maindir/$mod_dir/$capp" 1>> "$log" 2>&1
+    7za x -o"${maindir}/keep" "${maindir}/${mod_dir}/${capp}" 1>> "$log" 2>&1
     echo ""
     echo $white"In the apk manager folder you'll find"
     echo "a "$bgreen"keep"$white" folder. Within it, delete"
@@ -97,9 +99,9 @@ sys_yes_keep () {
     echo "folder as well."$white" Once done then press enter"
     echo "on this script."; $rclr;
     wait
-    7za a -tzip "$maindir/$mod_dir/unsigned-$capp" "$maindir/keep/*" -mx$uscr -r -y 1>> "$log" 2>&1
+    7za a -tzip "${maindir}/${mod_dir}/unsigned-${capp}" "${maindir}/keep/*" -mx${uscr} -r -y 1>> "$log" 2>&1
     if [[ $? -eq 0 ]]; then
-        rm -rf "$maindir/keep"
+        rm -rf "${maindir}/keep"
     fi
     echo "sys_yes_keep function complete" 1>> "$log"
 }
@@ -107,18 +109,18 @@ sys_yes_keep () {
 # Don't use "keep" process
 sys_no_keep () {
     echo "sys_no_keep (compile system apk, NO keep folder)" 1>> "$log"
-    if [[ -d "$maindir/$prj_dir/temp" ]]; then
-        rm -rf "$maindir/$prj_dir/temp"
-        mkdir -p "$maindir/$prj_dir/temp"
+    if [[ -d "${maindir}/${prj_dir}/temp" ]]; then
+        rm -rf "${maindir}/${prj_dir}/temp"
+        mkdir -p "${maindir}/${prj_dir}/temp"
     fi
-    cd "$maindir/other"
-    7za x -o"$maindir/$prj_dir/temp" "$maindir/$mod_dir/$capp" META-INF -r -y 1>> "$log" 2>&1
-    7za x -o"$maindir/$prj_dir/temp" "$maindir/$mod_dir/$capp" AndroidManifest.xml -y 1>> "$log" 2>&1
-    7za a -tzip "$maindir/$mod_dir/unsigned-$capp" "$maindir/$prj_dir/temp/*" -mx$uscr -r -y 1>> "$log" 2>&1
+    cd "${maindir}/other"
+    7za x -o"${maindir}/${prj_dir}/temp" "${maindir}/${mod_dir}/${capp}" META-INF -r -y 1>> "$log" 2>&1
+    7za x -o"${maindir}/${prj_dir}/temp" "${maindir}/${mod_dir}/${capp}" AndroidManifest.xml -y 1>> "$log" 2>&1
+    7za a -tzip "${maindir}/${mod_dir}/unsigned-${capp}" "${maindir}/${prj_dir}/temp/*" -mx${uscr} -r -y 1>> "$log" 2>&1
     if [[ $? -eq 0 ]]; then
-        rm -rf "$maindir/$prj_dir/temp"
+        rm -rf "${maindir}/${prj_dir}/temp"
     fi
-    cd "$maindir"
+    cd "${maindir}"
     echo "sys_no_keep function complete" 1>> "$log"
 }
 
@@ -153,17 +155,17 @@ co_sys_prompt () {
 # Actually compile with smali.jar
 comp_smali () {
     echo "comp_smali, actually compiling now" 1>> "$log"
-    rm -rf "$maindir/$prj_dir/$capp/build"
-    mkdir -p "$maindir/$prj_dir/$capp/build"
-    touch "$maindir/$prj_dir/$capp/build/classes.dex"
-    runj smali -JXmx"$heapy""m" "$maindir/$prj_dir/$capp" -o "$maindir/$prj_dir/$capp/build/classes.dex" 1>> "$log" 2>&1
+    rm -rf "${maindir}/${prj_dir}/${capp}/build"
+    mkdir -p "${maindir}/${prj_dir}/${capp}/build"
+    touch "${maindir}/${prj_dir}/${capp}/build/classes.dex"
+    runj smali -JXmx"${heapy}""m" "${maindir}/${prj_dir}/${capp}" -o "${maindir}/${prj_dir}/${capp}/build/classes.dex" 1>> "$log" 2>&1
     echo "comp_smali function complete" 1>> "$log"
 }
 
 # Actually compile an apk file with apktool
 comp_apkt () {
     echo "comp_apkt, actually compiling now" 1>> "$log"
-    runj apktool -JXmx"$heapy""m" b "$maindir/$prj_dir/$capp" "$maindir/$mod_dir/unsigned-$capp" 1>> "$log" 2>&1
+    runj apktool -JXmx"${heapy}""m" b "${maindir}/${prj_dir}/${capp}" "${maindir}/${mod_dir}/unsigned-${capp}" 1>> "$log" 2>&1
 }
 
 # Compile an apk skeleton/shell
@@ -182,17 +184,17 @@ compile_apk () {
 
 # Advanced compile final packaging
 comp_adv_final () {
-    7za x -o"$maindir/$prj_dir/temp" "$maindir/$mod_dir/unsigned-$capp" classes.dex -y 1>> "$log" 2>&1
-    dex1="$maindir/$prj_dir/$capp/build/classes.dex"
-    dex2="$maindir/$prj_dir/temp/classes.dex"
+    7za x -o"${maindir}/${prj_dir}/temp" "${maindir}/${mod_dir}/unsigned-${capp}" classes.dex -y 1>> "$log" 2>&1
+    dex1="${maindir}/${prj_dir}/${capp}/build/classes.dex"
+    dex2="${maindir}/${prj_dir}/temp/classes.dex"
     echo "comparing classes.dex to ensure the smali version is used" 1>> "$log"
-    diff -s "$dex1" "$dex2" 1>> "$log" 2>&1
+    diff -s "${dex1}" "${dex2}" 1>> "$log" 2>&1
     if [[ $? -ne 0 ]]; then
         echo "copying classes.dex compiled by smali into unsigned-$capp" 1>> "$log"
-        7za a -tzip "$maindir/$mod_dir/unsigned-$capp" "$maindir/$prj_dir/$capp/build/classes.dex" -y -mx$uscr 1>> "$log" 2>&1
-        rm -rf "$maindir/$prj_dir/temp"
+        7za a -tzip "${maindir}/${mod_dir}/unsigned-${capp}" "${maindir}/${prj_dir}/${capp}/build/classes.dex" -y -mx${uscr} 1>> "$log" 2>&1
+        rm -rf "${maindir}/${prj_dir}/temp"
     else
-        rm -rf "$maindir/$prj_dir/temp"
+        rm -rf "${maindir}/${prj_dir}/temp"
     fi
 }
 
@@ -206,8 +208,8 @@ compile_adv () {
         pressanykey
     else
         echo "Compiling Resources..."
-        mkdir -p "$maindir/$prj_dir/$capp/build/apk"
-        cp -p "$maindir/$prj_dir/$capp/build/classes.dex" "$maindir/$prj_dir/$capp/build/apk/classes.dex"
+        mkdir -p "${maindir}/${prj_dir}/${capp}/build/apk"
+        cp -p "${maindir}/${prj_dir}/${capp}/build/classes.dex" "${maindir}/${prj_dir}/${capp}/build/apk/classes.dex"
         comp_apkt
         if [[ $? -ne 0 ]]; then
             echo $bred"An error occured while compiling resources, please check log."; $rclr;
@@ -234,13 +236,13 @@ compile_adv () {
 compile_jar () {
     echo "compile_jar function" 1>> "$log"
     echo "Compiling jar..."
-    cp -pf "$maindir/$mod_dir/$capp" "$maindir/$mod_dir/unsigned-$capp" 1>> "$log" 2>&1
+    cp -pf "${maindir}/${mod_dir}/${capp}" "${maindir}/${mod_dir}/unsigned-${capp}" 1>> "$log" 2>&1
     comp_smali
     if [[ $? -ne 0 ]]; then
         echo $bred"An error occured while compiling code, please check log."; $rclr;
         pressanykey
     else
-        7za a -tzip "$maindir/$mod_dir/unsigned-$capp" "$maindir/$prj_dir/$capp/build/classes.dex" -mx$uscr 1>> "$log" 2>&1
+        7za a -tzip "${maindir}/${mod_dir}/unsigned-${capp}" "${maindir}/${prj_dir}/${capp}/build/classes.dex" -mx${uscr} 1>> "$log" 2>&1
         if [[ $? -ne 0 ]]; then
             echo $bred"An error occured while zipping classes.dex, please check log."; $rclr;
             pressanykey
@@ -253,25 +255,26 @@ compile_jar () {
 compile () {
     echo "compile (main) function" 1>> "$log"
     capp_test
-    if [[ $capp = "None" ]]; then
+    if [[ ${capp} = "None" ]]; then
         echo "no project selected, aborting" 1>> "$log"
-    elif [[ ! -d "$maindir/$prj_dir/$capp" ]]; then
+        return 1
+    elif [[ ! -d "${maindir}/${prj_dir}/${capp}" ]]; then
         nodir_err
-    elif [[ -d "$maindir/$prj_dir/$capp/java" ]]; then
-        if [[ ! -f "$maindir/$prj_dir/$capp/apktool.yml" ]]; then
+    elif [[ -d "${maindir}/${prj_dir}/${capp}/java" ]]; then
+        if [[ ! -f "${maindir}/${prj_dir}/${capp}/apktool.yml" ]]; then
             nodir_err
         fi
-    elif [[ $(ls -1 $maindir/$prj_dir/$capp | wc -l) -eq 0 ]]; then
+    elif [[ $(ls -1 "${maindir}/${prj_dir}/${capp}" | wc -l) -eq 0 ]]; then
         nodir_err
-    elif [[ -f "$maindir/$prj_dir/$capp/resources.arsc" ]]; then
+    elif [[ -f "${maindir}/${prj_dir}/${capp}/resources.arsc" ]]; then
         nodec_err
-    elif [[ ! -f "$maindir/$mod_dir/$capp" ]]; then
+    elif [[ ! -f "${maindir}/${mod_dir}/${capp}" ]]; then
         notfound_err
-    elif [[ -f "$maindir/$prj_dir/$capp/.advanced" ]]; then
+    elif [[ -f "${maindir}/${prj_dir}/${capp}/.advanced" ]]; then
         compile_adv
-    elif [[ $prjext = [Jj][Aa][Rr] ]]; then
+    elif [[ ${prjext} = [Jj][Aa][Rr] ]]; then
         compile_jar
-    elif [[ $prjext = [Aa][Pp][Kk] ]]; then
+    elif [[ ${prjext} = [Aa][Pp][Kk] ]]; then
         compile_apk
     fi
     echo "compile function complete" 1>> "$log"
@@ -279,8 +282,8 @@ compile () {
 
 # All-in-one actually sign and install now
 aio_sub_finish () {
-    if [[ $signfunc = signpkey ]]; then
-        if [[ -z $keystore ]]; then
+    if [[ ${signfunc} = signpkey ]]; then
+        if [[ -z ${keystore} ]]; then
             storecheck
         fi
         if [[ ! ${keystore##*.} = [kK][eE][yY][sS][tT][oO][rR][eE] ]]; then
@@ -290,11 +293,11 @@ aio_sub_finish () {
             return 1
         else
             storename="${keystore%%.*}"
-            key="$(awk '{ print $0}' $HOME/.apkmanager/.keystores/.${storename}_keyname)"
+            key="$(awk '{ print $0}' "${HOME}/.apkmanager/.keystores/.${storename}_keyname")"
         fi
     fi
     echo "Signing APK..."
-    $signfunc
+    ${signfunc}
     if [[ $? -ne 0 ]]; then
         echo "error during signing (aio_sub_finish function)" 1>> "$log" 2>&1
         return 1
@@ -316,8 +319,8 @@ aio_sub_adv () {
         return 1
     fi
     echo "Compiling Resources..."
-    mkdir -p "$maindir/$prj_dir/$capp/build/apk"
-    cp -p "$maindir/$prj_dir/$capp/build/classes.dex" "$maindir/$prj_dir/$capp/build/apk/classes.dex"
+    mkdir -p "${maindir}/${prj_dir}/${capp}/build/apk"
+    cp -p "${maindir}/${prj_dir}/${capp}/build/classes.dex" "${maindir}/${prj_dir}/${capp}/build/apk/classes.dex"
     comp_apkt
     if [[ $? -ne 0 ]]; then
         echo "error during compile (resources) (aio_sub_adv function)" 1>> "$log" 2>&1
@@ -359,7 +362,7 @@ aio_sub_cmp () {
 
 # All-in-one, .advanced decompile check
 aio_cmp_check () {
-    if [[ -f "$maindir/$prj_dir/$capp/.advanced" ]]; then
+    if [[ -f "${maindir}/${prj_dir}/${capp}/.advanced" ]]; then
         aio_sub_adv
     else
         aio_sub_cmp
@@ -378,22 +381,22 @@ aio_cleanup () {
 
 # Check which all-in-one sub-functions to run
 aio_type_check () {
-    if [[ $aio_option = zipapk ]]; then
-        if [[ ! -e "$maindir/$prj_dir/$capp/resources.arsc" ]]; then
+    if [[ ${aio_option} = zipapk ]]; then
+        if [[ ! -e "${maindir}/${prj_dir}/${capp}/resources.arsc" ]]; then
             noex_err
         else
             aio_sub_zip
         fi
-    elif [[ $aio_option = compapk ]]; then
-        if [[ ! -e "$maindir/$prj_dir/$capp/apktool.yml" ]]; then
+    elif [[ ${aio_option} = compapk ]]; then
+        if [[ ! -e "${maindir}/${prj_dir}/${capp}/apktool.yml" ]]; then
             nodec_err
         else
             aio_cmp_check
         fi
-    elif [[ $aio_option = advanced ]]; then
-        if [[ ! -e "$maindir/$prj_dir/$capp/apktool.yml" ]]; then
+    elif [[ ${aio_option} = advanced ]]; then
+        if [[ ! -e "${maindir}/${prj_dir}/${capp}/apktool.yml" ]]; then
             aio_sub_zip
-        elif [[ -e "$maindir/$prj_dir/$capp/apktool.yml" ]]; then
+        elif [[ -e "${maindir}/${prj_dir}/${capp}/apktool.yml" ]]; then
             aio_cmp_check
         else
             echo $bred"Something went wrong, please check the log."
@@ -404,13 +407,13 @@ aio_type_check () {
 # All-in-one function(s) initial start/check
 all_in_one () {
     echo "all_in_one function" 1>> "$log"
-    if [[ ! $prjext = [Aa][Pp][Kk] ]]; then
+    if [[ ! ${prjext} = [Aa][Pp][Kk] ]]; then
         jarext_err
-    elif [[ ! -d "$maindir/$prj_dir/$capp" ]]; then
+    elif [[ ! -d "${maindir}/${prj_dir}/${capp}" ]]; then
         nodir_err
-    elif [[ "$(ls -1 $maindir/$prj_dir/$capp | wc -l)" -eq 0 ]]; then
+    elif [[ "$(ls -1 "${maindir}/${prj_dir}/${capp}" | wc -l)" -eq 0 ]]; then
         nodir_err
-    elif [[ -d "$maindir/$prj_dir/$capp/java" ]]; then
+    elif [[ -d "${maindir}/${prj_dir}/${capp}/java" ]]; then
         aio_java_err
     else
         aio_type_check
@@ -423,11 +426,12 @@ all_in_one () {
 zip_sign_install () {
     echo "zip_sign_install (zip, sign, install) function" 1>> "$log"
     capp_test
-    if [[ $capp = "None" ]]; then
+    if [[ ${capp} = "None" ]]; then
         echo "no project selected, aborting" 1>> "$log"
+        return 1
     else
-        infile="$maindir/$mod_dir/unsigned-$capp"
-        outfile="$maindir/$mod_dir/signed-$capp"
+        infile="${maindir}/${mod_dir}/unsigned-${capp}"
+        outfile="${maindir}/${mod_dir}/signed-${capp}"
         signfunc="signtkey"
         aio_option="zipapk"
         all_in_one
@@ -439,11 +443,12 @@ zip_sign_install () {
 co_sign_install () {
     echo "co_sign_install (compile, sign, install) function" 1>> "$log"
     capp_test
-    if [[ $capp = "None" ]]; then
+    if [[ ${capp} = "None" ]]; then
         echo "no project selected, aborting" 1>> "$log"
+        return 1
     else
-        infile="$maindir/$mod_dir/unsigned-$capp"
-        outfile="$maindir/$mod_dir/signed-$capp"
+        infile="${maindir}/${mod_dir}/unsigned-${capp}"
+        outfile="${maindir}/${mod_dir}/signed-${capp}"
         signfunc="signtkey"
         aio_option="compapk"
         all_in_one
@@ -455,10 +460,11 @@ co_sign_install () {
 adv_all_in_one () {
     echo "adv_all_in_one (advanced all-in-one) function" 1>> "$log"
     capp_test
-    if [[ $capp = "None" ]]; then
+    if [[ ${capp} = "None" ]]; then
         echo "no project selected, aborting" 1>> "$log"
+        return 1
     else
-        infile="$maindir/$mod_dir/unsigned-$capp"
+        infile="${maindir}/${mod_dir}/unsigned-${capp}"
         signfunc="signpkey"
         aio_option="advanced"
         all_in_one

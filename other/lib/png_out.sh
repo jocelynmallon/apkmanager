@@ -7,7 +7,7 @@
 # http://girlintroverted.wordpress.com
 #
 # version: 3.0b
-# Fri. May 11, 2012
+# Sat. May 19, 2012
 # -----------------------------------------------------------------------
 
 # static url for latest version of pngout for mac
@@ -43,8 +43,8 @@ install_pngout () {
     menu_header
     echo $bgreen"$apkmspr"; $rclr;
     echo ""
-    if [[ $installtype = homebrew ]]; then
-        if [[ $BTAP -eq 1 ]]; then
+    if [[ ${installtype} = homebrew ]]; then
+        if [[ ${BTAP} -eq 1 ]]; then
             brew tap adamv/alt
             unset BTAP
             echo ""
@@ -54,25 +54,25 @@ install_pngout () {
         inst_pngo_check
     else
         echo $bgreen"Downloading pngout..."; $rclr;
-        curl "$pngouturl" > "$maindir/other/pngout.tar.gz"
-        local filehash="$(md5 -q $maindir/other/pngout.tar.gz)"
+        curl "${pngouturl}" > "${maindir}/other/pngout.tar.gz"
+        local filehash="$(md5 -q "${maindir}/other/pngout.tar.gz")"
         local expected="ce70a9d70e08b1920e5ac88d130d0eb9"
-        if [[ $filehash = $expected ]]; then
+        if [[ ${filehash} = ${expected} ]]; then
             echo $green"Extracting pngout..."; $rclr;
-            tar -xzvf "$maindir/other/pngout.tar.gz" 1>> "$log" 2>&1
-            cp -p "$maindir/pngout-20110722-darwin/pngout" "$maindir/other/bin/pngout"
+            tar -xzvf "${maindir}/other/pngout.tar.gz" 1>> "$log" 2>&1
+            cp -p "${maindir}/pngout-20110722-darwin/pngout" "${maindir}/other/bin/pngout"
             echo $green"cleaning up temporary files..."; $rclr;
-            rm -rf "$maindir/other/pngout.tar.gz"
-            rm -rf "$maindir/pngout-20110722-darwin"
+            rm -rf "${maindir}/other/pngout.tar.gz"
+            rm -rf "${maindir}/pngout-20110722-darwin"
             inst_pngo_check
         else
             echo $bred" ERROR: Corrupt download/file, md5 hash fail:"
-            echo $bred" download: $filehash"
-            echo $bred" expected: $expected"
+            echo $bred" download: ${filehash}"
+            echo $bred" expected: ${expected}"
             echo ""
             echo $white"press any key to try download again..."
             wait
-            rm -r "$maindir/other/pngout.tar.gz"
+            rm -r "${maindir}/other/pngout.tar.gz"
             install_pngout
         fi
     fi
@@ -89,7 +89,7 @@ pngout_prompt () {
     echo $white" source software, and is "$bgreen" (c) Ken Silverman http://advsys.net/ken/utils.htm"
     echo $white" Due to copyright, pngout can't legally be redistributed with APK Manager."
     echo ""
-    if [[ $installtype = homebrew ]]; then
+    if [[ ${installtype} = homebrew ]]; then
         echo $white" However, APK Manager can install pngout using Homebrew,"
         echo $white" thanks to the alt formula here: "$blue"https://github.com/adamv/homebrew-alt"
         echo $white" this will execute the following commands:"
@@ -103,7 +103,7 @@ pngout_prompt () {
         echo $white" However, APK Manager can download the latest pre-compiled mac binary "
         echo $white" from the official mac download page here:"
         echo ""
-        echo $bgreen" $pngouturl"
+        echo $bgreen" ${pngouturl}"
         echo ""
         echo $white" and copy/install it automatically into the apkmanager/other/bin folder for you."
     fi
@@ -121,7 +121,7 @@ pngout_prompt () {
 
 # Check if pngout exists and is in $PATH
 pngout_check () {
-    echo "pngout_check (checking if pngout is installed on this system)" 1>> "$log"
+    echo "pngout_check (checking if pngout is installed)" 1>> "$log"
     if [[ $(command -v pngout) ]]; then
         local key="pngtool"
         local value="pngout"

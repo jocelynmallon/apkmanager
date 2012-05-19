@@ -7,25 +7,25 @@
 # http://girlintroverted.wordpress.com
 #
 # version: 3.0b
-# Wed. May 16, 2012
+# Sat. May 19, 2012
 # -----------------------------------------------------------------------
 
 
 # Write 'string' type user preferences
 write_string () {
-    defaults write "$plist" "$key" "$value" 2>/dev/null
+    defaults write "${plist}" "${key}" "${value}" 2>/dev/null
 }
 
 # Write 'boolean' type user preferences
 write_boolean () {
-    defaults write "$plist" "$key" -bool "$value" 2>/dev/null
+    defaults write "${plist}" "${key}" -bool "${value}" 2>/dev/null
 }
 
 # Check the type of pref to write
 check_type () {
-    if [[ $pref = string ]]; then
+    if [[ ${pref} = string ]]; then
         write_string
-    elif [[ $pref = bool ]]; then
+    elif [[ ${pref} = bool ]]; then
         write_boolean
     else
         exit 1
@@ -44,7 +44,7 @@ main () {
             esac
             shift $(($OPTIND - 1))
         done
-        if [[ -z $pref ]]; then
+        if [[ -z ${pref} ]]; then
             pref="string"
         fi
         plist="$1"; shift

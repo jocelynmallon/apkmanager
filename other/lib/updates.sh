@@ -7,7 +7,7 @@
 # http://girlintroverted.wordpress.com
 #
 # version: 3.0b
-# Fri. May 11, 2012
+# Sat. May 19, 2012
 # -----------------------------------------------------------------------
 
 # setup git repo address
@@ -71,7 +71,7 @@ enable_auto_updates () {
     local key="updates"
     local value="true"
     write_preference
-    if [[ ! -d $maindir/.git ]]; then
+    if [[ ! -d "${maindir}"/.git ]]; then
         updates_init_prompt
     fi
 }
@@ -85,10 +85,10 @@ branch_change_log () {
 # try to checkout the selected branch
 checkout_new_branch () {
     echo "checkout_new_branch (change branches now)" 1>> "$log"
-    cd "$maindir"
-    echo "==> checking out branch: $saved_channel" 1>> "$log"
-    if [[ $(git branch | grep "$saved_channel") ]]; then
-        git checkout -q "$saved_channel" 2>> "$log"
+    cd "${maindir}"
+    echo "==> checking out branch: ${saved_channel}" 1>> "$log"
+    if [[ $(git branch | grep "${saved_channel}") ]]; then
+        git checkout -q "${saved_channel}" 2>> "$log"
         if [[ $? -ne 0 ]]; then
             git_checkout_error
             exit 1
@@ -97,7 +97,7 @@ checkout_new_branch () {
             exit 0
         fi
     else
-        git checkout -t -q "origin/$saved_channel" 2>> "$log"
+        git checkout -t -q "origin/${saved_channel}" 2>> "$log"
         if [[ $? -ne 0 ]]; then
             git_checkout_error
             exit 1
@@ -110,7 +110,7 @@ checkout_new_branch () {
 
 # placeholder - change branch
 change_update_branch () {
-    if [[ $(ls -1 $maindir/.git/refs/remotes/origin | wc -l) -eq 1 ]]; then
+    if [[ $(ls -1 "${maindir}"/.git/refs/remotes/origin | wc -l) -eq 1 ]]; then
         no_branches_err
         return 1
     else
@@ -123,13 +123,13 @@ change_update_freq () {
     printf "$white%s""Enter number of days to wait between update checks ("$bgreen"1-31"$white")\n"; $rclr;
     printf "$white%s""("$green"i.e. 1 means check every 24 hours, 2 is 48 hours, etc."$white"): "; $rclr;
     read input
-    if [[ ! $input = *[^0-9]* ]] && [[ $input -ge 1 ]] && [[ $input -le 31 ]]; then
+    if [[ ! ${input} = *[^0-9]* ]] && [[ ${input} -ge 1 ]] && [[ ${input} -le 31 ]]; then
         local key="updates_freq"
-        local value="$input"
+        local value="${input}"
         write_preference
-        echo "==> update frequency set to: $input days" 1>> "$log" 2>&1
+        echo "==> update frequency set to: ${input} days" 1>> "$log" 2>&1
     else
-        echo $bred"Error: $input is not valid, press any key to try again"; $rclr;
+        echo $bred"Error: ${input} is not valid, press any key to try again"; $rclr;
         wait
         change_update_freq
     fi
@@ -140,11 +140,11 @@ change_update_freq () {
 force_update_check () {
     echo "force_update_check (force updates check now)" 1>> "$log"
     update_apkm
-    if [[ ! $new_commit = $old_commit ]]; then
+    if [[ ! ${new_commit} = ${old_commit} ]]; then
         echo "force_update_check complete" 1>> "$log"
         updates_complete_log
         exit 0
-    elif [[ ! $channel_ver = $saved_channel ]]; then
+    elif [[ ! ${channel_ver} = ${saved_channel} ]]; then
         echo "force_update_check complete" 1>> "$log"
         echo $bgreen"Manual/forced update check complete!"; $rclr;
         git_branch_change
@@ -170,7 +170,7 @@ build_last_date_time () {
 
 # Initialize an empty repo if necessary
 updates_init_repo () {
-    if [[ ! -d ${maindir}/.git ]]; then
+    if [[ ! -d "${maindir}"/.git ]]; then
         echo ".git repo not found, initializing repo" 1>> "$log"
         cd "${maindir}"
         echo "==> git init..." 1>> "$log"
@@ -201,7 +201,7 @@ updates_init_prompt () {
     echo ""
     echo $white" APK Manager will run the following commands:"; $rclr;
     echo ""
-    echo $bgreen"  1  "$green"cd $maindir"
+    echo $bgreen"  1  "$green"cd ${maindir}"
     echo $bgreen"  2  "$green"git init"
     echo $bgreen"  3  "$green"git config core.autocrlf false"
     echo $bgreen"  4  "$green"git config branch.autosetuprebase always"
@@ -244,28 +244,28 @@ yes_update_message () {
     echo $bgreen""
     echo $bgreen"$apkmspr"; $rclr;
     echo ""
-    echo $bwhite" APK Manager for OSX succesfully updated from "$bgreen"$old_commit "$bwhite"to "$bgreen"$new_commit "$bwhite"!"
-    echo $bwhite" APK Manager for OSX is currently on the "$bgreen"$channel_ver "$bwhite"branch/channel"
+    echo $bwhite" APK Manager for OSX succesfully updated from "$bgreen"${old_commit} "$bwhite"to "$bgreen"${new_commit} "$bwhite"!"
+    echo $bwhite" APK Manager for OSX is currently on the "$bgreen"${channel_ver} "$bwhite"branch/channel"
     echo $bwhite" You can change the branch/channel for updates in the debug/settings"
     echo $bwhite" menu, and/or disable automatic updates entirely."
     echo ""
     echo $bred" APK Manager will now exit, please re-launch to complete the update."
     echo $bgreen"$apkmftr"
-    echo "APK Manager updated from $old_commit to $new_commit" 1>> "$log"
-    echo "==> on update branch/channel: $saved_channel" 1>> "$log"
+    echo "APK Manager updated from ${old_commit} to ${new_commit}" 1>> "$log"
+    echo "==> on update branch/channel: ${saved_channel}" 1>> "$log"
     genericpanykey
 }
 
 # apkmanager wasn't updated message
 no_update_message () {
     echo $bgreen"APK Manager is already up to date!"; $rclr;
-    echo "APK Manager already up to date @: $new_commit" 1>> "$log"
+    echo "APK Manager already up to date @: ${new_commit}" 1>> "$log"
     genericpanykey
 }
 
 # fancy display message on succesful update
 finish_message () {
-    if [[ ! $new_commit = $old_commit ]]; then
+    if [[ ! ${new_commit} = ${old_commit} ]]; then
         yes_update_message
     else
         no_update_message
@@ -273,7 +273,7 @@ finish_message () {
 }
 
 update_branch_check () {
-    saved_channel="$(defaults read $plist updates_branch 2>/dev/null)"
+    saved_channel="$(defaults read "${plist}" updates_branch 2>/dev/null)"
     if [[ $? -ne 0 ]]; then
         saved_channel="master"
         local key="updates_branch"
@@ -285,7 +285,7 @@ update_branch_check () {
 # Actually checking for updates now
 update_apkm () {
     echo "update_apkm (actually checking for updates now)" 1>> "$log"
-    cd $maindir
+    cd "${maindir}"
     echo "==> git config core.autocrlf false ..." 1>> "$log"
     git config core.autocrlf false
     if [[ $? -ne 0 ]]; then
@@ -301,9 +301,9 @@ update_apkm () {
     channel_ver="$(get_current_branch)"
     channel_ver="${channel_ver#refs/heads/}"
     update_branch_check
-    if [[ ! $channel_ver = $saved_channel ]]; then
-        echo "Checking out branch: $saved_channel" 1>> "$log"
-        git checkout -q $saved_channel 2>> "$log"
+    if [[ ! ${channel_ver} = ${saved_channel} ]]; then
+        echo "Checking out branch: ${saved_channel}" 1>> "$log"
+        git checkout -q ${saved_channel} 2>> "$log"
         if [[ $? -ne 0 ]]; then
             git_checkout_error
             return 1
@@ -312,7 +312,7 @@ update_apkm () {
     old_commit="$(get_commit_ver)"
     old_commit="${old_commit:0:8}"
     echo "==> git pull -q origin ${saved_channel} ..." 1>> "$log"
-    git pull -q origin refs/heads/$saved_channel:refs/remotes/origin/$saved_channel 2>> "$log"
+    git pull -q origin refs/heads/${saved_channel}:refs/remotes/origin/${saved_channel} 2>> "$log"
     if [[ $? -ne 0 ]]; then
         git_pull_error
         return 1
@@ -356,7 +356,7 @@ updates_check_prompt () {
 
 # Check if the update prompt is disabled
 update_prompt_state () {
-    upromptstate="$(defaults read $plist updates_prompt 2>/dev/null)"
+    upromptstate="$(defaults read "${plist}" updates_prompt 2>/dev/null)"
     if [[ $? -ne 0 ]]; then
         local key="updates_prompt"
         local value="true"
@@ -367,11 +367,11 @@ update_prompt_state () {
 
 # Check number of days to wait between updates
 check_update_freq () {
-    ufreq="$(defaults read $plist updates_freq 2>/dev/null)"
+    ufreq="$(defaults read "${plist}" updates_freq 2>/dev/null)"
     if [[ $? -ne 0 ]]; then
         ufreq="6"
         local key="updates_freq"
-        local value="$ufreq"
+        local value="${ufreq}"
         write_preference
     fi
 }
@@ -385,32 +385,32 @@ updates_complete_log () {
 # Check status of automatic updates
 updates_status () {
     echo "updates_status (check for updates) function" 1>> "$log"
-    if [[ ! -d $maindir/.git ]]; then
+    if [[ ! -d "${maindir}"/.git ]]; then
         updates_init_prompt
     fi
-    last_epoch="$(defaults read $plist updates_last_epoch 2>/dev/null)"
-    if [[ $? -ne 0 ]] || [[ -z $last_epoch ]]; then
+    last_epoch="$(defaults read "${plist}" updates_last_epoch 2>/dev/null)"
+    if [[ $? -ne 0 ]] || [[ -z ${last_epoch} ]]; then
         local key="updates_last_epoch"
         local value="$(gen_epoch)"
         write_preference
         return 0
     fi
-    epoch_diff=$(($(gen_epoch) - $last_epoch))
+    epoch_diff=$(($(gen_epoch) - ${last_epoch}))
     check_update_freq
-    if [[ $epoch_diff -ge $ufreq ]]; then
+    if [[ ${epoch_diff} -ge ${ufreq} ]]; then
         update_prompt_state
-        if [[ $upromptstate -eq 0 ]]; then
+        if [[ ${upromptstate} -eq 0 ]]; then
             update_apkm
         else
             updates_check_prompt
         fi
     fi
-    if [[ ! $new_commit = $old_commit ]]; then
+    if [[ ! ${new_commit} = ${old_commit} ]]; then
         updates_cleanup
         echo "updates_status complete" 1>> "$log"
         updates_complete_log
         exit 0
-    elif [[ ! $channel_ver = $saved_channel ]]; then
+    elif [[ ! ${channel_ver} = ${saved_channel} ]]; then
         git_branch_change
         updates_cleanup
         echo "updates_status complete" 1>> "$log"

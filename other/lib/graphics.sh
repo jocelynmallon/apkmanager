@@ -7,7 +7,7 @@
 # http://girlintroverted.wordpress.com
 #
 # version: 3.0b
-# Wed. May 16, 2012
+# Sat. May 19, 2012
 # -----------------------------------------------------------------------
 
 # define colors for pretty output
@@ -49,34 +49,34 @@ version_banner () {
 menu_header () {
     echo ""
     version_banner
-    echo $white" Compression-Level: "$bgreen"$uscr"$white"  |  Heap Size: "$bgreen"$heapy""mb"$white"  |  Project: "$bgreen"$capp"; $rclr;
+    echo $white" Compression-Level: "$bgreen"${uscr}"$white"  |  Heap Size: "$bgreen"${heapy}""mb"$white"  |  Project: "$bgreen"${capp}"; $rclr;
     echo $bgreen"$apkmspr"; $rclr;
-    if [[ $v_mode -ne 0 ]]; then
+    if [[ ${v_mode} -ne 0 ]]; then
         printf "$bred%s"" VERBOSE MODE ENABLED (-v for entire script) "$white" | "
     fi
-    if [[ $t_mode -ne 0 ]]; then
+    if [[ ${t_mode} -ne 0 ]]; then
         printf "$bred%s"" TRACE MODE ENABLED (-x for entire script) "$white" | "
     fi
-    if [[ $e_mode -ne 0 ]]; then
+    if [[ ${e_mode} -ne 0 ]]; then
         printf "$bred%s"" -e"$white" |"
         local emode=5
     fi
-    if [[ $debugstate -ne 0 ]]; then
+    if [[ ${debugstate} -ne 0 ]]; then
         if [[ -z $emode ]]; then
             local emode=0
         fi
         local trunc_symbol="..."
         local pidw="$$"
-        if [[ -z $errcode ]]; then
+        if [[ -z ${errcode} ]]; then
             errcode=0
-            local err_string="${white}| \$?: ${bred}$errcode"
+            local err_string="${white}| \$?: ${bred}${errcode}"
             local pwdfill=28
         else
-            local err_string="${white}| ${bred}${errfunc} ${white}\$?: ${bred}$errcode ${white}line: ${bred}$errline"
+            local err_string="${white}| ${bred}${errfunc} ${white}\$?: ${bred}${errcode} ${white}line: ${bred}${errline}"
             local pwdfill=36
         fi
-        local maxlength="$((100 - (((((${#errfunc} + ${#errcode}) + ${#errline}) + ${#pidw}) + $emode ) + $pwdfill )))"
-        if [[ ${#PWD} -gt $maxlength ]]; then
+        local maxlength="$((100 - (((((${#errfunc} + ${#errcode}) + ${#errline}) + ${#pidw}) + ${emode} ) + ${pwdfill} )))"
+        if [[ ${#PWD} -gt ${maxlength} ]]; then
             local pwdoffset="$(( ${#PWD} - $((maxlength - ${#trunc_symbol})) ))"
             local newpwd="${trunc_symbol}${PWD:$pwdoffset:$maxlength}"
         else
@@ -94,13 +94,13 @@ menu_header () {
 # Debug/settings menu sub-header
 debug_header () {
     echo $bgreen"------------------------------------Debug Info and Misc Settings------------------------------------";
-    echo $white" Current System: "$green"Mac OS X $osx_ver $osx_bld $arch_ver";
-    echo $white" APK Manager install type: "$green"$installtype";
-    echo $white" APK Manager root dir: "$green"$maindir";
-    echo $white" ANDROID_SDK_ROOT: "$green"$ANDROID_SDK_ROOT";
-    echo $white" Current log viewer: "$green"$logapp";
-    echo $white" Current \"png\" tool: "$green"$pngtool";
-    echo $white" Current APKtool: "$green"$apktool_ver"$blue" ($(basename "$(readlink "$libdir/apktool.jar")"))";
+    echo $white" Current System: "$green"Mac OS X ${osx_ver} ${osx_bld} ${arch_ver}";
+    echo $white" APK Manager install type: "$green"${installtype}";
+    echo $white" APK Manager root dir: "$green"${maindir}";
+    echo $white" ANDROID_SDK_ROOT: "$green"${ANDROID_SDK_ROOT}";
+    echo $white" Current log viewer: "$green"${logapp}";
+    echo $white" Current \"png\" tool: "$green"${pngtool}";
+    echo $white" Current APKtool: "$green"${apktool_ver}"$blue" ($(basename "$(readlink "${libdir}/apktool.jar")"))";
 }
 
 # automatic updates menu header
@@ -113,22 +113,22 @@ updates_header () {
         local value="false"
         write_preference
     fi
-    if [[ $updatestate -eq 1 ]]; then
+    if [[ ${updatestate} -eq 1 ]]; then
         update_branch_check
         local commit
         commit="$(get_commit_ver)"
         commit="${commit:0:8}"
         update_prompt_state
-        if [[ $upromptstate -eq 1 ]]; then
+        if [[ ${upromptstate} -eq 1 ]]; then
             local uprompt="${green}ON"
         else
             local uprompt="${bred}OFF"
         fi
         build_last_date_time
         check_update_freq
-        if [[ $ufreq -eq 1 ]]; then
+        if [[ ${ufreq} -eq 1 ]]; then
             local updfreq="${ufreq} ${white}day"
-        elif [[ $ufreq -gt 1 ]]; then
+        elif [[ ${ufreq} -gt 1 ]]; then
             local updfreq="${ufreq} ${white}days"
         fi
         echo $white" Updates status: "$green"ON"; $rclr;

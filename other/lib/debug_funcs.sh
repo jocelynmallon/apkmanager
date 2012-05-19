@@ -7,7 +7,7 @@
 # http://girlintroverted.wordpress.com
 #
 # version: 3.0b
-# Wed. May 16, 2012
+# Sat. May 19, 2012
 # -----------------------------------------------------------------------
 
 debug_cleanup () {
@@ -27,10 +27,10 @@ debug_cleanup () {
 
 # Toggle set -x/+x trace output
 toggle_trace () {
-    if [[ $t_mode -ne 0 ]]; then
+    if [[ ${t_mode} -ne 0 ]]; then
         t_mode=0
         set +x
-    elif [[ $t_mode -eq 0 ]]; then
+    elif [[ ${t_mode} -eq 0 ]]; then
         t_mode=1
         set -x
     fi
@@ -38,10 +38,10 @@ toggle_trace () {
 
 # Toggle set -v/+v verbose output
 toggle_verbose () {
-    if [[ $v_mode -ne 0 ]]; then
+    if [[ ${v_mode} -ne 0 ]]; then
         v_mode=0
         set +v
-    elif [[ $v_mode -eq 0 ]]; then
+    elif [[ ${v_mode} -eq 0 ]]; then
         v_mode=1
         set -v
     fi
@@ -49,10 +49,10 @@ toggle_verbose () {
 
 # Toggle set -e/+e error checking
 toggle_error () {
-    if [[ $e_mode -ne 0 ]]; then
+    if [[ ${e_mode} -ne 0 ]]; then
         e_mode=0
         set +e
-    elif [[ $e_mode -eq 0 ]]; then
+    elif [[ ${e_mode} -eq 0 ]]; then
         e_mode=1
         set -e
     fi
@@ -60,35 +60,35 @@ toggle_error () {
 
 # Toggle APK Manager symlink
 apkm_tool_toggle () {
-    if [[ $(echo $PATH | grep -m1 /usr/local/bin) ]]; then
-        if [[ $(command -v apkm) = /usr/local/bin/apkm ]]; then
+    if [[ $(echo ${PATH} | grep -m1 "/usr/local/bin") ]]; then
+        if [[ $(command -v apkm) = "/usr/local/bin/apkm" ]]; then
             echo "deleting \"apkm\" symlink in /usr/local/bin" 1>> "$log"
             rm "/usr/local/bin/apkm"
         elif [[ ! $(command -v apkm) ]]; then
             echo "creating \"apkm\" symlink in /usr/local/bin" 1>> "$log"
-            ln -s -F "$maindir/other/main.sh" "/usr/local/bin/apkm"; chmod ug+x "/usr/local/bin/apkm"
+            ln -s -F "${maindir}/other/main.sh" "/usr/local/bin/apkm"; chmod ug+x "/usr/local/bin/apkm"
         fi
     fi
 }
 
 # Actually download extra apktool versions
 install_apktool () {
-    if [[ ! -f $maindir/other/apktool_jar_files.tar.gz ]]; then
+    if [[ ! -f "${maindir}/other/apktool_jar_files.tar.gz" ]]; then
         echo $green" Local copy of archive not found, downloading now..."; $rclr;
         echo ""
-        curl "http://dl.dropbox.com/u/9401664/APK%20Manager/apktool_jar_files.tar.gz" > "$maindir/other/apktool_jar_files.tar.gz"
+        curl "http://dl.dropbox.com/u/9401664/APK%20Manager/apktool_jar_files.tar.gz" > "${maindir}/other/apktool_jar_files.tar.gz"
         echo ""
     fi
-    local filehash="$(md5 -q $maindir/other/apktool_jar_files.tar.gz)"
+    local filehash="$(md5 -q "${maindir}/other/apktool_jar_files.tar.gz")"
     local expected="4d1421628f009d063a04831210036952"
-    if [[ $filehash = $expected ]]; then
+    if [[ ${filehash} = ${expected} ]]; then
         echo $white" Extracting extra apktool.jar files to:"
-        echo $green" $maindir/other/apktool"; $rclr;
+        echo $green" ${maindir}/other/apktool"; $rclr;
         echo ""
-        cd "$maindir/other"
-        tar -xzvf "$maindir/other/apktool_jar_files.tar.gz" 1>> "$log" 2>&1
+        cd "${maindir}/other"
+        tar -xzvf "${maindir}/other/apktool_jar_files.tar.gz" 1>> "$log" 2>&1
         echo $green" Removing temporary files."
-        rm -r "$maindir/other/apktool_jar_files.tar.gz"
+        rm -r "${maindir}/other/apktool_jar_files.tar.gz"
         echo $bgreen" Download complete!"
         echo ""
         echo $bgreen"$apkmftr";
@@ -96,12 +96,12 @@ install_apktool () {
         apktool_menu
     else
         echo $bred" ERROR: Corrupt download/file, md5 hash fail:"
-        echo $bred" download: $filehash"
-        echo $bred" expected: $expected"
+        echo $bred" download: ${filehash}"
+        echo $bred" expected: ${expected}"
         echo ""
         echo $white"press any key to try download again..."
         wait
-        rm -r "$maindir/other/apktool_jar_files.tar.gz"
+        rm -r "${maindir}/other/apktool_jar_files.tar.gz"
         install_apktool
     fi
 }
@@ -115,7 +115,7 @@ apkt_prompt () {
     echo ""
     echo $white" APK Manager has the ability to change the version of "$bgreen"apktool.jar"$white" used when decompiling"
     echo $white" and compiling android applications. However, to cut down on file size, only the most"
-    echo $white" recent \"official\" release of apktool.jar ("$green"$apktool_ver"$white") is included by default."
+    echo $white" recent \"official\" release of apktool.jar ("$green"${apktool_ver}"$white") is included by default."
     echo ""
     echo $white" Would you like to download extra versions of apktool.jar file to use with APK Manager?"
     echo ""
@@ -132,9 +132,9 @@ apkt_prompt () {
 
 # Check for extra versions of apktool.jar
 apkt_menu_check () {
-    if [[ $( ls $aptdir | wc -l) -gt 1 ]]; then
+    if [[ $( ls "${aptdir}" | wc -l) -gt 1 ]]; then
         apktool_menu
-    elif [[ $( ls $aptdir | wc -l) -eq 1 ]]; then
+    elif [[ $( ls "${aptdir}" | wc -l) -eq 1 ]]; then
         apkt_prompt
     fi
 }
@@ -143,7 +143,7 @@ apkt_menu_check () {
 adb_shell () {
     if [[ $(command -v adb) ]]; then
         local apkmopt="adb kill-server; adb wait-for-device; adb shell; adb kill-server; exit"
-        newttab "$apkmopt" "$log"
+        newttab "${apkmopt}" "$log"
     elif [[ ! $(command -v adb) ]]; then
         echo $bred"ERROR: adb not found on the system."
         debuganykey
@@ -154,7 +154,7 @@ adb_shell () {
 launch_ddms () {
     if [[ $(command -v ddms) ]]; then
         local apkmopt="ddms; exit"
-        newttab "$apkmopt" "$log"
+        newttab "${apkmopt}" "$log"
     elif [[ ! $(command -v ddms) ]]; then
         echo $bred"ERROR: ddms not found on the system."
         debuganykey
@@ -165,7 +165,7 @@ launch_ddms () {
 draw_nine () {
     if [[ $(command -v draw9patch) ]]; then
         local apkmopt="draw9patch; exit"
-        newttab "$apkmopt" "$log"
+        newttab "${apkmopt}" "$log"
     elif [[ ! $(command -v draw9patch) ]]; then
         echo $bred"ERROR: draw9patch not found on the system."
         debuganykey
@@ -174,8 +174,8 @@ draw_nine () {
 
 # Read adb logcat file if it exists
 read_adb_log () {
-    if [[ -f $maindir/ADBLOG.txt ]]; then
-        txt="$maindir/ADBLOG.txt" 2>> "$log"
+    if [[ -e "${maindir}/ADBLOG.txt" ]]; then
+        txt="${maindir}/ADBLOG.txt" 2>> "$log"
         read_txt
     else
         echo $bred"ERROR: no adblog.txt file found."
@@ -215,10 +215,10 @@ adblog () {
     read input
     if [[ $input = [qQ] ]]; then :
     else
-        local adbopt="adb logcat 1> $maindir/ADBLOG.txt"
+        local adbopt="adb logcat 1> ${maindir}/ADBLOG.txt"
         local adbstart="starting adb logcat..."
-        local apkmopt="adb kill-server; adb wait-for-device; echo "$adbstart"; $maindir/other/bin/timeout 10 "$adbopt"; adb kill-server; exit"
-        newttab "$apkmopt" "$log"
+        local apkmopt="adb kill-server; adb wait-for-device; echo "${adbstart}"; ${maindir}/other/bin/timeout 10 "${adbopt}"; adb kill-server; exit"
+        newttab "${apkmopt}" "$log"
     fi
     echo "adblog function complete" 1>> "$log"
 }
@@ -273,31 +273,31 @@ getdebuginfo () {
     local value
     for p in "p7zip" "optipng" "pngcrush" "pngout" "sox" "smali" "baksmali" "adb" "aapt" "apktool" "dex2jar" "arch"
     do
-        key="$p"
-        if [[ $p = p7zip ]]; then
+        key="${p}"
+        if [[ ${p} = p7zip ]]; then
             value="$(7za | grep '7-Zip..............' | cut -d C -f1 | sed 's/^[ \t]*//;s/[ \t]*$//' | sed 's/(//g' | sed 's/)//g'  | sed 's/\[//g' | sed 's/\]//g' | sed 's/\ /_/g')"
-        elif [[ $p = optipng ]]; then
+        elif [[ ${p} = optipng ]]; then
             value="$(optipng -v | grep 'OptiPNG version......' | sed s/OptiPNG\ version\ //g)"
-        elif [[ $p = pngcrush ]]; then
+        elif [[ ${p} = pngcrush ]]; then
             value="$(pngcrush -version | grep 'pngcrush.......' | sed s/pngcrush\ //g | cut -d , -f1)"
-        elif [[ $p = pngout ]]; then
+        elif [[ ${p} = pngout ]]; then
             getpngoutver
-        elif [[ $p = sox ]]; then
+        elif [[ ${p} = sox ]]; then
             getsoxver
-        elif [[ $p = smali ]]; then
+        elif [[ ${p} = smali ]]; then
             value="$(runj smali --version | grep 'smali' | sed s/smali\ //g | cut -d  ' ' -f1)"
-        elif [[ $p = baksmali ]]; then
+        elif [[ ${p} = baksmali ]]; then
             value="$(runj baksmali --version | grep 'baksmali' | sed s/baksmali\ //g | cut -d  ' ' -f1)"
-        elif [[ $p = adb ]]; then
+        elif [[ ${p} = adb ]]; then
             value="$(adb version | sed s/Android\ Debug\ Bridge\ version\ //g)"
-        elif [[ $p = aapt ]]; then
+        elif [[ ${p} = aapt ]]; then
             value="$(aapt v | cut -d , -f2 | sed 's/^[ \t]*//;s/[ \t]*$//')"
-        elif [[ $p = dex2jar ]]; then
+        elif [[ ${p} = dex2jar ]]; then
             getdex2jarver
-        elif [[ $p = arch ]]; then
+        elif [[ ${p} = arch ]]; then
             value="$(uname -m)"
         fi
-        if [[ -z $value ]]; then
+        if [[ -z ${value} ]]; then
             value="${p}_not_found"
         fi
         write_preference
@@ -315,12 +315,12 @@ debug_check () {
     osx_ver="$(sw_vers | awk '/ProductVersion/ {print $2}')"
     osx_bld="$(sw_vers | awk '/BuildVersion/ {print $2}')"
     debugset="$(defaults read "${plist}" debugset 2>/dev/null)"
-    if [[ $? -ne 0 ]] || [[ $debugset -ne 1 ]] || [[ -z $debugset ]]; then
+    if [[ $? -ne 0 ]] || [[ ${debugset} -ne 1 ]] || [[ -z ${debugset} ]]; then
         getdebuginfo
         return 1
     fi
     arch_ver="$(defaults read "${plist}" arch 2>/dev/null)"
-    if [[ $? -ne 0 ]] || [[ ! $arch_ver = "$(uname -m)" ]] || [[ -z $arch_ver ]]; then
+    if [[ $? -ne 0 ]] || [[ ! ${arch_ver} = "$(uname -m)" ]] || [[ -z ${arch_ver} ]]; then
         getdebuginfo
         return 1
     fi
@@ -340,28 +340,28 @@ debug_check () {
 
 # Display debug/binary version information
 debug_display () {
-    cd "$maindir"
+    cd "${maindir}"
     clear
     menu_header
     debug_header
     echo $bgreen"-----------------------------------Binary version info, path, etc-----------------------------------";
-    echo $white" smali version: "$green"$smali_ver"
-    echo $white" baksmali version: "$green"$baksmali_ver"
-    echo $white" dex2jar version: "$green"$dex2jar_ver"
+    echo $white" smali version: "$green"${smali_ver}"
+    echo $white" baksmali version: "$green"${baksmali_ver}"
+    echo $white" dex2jar version: "$green"${dex2jar_ver}"
     echo $white" dex2jar path: "$blue"$(command -v dex2jar)";
-    echo $white" sox version: "$green"$sox_ver"
+    echo $white" sox version: "$green"${sox_ver}"
     echo $white" sox path: "$blue"$(command -v sox)";
-    echo $white" 7za version: "$green"$p7zip_ver"
+    echo $white" 7za version: "$green"${p7zip_ver}"
     echo $white" 7za path: "$blue"$(command -v 7za)";
-    echo $white" optipng version: "$green"$optipng_ver"
+    echo $white" optipng version: "$green"${optipng_ver}"
     echo $white" optipng path: "$blue"$(command -v optipng)";
-    echo $white" pngcrush version: "$green"$pngcrush_ver"
+    echo $white" pngcrush version: "$green"${pngcrush_ver}"
     echo $white" pngcrush path: "$blue"$(command -v pngcrush)";
-    echo $white" pngout version: "$green"$pngout_ver"
+    echo $white" pngout version: "$green"${pngout_ver}"
     echo $white" pngout path: "$blue"$(command -v pngout)";
-    echo $white" adb version: "$green"$adb_ver"
+    echo $white" adb version: "$green"${adb_ver}"
     echo $white" adb path: "$blue"$(command -v adb)";
-    echo $white" aapt version: "$green"$aapt_ver"
+    echo $white" aapt version: "$green"${aapt_ver}"
     echo $white" aapt path: "$blue"$(command -v aapt)";
     echo $white" zipalign path: "$blue"$(command -v zipalign)";
     echo $white" rm path: "$blue"$(command -v rm)";

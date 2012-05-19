@@ -7,7 +7,7 @@
 # http://girlintroverted.wordpress.com
 #
 # version: 3.0b
-# Wed. May 16, 2012
+# Sat. May 19, 2012
 # -----------------------------------------------------------------------
 
 # cleanup variables used during installation
@@ -28,14 +28,14 @@ setinstallstatus () {
     local key
     local value
     key="install"
-    value="$installtype"
+    value="${installtype}"
     write_preference
     local key="debugset"
     local value="false"
     write_preference
     unset apktool_ver
-    if [[ -f $HOME/.apkmanager/.debuginfo ]]; then
-        rm -r "$HOME/.apkmanager/.debuginfo"
+    if [[ -f "${HOME}/.apkmanager/.debuginfo" ]]; then
+        rm -r "${HOME}/.apkmanager/.debuginfo"
     fi
 }
 
@@ -251,7 +251,7 @@ setup_homebrew () {
 
 # setup using precompiled/bundled programs
 setup_bundled () {
-    cd "$maindir/other"
+    cd "${maindir}/other"
     clear
     echo ""
     version_banner
@@ -260,26 +260,26 @@ setup_bundled () {
     echo ""
     echo $white" Checking for other/bundled_programs.tar.gz"
     echo ""
-    if [[ ! -f $maindir/other/bundled_programs.tar.gz ]]; then
+    if [[ ! -f "${maindir}/other/bundled_programs.tar.gz" ]]; then
         echo $green" Archive not found, downloading archive..."; $rclr;
         echo ""
-        curl "http://dl.dropbox.com/u/9401664/APK%20Manager/bundled_programs.tar.gz" > "$maindir/other/bundled_programs.tar.gz"
+        curl "http://dl.dropbox.com/u/9401664/APK%20Manager/bundled_programs.tar.gz" > "${maindir}/other/bundled_programs.tar.gz"
         echo ""
     fi
-    local filehash="$(md5 -q $maindir/other/bundled_programs.tar.gz)"
+    local filehash="$(md5 -q ${maindir}/other/bundled_programs.tar.gz)"
     local expected="9780aeca7928aaba3e18cd89d29fbe31"
-    if [[ $filehash = $expected ]]; then
+    if [[ ${filehash} = ${expected} ]]; then
         echo $bgreen" Extracting pre-compiled programs to:"
-        echo $bgreen" $maindir/other"; $rclr;
+        echo $bgreen" ${maindir}/other"; $rclr;
         echo ""
         echo "Extracting pre-compiled programs..." 1>> "$log" 2>&1
-        tar -xzvf "$maindir/other/bundled_programs.tar.gz" 1>> "$log" 2>&1
+        tar -xzvf "${maindir}/other/bundled_programs.tar.gz" 1>> "$log" 2>&1
         if [[ $? -ne 0 ]]; then
             bin_install_err
         else
             echo $bgreen" Removing temporary files..."
             echo "Removing temporary files." 1>> "$log" 2>&1
-            rm -r "$maindir/other/bundled_programs.tar.gz"
+            rm -r "${maindir}/other/bundled_programs.tar.gz"
             echo ""
             echo $bgreen"$apkmftr";
             installtype="bundled"
@@ -289,12 +289,12 @@ setup_bundled () {
         fi
     else
         echo $bred" ERROR: Corrupt download/file, md5 hash fail:"
-        echo $bred" download: $filehash"
-        echo $bred" expected: $expected"
+        echo $bred" download: ${filehash}"
+        echo $bred" expected: ${expected}"
         echo ""
         echo $white"press any key to try download again..."
         wait
-        rm -r "$maindir/other/bundled_programs.tar.gz"
+        rm -r "${maindir}/other/bundled_programs.tar.gz"
         setup_bundled
     fi
 }
@@ -435,31 +435,31 @@ installcheck () {
         do
             if [[ ! $(command -v ${p}) ]]; then
                 count=$((count+1))
-                if [[ $p = adb ]] || [[ $p = aapt ]] || [[ $p = zipalign ]]; then
-                    if [[ $p = aapt ]]; then
+                if [[ ${p} = adb ]] || [[ ${p} = aapt ]] || [[ ${p} = zipalign ]]; then
+                    if [[ ${p} = aapt ]]; then
                         if [[ $(command -v android) ]] && [[ $(command -v brew) ]]; then
                             if [[ $(dirname "$(command -v android)") = /usr/local/bin ]]; then
                                 local sdkrev="$(brew list -v android-sdk | sed s/android-sdk\ //g)"
-                                ln -s "/usr/local/Cellar/android-sdk/${sdkrev}/platform-tools/aapt" /usr/local/bin/aapt
+                                ln -s "/usr/local/Cellar/android-sdk/${sdkrev}/platform-tools/aapt" "/usr/local/bin/aapt"
                                 count=$((count-1))
                             fi
                         else
                             and_sdk_sub
                         fi
-                    elif [[ $p = adb ]] || [[ $p = zipalign ]]; then
+                    elif [[ ${p} = adb ]] || [[ ${p} = zipalign ]]; then
                         and_sdk_sub
                     fi
-                elif [[ $p = pngout ]]; then
+                elif [[ ${p} = pngout ]]; then
                     if [[ $(command -v brew) ]]; then
-                        missing[$count]="$p"
+                        missing[$count]="${p}"
                     else
                         pngout_error
                     fi
-                elif [[ $p = 7za ]]; then
+                elif [[ ${p} = 7za ]]; then
                     p="p7zip"
-                    missing[$count]="$p"
+                    missing[$count]="${p}"
                 else
-                    missing[$count]="$p"
+                    missing[$count]="${p}"
                 fi
             fi
         done

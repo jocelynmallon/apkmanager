@@ -6,8 +6,8 @@
 # by Jocelyn Mallon CC by-nc-sa 2012
 # http://girlintroverted.wordpress.com
 #
-# version: 3.0b2
-# Wed. May 16, 2012
+# version: 3.0b3
+# Sat. May 19, 2012
 # -----------------------------------------------------------------------
 
 # define default directories to function
@@ -27,7 +27,7 @@ write_preference () {
     if [[ ${value} = true ]] || [[ ${value} = false ]]; then
         local bflag="-b"
     fi
-    preftool "$bflag" "$plist" "$key" "$value"
+    preftool "${bflag}" "${plist}" "${key}" "${value}"
 }
 
 # simple date formatting function
@@ -65,7 +65,7 @@ sourced_files_check () {
             echo "fatal_err: $fatal_err"
         fi
     done
-    if [[ $fatal_err -ne 0 ]]; then
+    if [[ ${fatal_err} -ne 0 ]]; then
         startup_fatal_err
         local key="maindir"
         local value="ERROR"
@@ -154,17 +154,17 @@ startup_check () {
     for prg in "optipng" "pngcrush" "pngout" "7za" "java" "sudo" "adb" "aapt" "sox" "zipalign"
     do
         if [[ ! $(command -v ${prg}) ]]; then
-            if [[ $prg = sox ]]; then
+            if [[ ${prg} = sox ]]; then
                 oggopts="disabled"
                 echo "program \"sox\" is missing, ogg functionality disabled" 1>> "$log" 2>&1
-            elif [[ $prg = optipng ]] || [[ $prg = pngcrush ]] || [[ $prg = pngout ]]; then
+            elif [[ ${prg} = optipng ]] || [[ ${prg} = pngcrush ]] || [[ ${prg} = pngout ]]; then
                 local pngerror
                 pngerror=$(($pngerror+1))
-                if [[ $pngerror -ge 3 ]]; then
+                if [[ ${pngerror} -ge 3 ]]; then
                     pngopts="disabled"
                     echo "\"optipng\", \"pngcrush\" & \"pngout\" missing; png options disabled" 1>> "$log" 2>&1
                 fi
-            elif [[ $prg = aapt ]]; then
+            elif [[ ${prg} = aapt ]]; then
                 if [[ $(command -v brew) ]] && [[ $(dirname "$(command -v android)") = /usr/local/bin ]]; then
                     local sdkrev="$(brew list -v android-sdk | sed s/android-sdk\ //g)"
                     ln -s "/usr/local/Cellar/android-sdk/${sdkrev}/platform-tools/aapt" /usr/local/bin/aapt
@@ -172,13 +172,13 @@ startup_check () {
             else
                 local fatal_err
                 fatal_err=$(($fatal_err+1))
-                echo "The program $prg is missing or is not in your"
+                echo "The program ${prg} is missing or is not in your"
                 echo "\$PATH, please install it or fix your \$PATH."
-                echo "$prg is missing or not in PATH" 1>> "$log" 2>&1
+                echo "${prg} is missing or not in PATH" 1>> "$log" 2>&1
             fi
         fi
     done
-    if [[ $fatal_err -ne 0 ]]; then
+    if [[ ${fatal_err} -ne 0 ]]; then
         exit 1
     fi
 }
@@ -205,17 +205,17 @@ and_sdk_check () {
 
 # Test CPU architecture
 archtest () {
-    if [[ -z $arch_ver ]]; then
+    if [[ -z ${arch_ver} ]]; then
         arch_ver="$(uname -m)"
-        if [[ $arch_ver = "Power Macintosh" ]]; then
+        if [[ ${arch_ver} = "Power Macintosh" ]]; then
             echo $bred"SORRY, APK Manager has not been tested on Power PC";
             printf "$bred%s""Macintosh Computers, Press any key to exit."; $rclr;
             wait
             exit 1
-        elif [[ $installtype = homebrew ]]; then
+        elif [[ ${installtype} = homebrew ]]; then
             echo "archtest (running on ${arch_ver} machine)" 1>> "$log" 2>&1
             return 0
-        elif [[ $installtype = preconfigured ]]; then
+        elif [[ ${installtype} = preconfigured ]]; then
             echo "archtest (running on ${arch_ver} machine)" 1>> "$log" 2>&1
             return 0
         elif [[ ${arch_ver} = "x86_64" ]]; then
@@ -257,8 +257,8 @@ colorcheck () {
 
 # Check for existing user settings directory
 user_dir_check () {
-    if [[ ! -d $HOME/.apkmanager ]]; then
-        mkdir -p "$HOME/.apkmanager"
+    if [[ ! -d "${HOME}/.apkmanager" ]]; then
+        mkdir -p "${HOME}/.apkmanager"
     fi
 }
 
@@ -286,7 +286,7 @@ installcheck () {
 migratecheck () {
     echo "migratecheck (check user settings & keys migration status)" 1>> "$log"
         migratecheck="$(defaults read "${plist}" migration 2>/dev/null)"
-        if [[ $? -ne 0 ]] || [[ $migratecheck -ne 1 ]]; then
+        if [[ $? -ne 0 ]] || [[ ${migratecheck} -ne 1 ]]; then
             echo "launching migration script..." 1>> "$log"
             source "${libdir}/migrate.sh"
             if [[ $? -ne 0 ]]; then
@@ -307,9 +307,9 @@ auto_update_check () {
     if [[ $? -ne 0 ]]; then
         disable_auto_updates
         echo "Automatic updates: OFF" 1>> "$log"
-    elif [[ $updatestate -eq 0 ]]; then
+    elif [[ ${updatestate} -eq 0 ]]; then
         echo "Automatic updates: OFF" 1>> "$log"
-    elif [[ $updatestate -eq 1 ]]; then
+    elif [[ ${updatestate} -eq 1 ]]; then
         if [[ ! $(command -v git) ]]; then
             updates_git_err
             return 1
@@ -323,12 +323,12 @@ auto_update_check () {
 # Check for apktool.jar symlink
 apktcheck () {
     echo "apktcheck (checking for apktool.jar symlink)" 1>> "$log" 2>&1
-    if [[ ! -e $(readlink ${libdir}/apktool.jar) ]]; then
-        rm ${libdir}/apktool.jar
+    if [[ ! -e $(readlink "${libdir}/apktool.jar") ]]; then
+        rm "${libdir}/apktool.jar"
     fi
-    if [[ ! -L ${libdir}/apktool.jar ]]; then
+    if [[ ! -L "${libdir}/apktool.jar" ]]; then
         local jarfile
-        jarfile="$(ls ${aptdir} | sed -n "/apktool_...\.jar/h;$ {x;p;}")"
+        jarfile="$(ls "${aptdir}" | sed -n "/apktool_...\.jar/h;$ {x;p;}")"
         echo "No apktool.jar symlink found in ${libdir}" 1>> "$log" 2>&1
         echo "==> Linking ${jarfile} > apktool.jar" 1>> "$log" 2>&1
         ln -s -f -F "${aptdir}/${jarfile}" "${libdir}/apktool.jar"
@@ -346,7 +346,7 @@ set_current_pid () {
 # Toggle utterly basic debug info in menu_header
 basic_debug () {
     debugstate="$(defaults read "${plist}" debug 2>/dev/null)"
-    if [[ $? -ne 0 ]] || [[ $debugstate -eq 0 ]]; then
+    if [[ $? -ne 0 ]] || [[ ${debugstate} -eq 0 ]]; then
         local key="debug"
         local value="true"
         write_preference
@@ -386,11 +386,11 @@ logstart () {
 
 # Reset logviewing app to Apple Textedit
 logvreset () {
-    if [[ $logapp ]]; then
-        echo "$logapp command line support not found" 1>> "$log" 2>&1
+    if [[ ${logapp} ]]; then
+        echo "${logapp} command line support not found" 1>> "$log" 2>&1
         echo "reverting to default, Apple TextEdit" 1>> "$log" 2>&1
     else
-        echo "log viewing app set to: $logapp" 1>> "$log" 2>&1
+        echo "log viewing app set to: ${logapp}" 1>> "$log" 2>&1
     fi
     local key="logviewapp"
     local value="open"
@@ -414,7 +414,7 @@ logvset () {
 
 # Check for user logviewing app preference
 logvchk () {
-    if [[ -z $logviewer ]]; then
+    if [[ -z ${logviewer} ]]; then
         logviewer="$(defaults read "${plist}" logviewapp 2>/dev/null)"
         if [[ $? -ne 0 ]]; then
             logvreset
@@ -432,11 +432,11 @@ defpngtool () {
 
 # Set png optimization tool
 pngtoolset () {
-    if [[ $pngopts = disabled ]]; then
+    if [[ ${pngopts} = disabled ]]; then
         pngtool="NONE - DISABLED"
     else
         pngtool="$(defaults read "${plist}" pngtool 2>/dev/null)"
-        if [[ $? -ne 0 ]] || [[ ! $(command -v $pngtool) ]]; then
+        if [[ $? -ne 0 ]] || [[ ! $(command -v ${pngtool}) ]]; then
             defpngtool
         fi
     fi
@@ -447,11 +447,11 @@ pngtoolset () {
 project_test () {
     echo "project_test (checking number of project files in modding folder)" 1>> "$log"
     local prjnum="$(ls "${maindir}/${mod_dir}" | wc -l)"
-    if [[ $prjnum -gt 1 ]]; then
+    if [[ ${prjnum} -gt 1 ]]; then
         echo "==>${prjnum} project files found in modding folder" 1>> "$log"
         capp="None"
         prjext=""
-    elif [[ $prjnum -eq 0 ]]; then
+    elif [[ ${prjnum} -eq 0 ]]; then
         echo "modding folder is empty" 1>> "$log"
         capp="None"
         prjext=""
@@ -471,7 +471,7 @@ project_test () {
 
 # test if no project currently selected
 capp_test () {
-    if [[ $capp = None ]] || [[ -z $capp ]]; then
+    if [[ ${capp} = None ]] || [[ -z ${capp} ]]; then
         echo $bred"Warning, no project currently selected";
         echo "no project selected, launching projects menu" 1>> "$log" 2>&1
         echo $bred"press any key to launch project select menu"; $rclr;
@@ -542,8 +542,12 @@ comp_level () {
 # trap handler for non-zero exit/return codes
 err_trap_handler () {
     errline="$1"
-    errfunc="$2"
-    errcode="$3"
+    errcode="$2"
+    if [[ "$#" -lt "3" ]]; then
+        errfunc="main.sh"
+    else
+        errfunc="$3"
+    fi
     echo "==> ERROR: ${errfunc} code: ${errcode} line: ${errline}" 1>> "$log" 2>&1
 }
 
@@ -558,6 +562,8 @@ control_c () {
 
 
 # Start
+set -o errtrace
+
 # set preference file domain name
 plist="com.girlintroverted.apkmanager"
 
@@ -668,7 +674,7 @@ set_current_pid
 echo "$logspcr" 1>> "$log" 2>&1
 
 # trap error codes and line number of errors
-trap 'err_trap_handler ${LINENO} ${FUNCNAME} $?' ERR
+trap 'err_trap_handler ${LINENO} $? ${FUNCNAME}' ERR
 
 # trap keyboard interrupt (control-c)
 trap control_c SIGINT
@@ -690,14 +696,13 @@ fi
 # main loop, check options and show main menu
 while [[ 1 = 1 ]];
 do
-    set -o errtrace
-    if [[ $v_mode -ne 0 ]]; then
+    if [[ ${v_mode} -ne 0 ]]; then
         set -v
     fi
-    if [[ $e_mode -ne 0 ]]; then
+    if [[ ${e_mode} -ne 0 ]]; then
         set -e
     fi
-    if [[ $t_mode -ne 0 ]]; then
+    if [[ ${t_mode} -ne 0 ]]; then
         set -x
     fi
     clear
