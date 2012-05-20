@@ -7,7 +7,7 @@
 # http://girlintroverted.wordpress.com
 #
 # version: 3.0b
-# Sat. May 19, 2012
+# Sun. May 20, 2012
 # -----------------------------------------------------------------------
 
 # Remove existing files before extract/decompile
@@ -348,6 +348,50 @@ install_d2j_check () {
     fi
 }
 
+# actually installing dex2jar now
+install_d2j_sub () {
+    echo $green"Extracting dex2jar-0.0.9.8.tar.gz..."
+    echo ""
+    cd "${maindir}/other"
+    echo "==> extracting dex2jar archive" 1>> "$log"
+    tar -xzvf "${maindir}/other/dex2jar-0.0.9.8.tar.gz" 1>> "$log" 2>&1
+    echo $green"Removing temporary files."
+    echo $green"renaming folder to \$maindir/other/dex2jar"
+    echo "==> renaming folder to \$maindir/other/dex2jar" 1>> "$log"
+    mv -f "${maindir}/other/dex2jar-0.0.9.8" "${maindir}/other/dex2jar"
+    cd "${maindir}/other/dex2jar/"
+    echo $green"deleting windows .bat files..."
+    echo "==> deleting windows .bat files..." 1>> "$log"
+    local f
+    ls -1 *.bat | while read f ; do
+        rm -r "${f}"
+    done
+    echo $green"patching for spaces in path fix..."
+    echo "==> patching files for spaces in path fix..." 1>> "$log"
+    ls -1 *.sh | while read f ; do
+        if [[ "${f}" = "dex-dump.sh" ]]; then
+            sed -i "" "s,\$1,\"\$1\",1" "${f}"
+            sed -i "" "s,\$2,\"\$2\",1" "${f}"
+            sed -i "" "s,\$3,\"\$3\",1" "${f}"
+            sed -i "" "s,\$4,\"\$4\",1" "${f}"
+            sed -i "" "s,\$5,\"\$5\",1" "${f}"
+            sed -i "" "s,\$6,\"\$6\",1" "${f}"
+        else
+            sed -i "" "s,\$@,\"\$@\",1" "${f}"
+        fi
+    done
+    echo $green"making dex2jar directory executable..."
+    echo "==> removing \".sh\" file extensions..." 1>> "$log"
+    ls -1 *.sh | while read f ; do
+        mv "${f}" "${f%\.*}"
+    done
+    echo "==> making dex2jar directory executable..." 1>> "$log"
+    chmod -R ug+x "${maindir}/other/dex2jar/"
+    echo $green"removing dex2jar-0.0.9.8.tar.gz"
+    echo "==> removing dex2jar-0.0.9.8.tar.gz" 1>> "$log"
+    rm -r "${maindir}/other/dex2jar-0.0.9.8.tar.gz"
+}
+
 # Download and install dex2jar
 install_d2j () {
     echo "install_d2j (actually installing dex2jar now)" 1>> "$log"
@@ -360,32 +404,7 @@ install_d2j () {
     local filehash="$(md5 -q "${maindir}/other/dex2jar-0.0.9.8.tar.gz")"
     local expected="deb35f0339b5f717c60e17317452a72c"
     if [[ ${filehash} = ${expected} ]]; then
-        echo $green"Extracting dex2jar-0.0.9.8.tar.gz..."
-        echo ""
-        cd "${maindir}/other"
-        echo "extracting dex2jar archive" 1>> "$log"
-        tar -xzvf "${maindir}/other/dex2jar-0.0.9.8.tar.gz" 1>> "$log" 2>&1
-        echo $green"Removing temporary files."
-        echo $green"renaming folder to \$maindir/other/dex2jar"
-        echo "renaming folder to \$maindir/other/dex2jar" 1>> "$log"
-        mv -f "${maindir}/other/dex2jar-0.0.9.8" "${maindir}/other/dex2jar"
-        cd "${maindir}/other/dex2jar/"
-        echo $green"deleting windows .bat files..."
-        echo "deleting windows .bat files..." 1>> "$log"
-        local f
-        ls -1 *.bat | while read f ; do
-            rm -r "${f}"
-        done
-        echo $green"making dex2jar directory executable..."
-        echo "removing \".sh\" file extensions..." 1>> "$log"
-        ls -1 *.sh | while read f ; do
-            mv "${f}" "${f%\.*}"
-        done
-        echo "making dex2jar directory executable..." 1>> "$log"
-        chmod -R ug+x "${maindir}/other/dex2jar/"
-        echo $green"removing dex2jar-0.0.9.8.tar.gz"
-        echo "removing dex2jar-0.0.9.8.tar.gz" 1>> "$log"
-        rm -r "${maindir}/other/dex2jar-0.0.9.8.tar.gz"
+        install_d2j_sub
         install_d2j_check
     else
         echo $bred"ERROR: Corrupt download/file, md5 hash fail:"
