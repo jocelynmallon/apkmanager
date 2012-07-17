@@ -80,7 +80,7 @@ install_apktool () {
         echo ""
     fi
     local filehash="$(md5 -q "${maindir}/other/apktool_jar_files.tar.gz")"
-    local expected="4d1421628f009d063a04831210036952"
+    local expected="5d19c1ad36c655dcfcf710af3492e068"
     if [[ ${filehash} = ${expected} ]]; then
         echo $white" Extracting extra apktool.jar files to:"
         echo $green" ${maindir}/other/apktool"; $rclr;
