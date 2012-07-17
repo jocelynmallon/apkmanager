@@ -7,7 +7,7 @@
 # http://girlintroverted.wordpress.com
 #
 # version: 3.0b
-# Sat. May 19, 2012
+# Tue. Jul 17, 2012
 # -----------------------------------------------------------------------
 
 # setup git repo address
@@ -349,7 +349,7 @@ updates_check_prompt () {
     read input
     case $input in
         [yY]) update_apkm ;;
-        [nN]) echo "user cancelled update check" 1>> "$log" ;;
+        [nN]) update_last_epoch; echo "user cancelled update check" 1>> "$log" ;;
            *) input_err; updates_check_prompt ;;
     esac
 }
