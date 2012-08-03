@@ -6,8 +6,8 @@
 # by Jocelyn Mallon CC by-nc-sa 2012
 # http://girlintroverted.wordpress.com
 #
-# version: 3.0b
-# Sun. May 20, 2012
+# version: 3.0b5
+# Fri. Aug 3, 2012
 # -----------------------------------------------------------------------
 
 # Remove existing files before extract/decompile
@@ -192,16 +192,16 @@ extract_classes_dex () {
 # View java source, deobfuscate source
 decj_jar_deobf () {
     echo "d2j_jar_deobf (attempt to deobfuscate jar) function" 1>> "$log"
-    d2j-init-deobf -f -o "${maindir}/${prj_dir}/${capp}/java/init.txt" "${maindir}/${prj_dir}/${capp}/java/classes_dex2jar.jar"
-    d2j-jar-remap -f -c "${maindir}/${prj_dir}/${capp}/java/init.txt" -o "${maindir}/${prj_dir}/${capp}/java/classes_deobf.jar" "${maindir}/${prj_dir}/${capp}/java/classes_dex2jar.jar"
+    d2j-init-deobf -f -o "${maindir}/${prj_dir}/${capp}/java/init.txt" "${maindir}/${prj_dir}/${capp}/java/classes-dex2jar.jar"
+    d2j-jar-remap -f -c "${maindir}/${prj_dir}/${capp}/java/init.txt" -o "${maindir}/${prj_dir}/${capp}/java/classes-deobf.jar" "${maindir}/${prj_dir}/${capp}/java/classes-dex2jar.jar"
     rm -r "${maindir}/${prj_dir}/${capp}/java/init.txt"
-    rm -r "${maindir}/${prj_dir}/${capp}/java/classes_dex2jar.jar"
+    rm -r "${maindir}/${prj_dir}/${capp}/java/classes-dex2jar.jar"
 }
 
 # View java source - process classes.dex
 decj_process_dex () {
     echo "decj_process_dex (convert classes.dex to jar file) function" 1>> "$log"
-    dex2jar "${maindir}/${prj_dir}/${capp}/java/classes.dex"
+    d2j-dex2jar -force "${maindir}/${prj_dir}/${capp}/java/classes.dex" -o "${maindir}/${prj_dir}/${capp}/java/classes-dex2jar.jar"
 }
 
 # View java source, check for/create /java folder
@@ -232,10 +232,10 @@ decj_norm_sub () {
 # View java source, extrat jar and open with JD-GUI
 decj_finish () {
     echo "decj_finish (extract decompiled jar) function" 1>> "$log"
-    if [[ -f "${maindir}/${prj_dir}/${capp}/java/classes_dex2jar.jar" ]]; then
-        local jarfile="${maindir}/${prj_dir}/${capp}/java/classes_dex2jar.jar"
-    elif [[ -f "${maindir}/${prj_dir}/${capp}/java/classes_deobf.jar" ]]; then
-        local jarfile="${maindir}/${prj_dir}/${capp}/java/classes_deobf.jar"
+    if [[ -f "${maindir}/${prj_dir}/${capp}/java/classes-dex2jar.jar" ]]; then
+        local jarfile="${maindir}/${prj_dir}/${capp}/java/classes-dex2jar.jar"
+    elif [[ -f "${maindir}/${prj_dir}/${capp}/java/classes-deobf.jar" ]]; then
+        local jarfile="${maindir}/${prj_dir}/${capp}/java/classes-deobf.jar"
     fi
     cd "${maindir}/${prj_dir}/${capp}/java"
     jar xvf "${jarfile}"
@@ -350,15 +350,15 @@ install_d2j_check () {
 
 # actually installing dex2jar now
 install_d2j_sub () {
-    echo $green"Extracting dex2jar-0.0.9.8.tar.gz..."
+    echo $green"Extracting ${d2j_file}..."
     echo ""
     cd "${maindir}/other"
     echo "==> extracting dex2jar archive" 1>> "$log"
-    tar -xzvf "${maindir}/other/dex2jar-0.0.9.8.tar.gz" 1>> "$log" 2>&1
+    tar -xzvf "${maindir}/other/${d2j_file}" 1>> "$log" 2>&1
     echo $green"Removing temporary files."
     echo $green"renaming folder to \$maindir/other/dex2jar"
     echo "==> renaming folder to \$maindir/other/dex2jar" 1>> "$log"
-    mv -f "${maindir}/other/dex2jar-0.0.9.8" "${maindir}/other/dex2jar"
+    mv -f "${maindir}/other/dex2jar-0.0.9.9" "${maindir}/other/dex2jar"
     cd "${maindir}/other/dex2jar/"
     echo $green"deleting windows .bat files..."
     echo "==> deleting windows .bat files..." 1>> "$log"
@@ -387,22 +387,23 @@ install_d2j_sub () {
     done
     echo "==> making dex2jar directory executable..." 1>> "$log"
     chmod -R ug+x "${maindir}/other/dex2jar/"
-    echo $green"removing dex2jar-0.0.9.8.tar.gz"
-    echo "==> removing dex2jar-0.0.9.8.tar.gz" 1>> "$log"
-    rm -r "${maindir}/other/dex2jar-0.0.9.8.tar.gz"
+    echo $green"removing ${d2j_file}"
+    echo "==> removing ${d2j_file}" 1>> "$log"
+    rm -r "${maindir}/other/${d2j_file}"
 }
 
 # Download and install dex2jar
 install_d2j () {
+    d2j_file="dex2jar-0.0.9.9.tar.gz"
     echo "install_d2j (actually installing dex2jar now)" 1>> "$log"
-    if [[ ! -f "${maindir}/other/dex2jar-0.0.9.8.tar.gz" ]]; then
+    if [[ ! -f "${maindir}/other/${d2j_file}" ]]; then
         echo $green" Local copy of archive not found, downloading now..."; $rclr;
         echo ""
-        curl "http://dex2jar.googlecode.com/files/dex2jar-0.0.9.8.tar.gz" > "${maindir}/other/dex2jar-0.0.9.8.tar.gz"
+        curl "http://dex2jar.googlecode.com/files/${d2j_file}" > "${maindir}/other/${d2j_file}"
         echo ""
     fi
-    local filehash="$(md5 -q "${maindir}/other/dex2jar-0.0.9.8.tar.gz")"
-    local expected="deb35f0339b5f717c60e17317452a72c"
+    local filehash="$(md5 -q "${maindir}/other/${d2j_file}")"
+    local expected="6101d4d4dd25558ca1818ad534c55ff9"
     if [[ ${filehash} = ${expected} ]]; then
         install_d2j_sub
         install_d2j_check
@@ -413,7 +414,7 @@ install_d2j () {
         echo ""
         echo $white"press any key to try download again..."
         wait
-        rm -r "${maindir}/other/dex2jar-0.0.9.8.tar.gz"
+        rm -r "${maindir}/other/${d2j_file}"
         install_d2j
     fi
     echo "install_d2j function complete" 1>> "$log"
