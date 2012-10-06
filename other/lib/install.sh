@@ -93,8 +93,9 @@ brew_install_error () {
 
 # pngout error message
 pngout_error () {
-    echo $bred" WARNING: pngout was not found on this system,"
-    echo $bred" and APK Manager did not find \"homebrew\" either."
+#    echo $bred" WARNING: pngout was not found on this system,"
+#    echo $bred" and APK Manager did not find \"homebrew\" either."
+    echo $bred" WARNING: pngout was not found on this system."
     echo $bred" To install pngout, please select pngout for"
     echo $bred" your optimization tool from the debug menu inside"
     echo $bred" APK Manager once setup finishes."
@@ -165,13 +166,14 @@ setup_homebrew () {
     declare -i count=1
     while [[ ${missing[$count]} ]]
     do
-        if [[ ${missing[$count]} = pngout ]]; then
-            if [[ ! $(brew tap | grep "adamv/alt") ]]; then
-                echo $green" brew tap adamv/alt "$blue"(to install pngout)"
-                btap="1"
-            fi
-            echo $green" brew install ${missing[$count]}"
-        elif [[ ${missing[$count]} = android-sdk ]]; then
+#        if [[ ${missing[$count]} = pngout ]]; then
+#            if [[ ! $(brew tap | grep "adamv/alt") ]]; then
+#                echo $green" brew tap adamv/alt "$blue"(to install pngout)"
+#                btap="1"
+#            fi
+#            echo $green" brew install ${missing[$count]}"
+#        elif [[ ${missing[$count]} = android-sdk ]]; then
+        if [[ ${missing[$count]} = android-sdk ]]; then
             needsdk="1"
             echo $green" brew install ${missing[$count]}"
         elif [[ ${missing[$count]} = sox ]]; then
@@ -431,7 +433,8 @@ installcheck () {
         sudo_error
     else
         declare -i count=0
-        for p in "optipng" "sox" "pngcrush" "pngout" "7za" "adb" "aapt" "zipalign"
+#        for p in "optipng" "sox" "pngcrush" "pngout" "7za" "adb" "aapt" "zipalign"
+        for p in "optipng" "sox" "pngcrush" "7za" "adb" "aapt" "zipalign"
         do
             if [[ ! $(command -v ${p}) ]]; then
                 count=$((count+1))
@@ -449,12 +452,12 @@ installcheck () {
                     elif [[ ${p} = adb ]] || [[ ${p} = zipalign ]]; then
                         and_sdk_sub
                     fi
-                elif [[ ${p} = pngout ]]; then
-                    if [[ $(command -v brew) ]]; then
-                        missing[$count]="${p}"
-                    else
-                        pngout_error
-                    fi
+#                elif [[ ${p} = pngout ]]; then
+#                    if [[ $(command -v brew) ]]; then
+#                        missing[$count]="${p}"
+#                    else
+#                        pngout_error
+#                    fi
                 elif [[ ${p} = 7za ]]; then
                     p="p7zip"
                     missing[$count]="${p}"

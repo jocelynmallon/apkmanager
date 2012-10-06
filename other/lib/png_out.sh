@@ -11,7 +11,8 @@
 # -----------------------------------------------------------------------
 
 # static url for latest version of pngout for mac
-pngouturl="http://static.jonof.id.au/dl/kenutils/pngout-20110722-darwin.tar.gz"
+pngouturl="http://static.jonof.id.au/dl/kenutils/pngout-20120530-darwin.tar.gz"
+pngoutfld="pngout-20120530-darwin"
 
 # Check if pngout install succeeded
 inst_pngo_check () {
@@ -34,6 +35,8 @@ inst_pngo_check () {
         echo $bred"Please check the log and try again."; $rclr;
         debuganykey
     fi
+    unset pngouturl
+    unset pngoutfld
 }
 
 # Actually install pngout
@@ -43,7 +46,8 @@ install_pngout () {
     menu_header
     echo $bgreen"$apkmspr"; $rclr;
     echo ""
-    if [[ ${installtype} = homebrew ]]; then
+#    if [[ ${installtype} = homebrew ]]; then
+    if [[ ${installtype} = disabled ]]; then
         if [[ ${BTAP} -eq 1 ]]; then
             brew tap adamv/alt
             unset BTAP
@@ -56,14 +60,14 @@ install_pngout () {
         echo $bgreen"Downloading pngout..."; $rclr;
         curl "${pngouturl}" > "${maindir}/other/pngout.tar.gz"
         local filehash="$(md5 -q "${maindir}/other/pngout.tar.gz")"
-        local expected="ce70a9d70e08b1920e5ac88d130d0eb9"
+        local expected="f31d9971603d7cb976b286dfee213618"
         if [[ ${filehash} = ${expected} ]]; then
             echo $green"Extracting pngout..."; $rclr;
             tar -xzvf "${maindir}/other/pngout.tar.gz" 1>> "$log" 2>&1
-            cp -p "${maindir}/pngout-20110722-darwin/pngout" "${maindir}/other/bin/pngout"
+            cp -p "${maindir}/${pngoutfld}/pngout" "${maindir}/other/bin/pngout"
             echo $green"cleaning up temporary files..."; $rclr;
             rm -rf "${maindir}/other/pngout.tar.gz"
-            rm -rf "${maindir}/pngout-20110722-darwin"
+            rm -rf "${maindir}/${pngoutfld}"
             inst_pngo_check
         else
             echo $bred" ERROR: Corrupt download/file, md5 hash fail:"
@@ -89,7 +93,8 @@ pngout_prompt () {
     echo $white" source software, and is "$bgreen" (c) Ken Silverman http://advsys.net/ken/utils.htm"
     echo $white" Due to copyright, pngout can't legally be redistributed with APK Manager."
     echo ""
-    if [[ ${installtype} = homebrew ]]; then
+#    if [[ ${installtype} = homebrew ]]; then
+    if [[ ${installtype} = disabled ]]; then
         echo $white" However, APK Manager can install pngout using Homebrew,"
         echo $white" thanks to the alt formula here: "$blue"https://github.com/adamv/homebrew-alt"
         echo $white" this will execute the following commands:"
