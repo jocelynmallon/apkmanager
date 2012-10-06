@@ -235,7 +235,7 @@ getapktver () {
 getsoxver () {
     if [[ ${installtype} = homebrew ]]; then
         if [[ $(command -v sox) ]]; then
-            value="$(brew list -v sox | sed s/sox\ //g)"
+            value="$(brew list --versions sox | sed s/sox\ //g)"
         else
             value="ERROR_sox_not_found"
         fi

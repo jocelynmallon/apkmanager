@@ -439,7 +439,7 @@ installcheck () {
                     if [[ ${p} = aapt ]]; then
                         if [[ $(command -v android) ]] && [[ $(command -v brew) ]]; then
                             if [[ $(dirname "$(command -v android)") = /usr/local/bin ]]; then
-                                local sdkrev="$(brew list -v android-sdk | sed s/android-sdk\ //g)"
+                                local sdkrev="$(brew list --versions android-sdk | sed s/android-sdk\ //g)"
                                 ln -s "/usr/local/Cellar/android-sdk/${sdkrev}/platform-tools/aapt" "/usr/local/bin/aapt"
                                 count=$((count-1))
                             fi

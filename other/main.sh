@@ -166,7 +166,7 @@ startup_check () {
                 fi
             elif [[ ${prg} = aapt ]]; then
                 if [[ $(command -v brew) ]] && [[ $(dirname "$(command -v android)") = /usr/local/bin ]]; then
-                    local sdkrev="$(brew list -v android-sdk | sed s/android-sdk\ //g)"
+                    local sdkrev="$(brew list --versions android-sdk | sed s/android-sdk\ //g)"
                     ln -s "/usr/local/Cellar/android-sdk/${sdkrev}/platform-tools/aapt" /usr/local/bin/aapt
                 fi
             else
@@ -188,7 +188,7 @@ and_sdk_check () {
     if [[ -z $ANDROID_SDK_ROOT ]]; then
         if [[ $(command -v brew) ]]; then
             if [[ $(dirname "$(command -v android)") = /usr/local/bin ]]; then
-                local sdkrev="$(brew list -v android-sdk | sed s/android-sdk\ //g)"
+                local sdkrev="$(brew list --versions android-sdk | sed s/android-sdk\ //g)"
                 export "ANDROID_SDK_ROOT=/usr/local/Cellar/android-sdk/${sdkrev}"
             fi
         else
