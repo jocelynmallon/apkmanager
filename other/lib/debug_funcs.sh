@@ -279,7 +279,7 @@ getdebuginfo () {
         elif [[ ${p} = optipng ]]; then
             value="$(optipng -v | grep 'OptiPNG version......' | sed s/OptiPNG\ version\ //g)"
         elif [[ ${p} = pngcrush ]]; then
-            value="$(pngcrush -version | grep 'pngcrush.......' | sed s/pngcrush\ //g | cut -d , -f1)"
+            value="$(pngcrush -version 2>&1 | grep 'pngcrush' | sed s/pngcrush\ //g | cut -d , -f1)"
         elif [[ ${p} = pngout ]]; then
             getpngoutver
         elif [[ ${p} = sox ]]; then
