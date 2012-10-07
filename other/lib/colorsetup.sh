@@ -6,8 +6,8 @@
 # by Jocelyn Mallon CC by-nc-sa 2012
 # http://girlintroverted.wordpress.com
 #
-# version: 3.0b
-# Fri. May 11, 2012
+# version: 3.0
+# Sun. Oct 07, 2012
 # -----------------------------------------------------------------------
 
 # Set dark color scheme function

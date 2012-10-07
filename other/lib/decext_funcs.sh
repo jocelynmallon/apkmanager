@@ -6,8 +6,8 @@
 # by Jocelyn Mallon CC by-nc-sa 2012
 # http://girlintroverted.wordpress.com
 #
-# version: 3.0b5
-# Fri. Aug 3, 2012
+# version: 3.0
+# Sun. Oct 07, 2012
 # -----------------------------------------------------------------------
 
 # Remove existing files before extract/decompile
