@@ -58,6 +58,50 @@ toggle_error () {
     fi
 }
 
+# Format and view git commit log
+view_git_log () {
+    clear
+    menu_header
+    debug_header
+    echo $bgreen"$apkmspr"; $rclr;
+    echo $white"Viewing last "$bgreen"15"$white" commits/changes made to APK Manager..."
+    echo ""
+    echo "$(git log --pretty=format:"%Cred%h%Creset | %Cgreen%ad%Creset | %s" --date=short --max-count=15)"
+    echo ""
+    echo $bgreen"$apkmftr";
+    echo $white"press "$bgreen"G"$white" to open commit history on github.com"; $rclr;
+    echo $white"press "$bgreen"W"$white" to view the wiki changelog on github.com"; $rclr;
+    echo $white"press "$bgreen"Q"$white" to return to debug menu"; $rclr;
+    printf "$bwhite%s""Please select an option from above: "; $rclr;
+    read input
+    case "$input" in
+     [gG])  view_github_commits ;;
+     [wW])  view_github_wiki ;;
+     [qQ])  ;;
+        *)  input_err; view_git_log ;;
+    esac
+    unset input
+}
+
+# Open the github wiki changelog page
+view_github_wiki () {
+    open https://github.com/jocelynmallon/apkmanager/wiki/Changelog
+}
+
+# Open the github commit history page
+view_github_commits () {
+    open https://github.com/jocelynmallon/apkmanager/commits/master/
+}
+
+# View changelog/git-log
+view_changelog () {
+    if [[ $(command -v git) ]] && [[ -d "${maindir}/.git" ]]; then
+        view_git_log
+    else
+        view_github_wiki
+    fi
+}
+
 # Toggle APK Manager symlink
 apkm_tool_toggle () {
     if [[ $(echo ${PATH} | grep -m1 "/usr/local/bin") ]]; then

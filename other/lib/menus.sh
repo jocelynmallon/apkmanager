@@ -208,7 +208,7 @@ debug_menu () {
     echo $bgreen"  1   "$white"Set editor for log/txt files";
     echo $bgreen"  2   "$white"View binary info, paths, etc. ";
     echo $bgreen"  3   "$white"View README" $blue"(opens wiki on github)";
-    echo $bgreen"  4   "$white"View CHANGELOG" $blue"(opens wiki on github)";
+    echo $bgreen"  4   "$white"View CHANGELOG/COMMIT History";
     echo $bgreen"  5   "$white"View TIPS" $blue"(opens wiki on github)";
     echo $bgreen"  6   "$white"View LOG.txt";
     echo $bgreen"  7   "$white"View ADBLOG.txt "$blue"(if file exists)";
@@ -233,7 +233,7 @@ debug_menu () {
          1)  textapp_menu ; debug_menu ;;
          2)  debug_display; debug_menu ;;
          3)  open https://github.com/jocelynmallon/apkmanager/wiki; debug_menu ;;
-         4)  open https://github.com/jocelynmallon/apkmanager/wiki/Changelog; debug_menu ;;
+         4)  view_changelog; debug_menu ;;
          5)  open https://github.com/jocelynmallon/apkmanager/wiki/General-Tips; debug_menu ;;
          6)  txt="$log" 2>> "$log"; read_txt; debug_menu ;;
          7)  read_adb_log; debug_menu ;;
