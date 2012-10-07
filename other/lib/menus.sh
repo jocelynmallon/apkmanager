@@ -277,7 +277,7 @@ restart () {
     echo $bgreen"  11  "$white"Decompile "$blue"(Supports both apk and jar files)";
     echo $bgreen"  12  "$white"Decompile with dependencies"$blue" (For propietary rom apks)" $bred"(apk files only)";
     echo $bgreen"  13  "$white"Advanced Decompile APK "$blue"(Uses baksmali for code, apktool for resources)";
-    echo $bgreen"  14  "$white"Compile "$blue"(For use with decompile options: 10, 11, 12)";
+    echo $bgreen"  14  "$white"Compile "$blue"(For use with decompile options: 11, 12, 13)";
     echo $bgreen"  15  "$white"Compile / Sign / Install "$blue"(All in one step) "$bred"(apk files only)";
     echo $bgreen"  16  "$white"Advanced \"All-in-one\" "$blue"(Zip/Compile, sign with private keys, install)";
     echo $bgreen"  17  "$white"View Java Source "$blue"(apk and jar support) "$bred"(CANNOT be recompiled)";
