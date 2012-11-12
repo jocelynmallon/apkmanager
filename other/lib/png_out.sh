@@ -7,12 +7,17 @@
 # http://girlintroverted.wordpress.com
 #
 # version: 3.0
-# Sun. Oct 07, 2012
+# Sun. Nov 11, 2012
 # -----------------------------------------------------------------------
 
 # static url for latest version of pngout for mac
 pngouturl="http://static.jonof.id.au/dl/kenutils/pngout-20120530-darwin.tar.gz"
-pngoutfld="pngout-20120530-darwin"
+
+# setup name of downloaded folder
+set_pngout_fld () {
+    pngoutfld="${pngouturl##*/}"
+    pngoutfld="${pngoutfld%%.*}"
+}
 
 # Check if pngout install succeeded
 inst_pngo_check () {
@@ -42,6 +47,7 @@ inst_pngo_check () {
 # Actually install pngout
 install_pngout () {
     echo "install_pngout (download and install pngout) function" 1>> "$log"
+    set_pngout_fld
     clear
     menu_header
     echo $bgreen"$apkmspr"; $rclr;
