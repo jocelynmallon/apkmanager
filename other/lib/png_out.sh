@@ -6,12 +6,13 @@
 # by Jocelyn Mallon CC by-nc-sa 2012
 # http://girlintroverted.wordpress.com
 #
-# version: 3.0
-# Sun. Nov 11, 2012
+# version: 3.0.2
+# Wed. May 22, 2013
 # -----------------------------------------------------------------------
 
 # static url for latest version of pngout for mac
-pngouturl="http://static.jonof.id.au/dl/kenutils/pngout-20120530-darwin.tar.gz"
+pngouturl="http://static.jonof.id.au/dl/kenutils/pngout-20130221-darwin.tar.gz"
+pngoutmd5="2f35b7369d5ab668cea414772de6fba9"
 
 # setup name of downloaded folder
 set_pngout_fld () {
@@ -42,6 +43,7 @@ inst_pngo_check () {
     fi
     unset pngouturl
     unset pngoutfld
+    unset pngoutmd5
 }
 
 # Actually install pngout
@@ -66,8 +68,7 @@ install_pngout () {
         echo $bgreen"Downloading pngout..."; $rclr;
         curl "${pngouturl}" > "${maindir}/other/pngout.tar.gz"
         local filehash="$(md5 -q "${maindir}/other/pngout.tar.gz")"
-        local expected="f31d9971603d7cb976b286dfee213618"
-        if [[ ${filehash} = ${expected} ]]; then
+        if [[ ${filehash} = ${pngoutmd5} ]]; then
             echo $green"Extracting pngout..."; $rclr;
             tar -xzvf "${maindir}/other/pngout.tar.gz" 1>> "$log" 2>&1
             cp -p "${maindir}/${pngoutfld}/pngout" "${maindir}/other/bin/pngout"
@@ -78,7 +79,7 @@ install_pngout () {
         else
             echo $bred" ERROR: Corrupt download/file, md5 hash fail:"
             echo $bred" download: ${filehash}"
-            echo $bred" expected: ${expected}"
+            echo $bred" expected: ${pngoutmd5}"
             echo ""
             echo $white"press any key to try download again..."
             wait
