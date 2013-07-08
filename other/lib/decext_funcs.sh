@@ -6,8 +6,8 @@
 # by Jocelyn Mallon CC by-nc-sa 2012
 # http://girlintroverted.wordpress.com
 #
-# version: 3.0
-# Sun. Oct 07, 2012
+# version: 3.0.3
+# Wed. Jul 7, 2013
 # -----------------------------------------------------------------------
 
 # Remove existing files before extract/decompile
@@ -201,7 +201,7 @@ decj_jar_deobf () {
 # View java source - process classes.dex
 decj_process_dex () {
     echo "decj_process_dex (convert classes.dex to jar file) function" 1>> "$log"
-    d2j-dex2jar -force "${maindir}/${prj_dir}/${capp}/java/classes.dex" -o "${maindir}/${prj_dir}/${capp}/java/classes-dex2jar.jar"
+    d2j-dex2jar -f "${maindir}/${prj_dir}/${capp}/java/classes.dex" -o "${maindir}/${prj_dir}/${capp}/java/classes-dex2jar.jar"
 }
 
 # View java source, check for/create /java folder
@@ -358,27 +358,13 @@ install_d2j_sub () {
     echo $green"Removing temporary files."
     echo $green"renaming folder to \$maindir/other/dex2jar"
     echo "==> renaming folder to \$maindir/other/dex2jar" 1>> "$log"
-    mv -f "${maindir}/other/dex2jar-0.0.9.9" "${maindir}/other/dex2jar"
+    mv -f "${maindir}/other/${d2j_folder}" "${maindir}/other/dex2jar"
     cd "${maindir}/other/dex2jar/"
     echo $green"deleting windows .bat files..."
     echo "==> deleting windows .bat files..." 1>> "$log"
     local f
     ls -1 *.bat | while read f ; do
         rm -r "${f}"
-    done
-    echo $green"patching for spaces in path fix..."
-    echo "==> patching files for spaces in path fix..." 1>> "$log"
-    ls -1 *.sh | while read f ; do
-        if [[ "${f}" = "dex-dump.sh" ]]; then
-            sed -i "" "s,\$1,\"\$1\",1" "${f}"
-            sed -i "" "s,\$2,\"\$2\",1" "${f}"
-            sed -i "" "s,\$3,\"\$3\",1" "${f}"
-            sed -i "" "s,\$4,\"\$4\",1" "${f}"
-            sed -i "" "s,\$5,\"\$5\",1" "${f}"
-            sed -i "" "s,\$6,\"\$6\",1" "${f}"
-        else
-            sed -i "" "s,\$@,\"\$@\",1" "${f}"
-        fi
     done
     echo $green"making dex2jar directory executable..."
     echo "==> removing \".sh\" file extensions..." 1>> "$log"
@@ -394,7 +380,8 @@ install_d2j_sub () {
 
 # Download and install dex2jar
 install_d2j () {
-    d2j_file="dex2jar-0.0.9.9.tar.gz"
+    local d2j_file="dex2jar-0.0.9.15.zip"
+    local d2j_folder="${d2j_file%%.z*}"
     echo "install_d2j (actually installing dex2jar now)" 1>> "$log"
     if [[ ! -f "${maindir}/other/${d2j_file}" ]]; then
         echo $green" Local copy of archive not found, downloading now..."; $rclr;
@@ -403,7 +390,7 @@ install_d2j () {
         echo ""
     fi
     local filehash="$(md5 -q "${maindir}/other/${d2j_file}")"
-    local expected="6101d4d4dd25558ca1818ad534c55ff9"
+    local expected="70f62db86e70318538a5b90df05b954b"
     if [[ ${filehash} = ${expected} ]]; then
         install_d2j_sub
         install_d2j_check
