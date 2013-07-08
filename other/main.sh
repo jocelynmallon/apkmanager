@@ -7,7 +7,7 @@
 # http://girlintroverted.wordpress.com
 #
 # version: 3.0.3
-# Wed. Jul 7, 2013
+# Mon. Jul 08, 2013
 # -----------------------------------------------------------------------
 
 # define default directories to function

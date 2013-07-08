@@ -6,8 +6,8 @@
 # by Jocelyn Mallon CC by-nc-sa 2012
 # http://girlintroverted.wordpress.com
 #
-# version: 3.0
-# Sun. Oct 07, 2012
+# version: 3.0.3
+# Mon. Jul 08, 2013
 # -----------------------------------------------------------------------
 
 # Advanced signing menu
@@ -222,7 +222,7 @@ debug_menu () {
     echo $bgreen"  14  "$white"Use \"pngout\" for PNG optimization "$green"(Persistent) "$blue"(used in commercial plugins)";
     echo $bgreen"  15  "$white"Open an adb shell "$blue"(In new terminal tab)";
     echo $bgreen"  16  "$white"Launch draw9patch "$blue"(Requires you have Android SDK installed)";
-    echo $bgreen"  17  "$white"Launch DDMS "$blue"(Requires you have Android SDK installed)";
+    echo $bgreen"  17  "$white"Launch Android Device Monitor "$blue"(Requires you have Android SDK installed)";
     echo $bgreen"  18  "$white"Choose APKtool version "$blue"(For decompiling/compiling apk files)";
     echo $bgreen"  19  "$white"Create adb log file";
     echo $bgreen"  Q   "$white"Return to Main Menu";

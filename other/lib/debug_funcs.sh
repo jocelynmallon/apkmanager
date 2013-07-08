@@ -6,8 +6,8 @@
 # by Jocelyn Mallon CC by-nc-sa 2012
 # http://girlintroverted.wordpress.com
 #
-# version: 3.0
-# Sun. Oct 07, 2012
+# version: 3.0.3
+# Mon. Jul 08, 2013
 # -----------------------------------------------------------------------
 
 debug_cleanup () {
@@ -196,11 +196,11 @@ adb_shell () {
 
 # Launch ddms if it exists
 launch_ddms () {
-    if [[ $(command -v ddms) ]]; then
-        local apkmopt="ddms; exit"
+    if [[ $(command -v monitor) ]]; then
+        local apkmopt="monitor; exit"
         newttab "${apkmopt}" "$log"
-    elif [[ ! $(command -v ddms) ]]; then
-        echo $bred"ERROR: ddms not found on the system."
+    elif [[ ! $(command -v monitor) ]]; then
+        echo $bred"ERROR: Android Device Monitor not found on the system."
         debuganykey
     fi
 }
