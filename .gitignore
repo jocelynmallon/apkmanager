@@ -13,7 +13,6 @@ pngcrush
 64_pngcrush
 pngout
 adb
-aapt
 zipalign
 sox
 jd-gui.cfg
@@ -26,6 +25,9 @@ apktool_142_31e6dc5.jar
 apktool_142_269870b.jar
 apktool_143_ics_mod.jar
 apktool_144_5174001.jar
+apktool_147.jar
+apktool_150.jar
+aaptOLD
 dex2jar
 temp
 bitstream_vera_mono

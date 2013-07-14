@@ -6,8 +6,8 @@
 # by Jocelyn Mallon CC by-nc-sa 2012
 # http://girlintroverted.wordpress.com
 #
-# version: 3.0.3
-# Mon. Jul 08, 2013
+# version: 3.0.4
+# Mon. Jul 14, 2013
 # -----------------------------------------------------------------------
 
 # define default directories to function

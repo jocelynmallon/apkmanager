@@ -6,8 +6,8 @@
 # by Jocelyn Mallon CC by-nc-sa 2012
 # http://girlintroverted.wordpress.com
 #
-# version: 3.0.3
-# Mon. Jul 08, 2013
+# version: 3.0.4
+# Mon. Jul 14, 2013
 # -----------------------------------------------------------------------
 
 debug_cleanup () {
@@ -120,11 +120,11 @@ install_apktool () {
     if [[ ! -f "${maindir}/other/apktool_jar_files.tar.gz" ]]; then
         echo $green" Local copy of archive not found, downloading now..."; $rclr;
         echo ""
-        curl "http://dl.dropbox.com/u/9401664/APK%20Manager/apktool_jar_files.tar.gz" > "${maindir}/other/apktool_jar_files.tar.gz"
+        curl "https://dl.dropboxusercontent.com/u/9401664/APK%20Manager/apktool_jar_files.tar.gz" > "${maindir}/other/apktool_jar_files.tar.gz"
         echo ""
     fi
     local filehash="$(md5 -q "${maindir}/other/apktool_jar_files.tar.gz")"
-    local expected="5d19c1ad36c655dcfcf710af3492e068"
+    local expected="d1e4fee31e403bc63457e12731b25db6"
     if [[ ${filehash} = ${expected} ]]; then
         echo $white" Extracting extra apktool.jar files to:"
         echo $green" ${maindir}/other/apktool"; $rclr;
