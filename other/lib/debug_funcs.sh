@@ -6,8 +6,8 @@
 # by Jocelyn Mallon CC by-nc-sa 2012
 # http://girlintroverted.wordpress.com
 #
-# version: 3.0.4
-# Mon. Jul 14, 2013
+# version: 3.1b
+# Sun. Jul 21, 2013
 # -----------------------------------------------------------------------
 
 debug_cleanup () {
@@ -56,6 +56,19 @@ toggle_error () {
         e_mode=1
         set -e
     fi
+}
+
+# Toggle killing adb daemon on APKM quit
+toggle_adb_kill_on_quit () {
+    local key="adbkillonquit"
+    if [[ ${adb_kill} -ne 0 ]]; then
+        adb_kill=0
+        local value="false"
+    elif [[ ${adb_kill} -eq 0 ]]; then
+        adb_kill=1
+        local value="true"
+    fi
+    write_preference
 }
 
 # Format and view git commit log
@@ -183,17 +196,6 @@ apkt_menu_check () {
     fi
 }
 
-# Open an adb shell
-adb_shell () {
-    if [[ $(command -v adb) ]]; then
-        local apkmopt="adb kill-server; adb wait-for-device; adb shell; adb kill-server; exit"
-        newttab "${apkmopt}" "$log"
-    elif [[ ! $(command -v adb) ]]; then
-        echo $bred"ERROR: adb not found on the system."
-        debuganykey
-    fi
-}
-
 # Launch ddms if it exists
 launch_ddms () {
     if [[ $(command -v monitor) ]]; then
@@ -227,30 +229,97 @@ read_adb_log () {
     fi
 }
 
+# Open an adb shell
+adb_shell () {
+    if [[ $(command -v adb) ]]; then
+        local apkmopt="adb -s ${adb_dev_choice} wait-for-device shell; exit"
+        newttab "${apkmopt}" "$log"
+    elif [[ ! $(command -v adb) ]]; then
+        echo $bred"ERROR: adb not found on the system."
+        debuganykey
+    fi
+}
+
+# test if the IP address is valid
+adb_wireless_ip_test () {
+    local adb_port="${input##*:}"
+    local adb_ip="${input%%:*}"
+    iptest ${adb_ip} 1> /dev/null 2>&1
+    if [[ $? -ne 0 ]]; then
+        echo $bred"Error: ${adb_ip} is invalid, press any key to try again"; $rclr;
+        wait
+        adb_wireless_connect_prompt
+    else
+        if [[ ${adb_port} = ${adb_ip} ]]; then
+            adb_port=5555
+        fi
+        adb connect "${adb_ip}:${adb_port}" 1> /dev/null 2>&1
+    fi
+}
+
+# prompt for IP address to try and connect to
+adb_wireless_connect_prompt () {
+    printf "$bwhite%s""Please enter IP address of your device: "; $rclr;
+    read input
+    if [[ $input = [qQ] ]]; then :
+    else
+        adb_wireless_ip_test
+    fi
+    unset input
+}
+
+# setup an wireless adb connection
+adb_wireless_connect () {
+    echo "adb_wireless_connect (setup wireless adb) function" 1>> "$log"
+    clear
+    menu_header
+    echo $bgreen"-----------------------------------------Wireless ADB Setup-----------------------------------------" ; $rclr;
+    echo ""
+    echo $bgreen"  1)"$white" Ensure wireless ADB is running on your android device";
+    echo $bgreen"  2)"$white" Make note of the IP address of the device wireless adb is running on";
+    echo $bgreen"  3)"$white" Enter the IP address, including periods/dots, when prompted.";
+    echo $bgreen"  4)"$white" If you setup a non-standard port (e.g. anything other than 5555) then";
+    echo $bgreen"    "$white" enter it after the IP address like normal:"$green" e.g. 192.168.1.10"$bred":5678";
+    echo ""
+#    echo $bgreen"  Type \"Q\" and press enter at any time to return to ADB menu.";
+#    echo ""
+    echo $bgreen"$apkmftr"; $rclr;
+    echo ""
+    echo $bwhite"Press "$bgreen"Q"$bwhite" and enter to go back to debug menu, or press";
+    adb_wireless_connect_prompt
+    echo "adb_wireless_connect function complete" 1>> "$log"
+}
+
+# Quick check to make sure timeout is not null
+set_adb_log_timeout () {
+    if [[ -z $logtimeout ]] || [[ $logtimeout = 0 ]]; then
+         (( logtimeout=10 ))
+    fi
+}
+
 # Create an adb logcat file
 adblog () {
     echo "adblog (generate adb logcat txt file) function" 1>> "$log"
     clear
     menu_header
+    set_adb_log_timeout
     echo $bgreen"----------------------------------------adblog.txt generator----------------------------------------" ; $rclr;
     echo ""
-    echo $white" To generate an adb log file, this script will open a new terminal";
-    echo $white" tab, run "$green"\"adb logcat\""$white" and save the output into a new file"
-    echo $green" \"adblog.txt\" "$white"in the root apkmanager directory."
+    echo $white" selected android device:";
+    echo $bgreen"  ${adb_dev_choice}";
     echo ""
-    echo $bred" This will first kill any existing adb instances, so please close"
-    echo $bred" any adb shell sessions (or anything else) before continuing."
+    echo $white" device status:";
+    echo $bgreen"  ${adbstatus}";
     echo ""
-    echo $white" then it will re-start adb and wait for your device to be detected"
+    echo $white" device model/product info:";
+    echo $green"  model:"$bgreen" ${adb_dev_model}";
+    echo $green"  product:"$bgreen" ${adb_dev_product}";
     echo ""
     echo $bred" if it \"hangs\" on starting adb, please unplug your device";
     echo $bred" and make sure \"usb debugging\" is enabled before reconnecting"
     echo $bred" your android device's usb cable."
     echo ""
-    echo $white" it will then run adb logcat for ten seconds."
-    echo ""
-    echo $white" after ten seconds, it will kill the adb logcat process, close the"
-    echo $white" new terminal tab, and again kill adb, before returning to the debug menu."
+    echo $white" it will then run adb logcat for "$bgreen"${logtimeout}"$white" seconds."
     echo ""
     echo $bgreen"$apkmftr"; $rclr;
     echo ""
@@ -259,12 +328,39 @@ adblog () {
     read input
     if [[ $input = [qQ] ]]; then :
     else
-        local adbopt="adb logcat 1> ${maindir}/ADBLOG.txt"
-        local adbstart="starting adb logcat..."
-        local apkmopt="adb kill-server; adb wait-for-device; echo "${adbstart}"; ${maindir}/other/bin/timeout 10 "${adbopt}"; adb kill-server; exit"
-        newttab "${apkmopt}" "$log"
+        echo "starting adb logcat..."
+        timeout3 -t $logtimeout adb logcat 1> "${maindir}/ADBLOG.txt"
     fi
     echo "adblog function complete" 1>> "$log"
+}
+
+# check if adb connection is wired or wireless
+adb_device_status () {
+    if [[ ${adbtmp} = *.* ]]; then
+        if [[ "${adbstatus}" = *offline* ]]; then
+            adbstatus="Wireless, OFFLINE"
+        else
+            adbstatus="Wireless, connected"
+        fi
+    else
+        adbstatus="Wired, connected"
+    fi
+}
+
+# check for adb device connection
+adb_device_check () {
+    adbstatus="${adb_dev_choice##*[[:space:]]}"
+    adbstatus="${adb_dev_choice##*'\n'}"
+    if [[ -z "${adb_dev_choice}" ]] || [[ "${adb_dev_choice}" = *List* ]] || [[ "${adb_dev_choice}" = *daemon* ]]; then
+        adb_dev_choice="no device detected"
+        adbstatus="no device detected"
+        adblog
+    else
+        adb_device_status
+        adblog
+    fi
+    unset logtimeout
+    unset adbstatus
 }
 
 # Generate apktool version information

@@ -6,8 +6,8 @@
 # by Jocelyn Mallon CC by-nc-sa 2012
 # http://girlintroverted.wordpress.com
 #
-# version: 3.0
-# Sun. Oct 07, 2012
+# version: 3.1b
+# Tue. Jul 16, 2013
 # -----------------------------------------------------------------------
 
 # cleanup and unset all variables used
@@ -24,6 +24,21 @@ mmcleanup () {
     unset total
     unset pnum
     unset apktver
+}
+
+# keystore menu finish function
+adbd_finish () {
+    adb_dev_choice="${files[$input]}"
+    adb_dev_model="${files[$input]}"
+    adb_dev_product="${files[$input]}"
+    adb_dev_choice="${adb_dev_choice%%[[:space:]]*}"
+    adb_dev_choice="${adb_dev_choice##*'\n'}"
+    adb_dev_model="$(echo ${adb_dev_model} | awk '{print $5}' )"
+    adb_dev_model="${adb_dev_model##*:}"
+    adb_dev_product="$(echo ${adb_dev_product} | awk '{print $4}' )"
+    adb_dev_product="${adb_dev_product##*:}"
+    echo "==> Selected ADB device ID is: ${adb_dev_choice}" 1>> "$log" 2>&1
+    echo "==> ADB device product & model: ${adb_dev_product}, ${adb_dev_model}" 1>> "$log" 2>&1
 }
 
 # keystore menu finish function
@@ -78,6 +93,7 @@ get_mmenu_input () {
                  apktool)  input_err; apktool_menu ;;
                  signing)  input_err; listpkeys ;;
                 branches)  input_err; git_branches_menu ;;
+                  adbdev)  input_err; adb_devices_menu ;;
             esac
         fi
     elif [[ ${input} = [bB] ]]; then
@@ -90,6 +106,7 @@ get_mmenu_input () {
                  apktool)  input_err; apktool_menu ;;
                  signing)  input_err; listpkeys ;;
                 branches)  input_err; git_branches_menu ;;
+                  adbdev)  input_err; adb_devices_menu ;;
             esac
         fi
     elif [[ ! ${input} =~ ^[0-9]+$ ]]; then
@@ -98,6 +115,7 @@ get_mmenu_input () {
              apktool)  input_err; apktool_menu ;;
              signing)  input_err; listpkeys ;;
             branches)  input_err; git_branches_menu ;;
+              adbdev)  input_err; adb_devices_menu ;;
         esac
     elif [[ ${input} -lt ${scount} ]] || [[ ${input} -gt ${limit} ]]; then
         case ${mkey} in
@@ -105,6 +123,7 @@ get_mmenu_input () {
              apktool)  input_err; apktool_menu ;;
              signing)  input_err; listpkeys ;;
             branches)  input_err; git_branches_menu ;;
+              adbdev)  input_err; adb_devices_menu ;;
         esac
     else
         case ${mkey} in
@@ -112,6 +131,7 @@ get_mmenu_input () {
              apktool)  apkt_finish ;;
              signing)  sign_finish ;;
             branches)  gitb_finish ;;
+              adbdev)  adbd_finish ;;
         esac
     fi
 }
@@ -183,6 +203,11 @@ buildmenu () {
     menu_header
     if [[ ${mkey} = projects ]]; then
         echo $bgreen"-----------------------------------Select project file to work on-----------------------------------";
+    elif [[ ${mkey} = adbdev ]]; then
+        debug_header
+        echo $bgreen"----------------------------------------Select an ADB Device----------------------------------------";
+        echo $bred" If Menu is empty, try reconnecting your devices USB cable, or setup a wireless adb connection."
+        echo $bgreen"$apkmspr"
     elif [[ ${mkey} = apktool ]]; then
         debug_header
         echo $bgreen"------------------------------------------APKtool Versions------------------------------------------";
@@ -207,6 +232,18 @@ buildmenu () {
     fi
     printf "$bwhite%s""Please select an option from above: "; $rclr;
     get_mmenu_input
+}
+
+# parse the adb devices command
+populate_adb_devices () {
+    adb devices -l | while read line;
+    do
+        if [[ "${line}" = *daemon* ]] || [[ "${line}" = *List* ]]; then
+            :
+        else
+            echo "${line}"
+        fi
+    done
 }
 
 # check for existing array before starting
@@ -247,7 +284,7 @@ apktool_menu () {
     cd "${aptdir}"
     files[0]="apktool_menu - YOU SHOULD NOT SEE THIS"
     files+=( $(ls [aA][pP][kK][tT][oO][oO][lL]_*.[jJ][aA][rR]) )
-    pnum=20
+    pnum=19
     buildmenu
     mmcleanup
 }
@@ -260,6 +297,21 @@ git_branches_menu () {
     files[0]="change_branch_menu - YOU SHOULD NOT SEE THIS"
     files+=( $(ls -1) )
     pnum=19
+    buildmenu
+    mmcleanup
+}
+
+# adb connected devices menu
+adb_devices_menu () {
+    check_files_set
+    mkey="adbdev"
+    cd "${maindir}"
+    OLDIFS=$IFS
+    IFS=$'\n'
+    files[0]="adb_devices_menu - YOU SHOULD NOT SEE THIS"
+    files+=( $(populate_adb_devices) )
+    IFS=$OLDIFS
+    pnum=17
     buildmenu
     mmcleanup
 }

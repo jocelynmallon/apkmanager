@@ -6,8 +6,8 @@
 # by Jocelyn Mallon CC by-nc-sa 2012
 # http://girlintroverted.wordpress.com
 #
-# version: 3.0
-# Sun. Oct 07, 2012
+# version: 3.1b
+# Sun. Jul 21, 2013
 # -----------------------------------------------------------------------
 
 # define colors for pretty output
@@ -45,12 +45,47 @@ version_banner () {
     echo $bgreen"${title_fill// /*}"; $rclr;
 }
 
-# Main APK Manager header
-menu_header () {
-    echo ""
-    version_banner
-    echo $white" Compression-Level: "$bgreen"${uscr}"$white"  |  Heap Size: "$bgreen"${heapy}""mb"$white"  |  Project: "$bgreen"${capp}"; $rclr;
-    echo $bgreen"$apkmspr"; $rclr;
+gen_adb_kill_status () {
+    if [[ -z ${adb_kill} ]]; then
+        adb_kill="$(defaults read "${plist}" adbkillonquit 2>/dev/null)"
+        if [[ $? -ne 0 ]]; then
+            adb_kill=0
+        fi
+    fi
+}
+
+# Check if we're killing adb on quit
+adb_kill_display () {
+    if [[ ${adb_kill} -eq 1 ]]; then
+        echo $bred"ON"$blue" )"; $rclr;
+    else
+        echo $bgreen"OFF"$blue" )"; $rclr;
+    fi
+}
+
+# generate adb device information for header
+gen_adb_device_info () {
+    if [[ -n $adb_dev_choice ]] && [[ -n $adb_dev_model ]] && [[ -n $adb_dev_product ]]; then
+        echo $green"${adb_dev_choice}"$blue" (model: "$green"${adb_dev_model}"$blue" | product: "$green"${adb_dev_product} "$blue")"; $rclr;
+    else
+        echo $green"No ADB device connected"
+    fi
+}
+
+# check if we need to truncate project name for display
+gen_project_display_text () {
+    local maxlength="$((47 - (${#uscr} + ${#heapy})))"
+    if [[ ${#capp} -gt ${maxlength} ]]; then
+        local cappoffset="$(( ${#capp} - $((maxlength - ${#trunc_symbol})) ))"
+        local newcapp="${trunc_symbol}${capp:$cappoffset:$maxlength}"
+        echo "${newcapp}"
+    else
+        echo "${capp}"
+    fi
+}
+
+# generate debug information for display
+gen_debug_display_text () {
     if [[ ${v_mode} -ne 0 ]]; then
         printf "$bred%s"" VERBOSE MODE ENABLED (-v for entire script) "$white" | "
     fi
@@ -65,7 +100,6 @@ menu_header () {
         if [[ -z $emode ]]; then
             local emode=0
         fi
-        local trunc_symbol="..."
         local pidw="$$"
         if [[ -z ${errcode} ]]; then
             errcode=0
@@ -91,6 +125,16 @@ menu_header () {
     fi
 }
 
+# Main APK Manager header
+menu_header () {
+    local trunc_symbol="..."
+    echo ""
+    version_banner
+    echo $white" Compression-Level: "$bgreen"${uscr}"$white"  |  Heap Size: "$bgreen"${heapy}""mb"$white"  |  Project:"$bgreen $(gen_project_display_text); $rclr;
+    echo $bgreen"$apkmspr"; $rclr;
+    gen_debug_display_text
+}
+
 # Debug/settings menu sub-header
 debug_header () {
     echo $bgreen"------------------------------------Debug Info and Misc Settings------------------------------------";
@@ -98,6 +142,7 @@ debug_header () {
     echo $white" APK Manager install type: "$green"${installtype}";
     echo $white" APK Manager root dir: "$green"${maindir}";
     echo $white" ANDROID_SDK_ROOT: "$green"${ANDROID_SDK_ROOT}";
+    echo $white" Selected ADB Device:" $(gen_adb_device_info);
     echo $white" Current log viewer: "$green"${logapp}";
     echo $white" Current \"png\" tool: "$green"${pngtool}";
     echo $white" Current APKtool: "$green"${apktool_ver}"$blue" ($(basename "$(readlink "${libdir}/apktool.jar")"))";

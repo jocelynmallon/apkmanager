@@ -6,8 +6,8 @@
 # by Jocelyn Mallon CC by-nc-sa 2012
 # http://girlintroverted.wordpress.com
 #
-# version: 3.0.4
-# Mon. Jul 14, 2013
+# version: 3.1b
+# Sun. Jul 21, 2013
 # -----------------------------------------------------------------------
 
 # define default directories to function
@@ -37,7 +37,9 @@ gen_date () {
 
 # Quit APk Manager and exit clean
 quit () {
-    adb kill-server
+    if [[ ${adb_kill} = 1 ]]; then
+        adb kill-server
+    fi
     clear
     echo "quit (quit APK Manager and exit clean) function" 1>> "$log" 2>&1
     echo "SESSION END: $(gen_date)" 1>> "$log" 2>&1
@@ -669,6 +671,9 @@ project_test
 
 # write PID to plist in case we need it
 set_current_pid
+
+# check if we're going to kill adb on exit
+gen_adb_kill_status
 
 # startup complete, write divider to log
 echo "$logspcr" 1>> "$log" 2>&1

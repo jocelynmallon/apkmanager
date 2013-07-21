@@ -6,8 +6,8 @@
 # by Jocelyn Mallon CC by-nc-sa 2012
 # http://girlintroverted.wordpress.com
 #
-# version: 3.0.3
-# Mon. Jul 08, 2013
+# version: 3.1b
+# Sun. Jul 21, 2013
 # -----------------------------------------------------------------------
 
 # Advanced signing menu
@@ -124,7 +124,7 @@ textapp_menu () {
     echo $bgreen"  8   "$white"Aquamacs";
     echo $bgreen"  9   "$white"Smultron";
     echo $bgreen"  10  "$white"Vico";
-    echo $bgreen"  11  "$white"Sublime Text 2";
+    echo $bgreen"  11  "$white"Sublime Text 2 (or 3)";
     echo $bgreen"  12  "$white"Chocolat";
     echo $bgreen"  13  "$white"Nano "$blue"(In new terminal tab)";
     echo $bgreen"  14  "$white"Emacs "$blue"(In new terminal tab)";
@@ -194,6 +194,45 @@ updates_menu () {
     esac
 }
 
+# ADB setup and tools menu
+adb_menu () {
+    clear
+    menu_header
+    debug_header
+    echo $bgreen"$apkmspr"
+    echo $bgreen"  1   "$white"Select default ADB device "$blue"(temporary, resets on every launch)";
+    echo $bgreen"  2   "$white"Connect a device over wireless adb "$blue"(ensure you know the IP address and port of device)";
+    echo $bgreen"  3   "$white"Make default ADB device persistent "$bred"(IF USING WIRELESS ADB, MUST HAVE STATIC IP)";
+    echo $bgreen"  4   "$white"Quick adb log file "$blue"(capture adb logcat for 10 seconds)";
+    echo $bgreen"  5   "$white"Extended adb log file "$blue"(capture adb logcat for a user specified number of seconds)";
+    echo $bgreen"  6   "$white"Open an ADB shell session "$blue"(select a default adb device first)";
+    echo $bgreen"  7   "$white"Setup advanced ADB command line options "$bred"(MAY HAVE UNINTENDED CONSEQUENCES)";
+    echo $bgreen"  8   "$white"Toggle killing ADB daemon on quit" $blue"(currently: "$(adb_kill_display);
+    echo $bgreen"  9   "$white"Restart ADB daemon" $blue"(must reconnect wireless adb sessions afterwards)";
+    echo $bgreen"  Q   "$white"Return to Debug Menu";
+    echo $bgreen"$apkmftr";
+    printf "$bwhite%s""Please select an option from above: "; $rclr;
+    read input
+    case "$input" in
+         1)  adb_devices_menu; adb_menu  ;;
+         2)  adb_wireless_connect; adb_menu  ;;
+         3)  adb_menu  ;;
+         4)  adb_device_check; adb_menu  ;;
+         5)  (( logtimeout=13 )); adb_device_check ; adb_menu  ;;
+         6)  adb_shell; adb_menu  ;;
+         7)  adb_menu  ;;
+         8)  toggle_adb_kill_on_quit; adb_menu  ;;
+         9)  adb kill-server; adb start-server >/dev/null; adb_menu  ;;
+        96)  toggle_trace; adb_menu  ;;
+        97)  toggle_verbose; adb_menu  ;;
+        98)  toggle_error; adb_menu  ;;
+        99)  basic_debug; adb_menu  ;;
+      [qQ])  ;;
+#      [qQ])  adb_menu_cleanup ;;
+         *)  input_err; adb_menu ;;
+    esac
+}
+
 # Debug & Settings menu
 debug_menu () {
     debug_check
@@ -220,11 +259,10 @@ debug_menu () {
     echo $bgreen"  12  "$white"Use \"optipng\" for PNG optimization "$green"(Persistent) "$blue"(default APK Manager tool)";
     echo $bgreen"  13  "$white"Use \"pngcrush\" for PNG optimization "$green"(Persistent) "$blue"(tool used by CyanogenMod)";
     echo $bgreen"  14  "$white"Use \"pngout\" for PNG optimization "$green"(Persistent) "$blue"(used in commercial plugins)";
-    echo $bgreen"  15  "$white"Open an adb shell "$blue"(In new terminal tab)";
-    echo $bgreen"  16  "$white"Launch draw9patch "$blue"(Requires you have Android SDK installed)";
-    echo $bgreen"  17  "$white"Launch Android Device Monitor "$blue"(Requires you have Android SDK installed)";
-    echo $bgreen"  18  "$white"Choose APKtool version "$blue"(For decompiling/compiling apk files)";
-    echo $bgreen"  19  "$white"Create adb log file";
+    echo $bgreen"  15  "$white"Launch draw9patch "$blue"(Requires you have Android SDK installed)";
+    echo $bgreen"  16  "$white"Launch Android Device Monitor "$blue"(Requires you have Android SDK installed)";
+    echo $bgreen"  17  "$white"Choose APKtool version "$blue"(For decompiling/compiling apk files)";
+    echo $bgreen"  18  "$white"ADB Tools "$blue"(logcat, shell, wireless ADB setup, etc.)";
     echo $bgreen"  Q   "$white"Return to Main Menu";
     echo $bgreen"$apkmftr";
     printf "$bwhite%s""Please select an option from above: "; $rclr;
@@ -244,11 +282,10 @@ debug_menu () {
         12)  local key="pngtool" && local value="optipng" && write_preference && pngtoolset; debug_menu ;;
         13)  local key="pngtool" && local value="pngcrush" && write_preference && pngtoolset; debug_menu ;;
         14)  pngout_check; debug_menu ;;
-        15)  adb_shell; debug_menu ;;
-        16)  draw_nine; debug_menu ;;
-        17)  launch_ddms; debug_menu ;;
-        18)  apkt_menu_check; debug_menu ;;
-        19)  adblog; debug_menu ;;
+        15)  draw_nine; debug_menu ;;
+        16)  launch_ddms; debug_menu ;;
+        17)  apkt_menu_check; debug_menu ;;
+        18)  adb_menu; debug_menu ;;
         96)  toggle_trace; debug_menu ;;
         97)  toggle_verbose; debug_menu ;;
         98)  toggle_error; debug_menu ;;
