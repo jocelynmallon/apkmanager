@@ -208,9 +208,9 @@ adb_menu () {
     echo $bgreen"  4   "$white"Quick adb log file "$blue"(capture adb logcat for 10 seconds)";
     echo $bgreen"  5   "$white"Extended adb log file "$blue"(capture adb logcat for a user specified number of seconds)";
     echo $bgreen"  6   "$white"Open an ADB shell session "$blue"(select a default adb device first)";
-    echo $bgreen"  7   "$white"Setup advanced ADB command line options "$bred"(MAY HAVE UNINTENDED CONSEQUENCES)";
-    echo $bgreen"  8   "$white"Toggle killing ADB daemon on quit" $blue"(currently: "$(adb_kill_display);
-    echo $bgreen"  9   "$white"Restart ADB daemon" $blue"(must reconnect wireless adb sessions afterwards)";
+    echo $bgreen"  7   "$white"Toggle killing ADB daemon on quit" $blue"(currently: "$(adb_kill_display);
+    echo $bgreen"  8   "$white"Restart ADB daemon" $blue"(must reconnect wireless adb sessions afterwards)";
+#    echo $bgreen"  9   "$white"Setup advanced ADB command line options "$bred"(MAY HAVE UNINTENDED CONSEQUENCES)";
     echo $bgreen"  Q   "$white"Return to Debug Menu";
     echo $bgreen"$apkmftr";
     printf "$bwhite%s""Please select an option from above: "; $rclr;
@@ -222,9 +222,9 @@ adb_menu () {
          4)  adb_log_device_check; adb_menu  ;;
          5)  extended_adb_log=1; adb_log_device_check; adb_menu  ;;
          6)  adb_shell; adb_menu  ;;
-         7)  adb_menu  ;;
-         8)  toggle_adb_kill_on_quit; adb_menu  ;;
-         9)  adb kill-server; adb start-server >/dev/null; adb_menu  ;;
+         7)  toggle_adb_kill_on_quit; adb_menu  ;;
+         8)  adb kill-server; adb start-server >/dev/null; adb_menu  ;;
+#         9)  adb_menu  ;;
         96)  toggle_trace; adb_menu  ;;
         97)  toggle_verbose; adb_menu  ;;
         98)  toggle_error; adb_menu  ;;
