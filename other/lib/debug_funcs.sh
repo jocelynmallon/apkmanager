@@ -281,8 +281,6 @@ adb_wireless_connect () {
     echo $bgreen"  4)"$white" If you setup a non-standard port (e.g. anything other than 5555) then";
     echo $bgreen"    "$white" enter it after the IP address like normal:"$green" e.g. 192.168.1.10"$bred":5678";
     echo ""
-#    echo $bgreen"  Type \"Q\" and press enter at any time to return to ADB menu.";
-#    echo ""
     echo $bgreen"$apkmftr"; $rclr;
     echo ""
     echo $bwhite"Press "$bgreen"Q"$bwhite" and enter to go back to debug menu, or press";
