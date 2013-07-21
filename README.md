@@ -1,7 +1,7 @@
 APK Manager for Mac OS X
 ==================
-**version: 3.0a**  
-**Fri. May 11, 2012**
+**version: 3.1b**  
+**Sun. Jul 21, 2013**
 
 [CC (by-nc-sa)](http://creativecommons.org/licenses/by-nc-sa/3.0/) Jocelyn Mallon, 2011-2012  
 [http://girlintroverted.wordpress.com](http://girlintroverted.wordpress.com)

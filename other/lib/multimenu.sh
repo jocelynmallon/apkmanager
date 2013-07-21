@@ -7,7 +7,7 @@
 # http://girlintroverted.wordpress.com
 #
 # version: 3.1b
-# Tue. Jul 16, 2013
+# Sun. Jul 21, 2013
 # -----------------------------------------------------------------------
 
 # cleanup and unset all variables used
