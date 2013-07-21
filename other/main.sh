@@ -35,6 +35,16 @@ gen_date () {
     echo "$(date +"%T %Z") - $(date +"%b. %d, %Y")\c"
 }
 
+# Check if we're killing adb on quit
+gen_adb_kill_status () {
+    if [[ -z ${adb_kill} ]]; then
+        adb_kill="$(defaults read "${plist}" adbkillonquit 2>/dev/null)"
+        if [[ $? -ne 0 ]]; then
+            adb_kill=0
+        fi
+    fi
+}
+
 # Quit APk Manager and exit clean
 quit () {
     if [[ ${adb_kill} = 1 ]]; then

@@ -45,15 +45,6 @@ version_banner () {
     echo $bgreen"${title_fill// /*}"; $rclr;
 }
 
-gen_adb_kill_status () {
-    if [[ -z ${adb_kill} ]]; then
-        adb_kill="$(defaults read "${plist}" adbkillonquit 2>/dev/null)"
-        if [[ $? -ne 0 ]]; then
-            adb_kill=0
-        fi
-    fi
-}
-
 # Check if we're killing adb on quit
 adb_kill_display () {
     if [[ ${adb_kill} -eq 1 ]]; then
