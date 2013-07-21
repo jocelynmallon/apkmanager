@@ -45,7 +45,7 @@ version_banner () {
     echo $bgreen"${title_fill// /*}"; $rclr;
 }
 
-# Check if we're killing adb on quit
+# generate adb killing on quit status for display
 adb_kill_display () {
     if [[ ${adb_kill} -eq 1 ]]; then
         echo $bred"ON"$blue" )"; $rclr;
@@ -54,12 +54,36 @@ adb_kill_display () {
     fi
 }
 
+# actual adb device info string for display
+adb_device_display_text () {
+    echo $green"${adb_dev_choice}"$blue" (model: "$green"${adb_dev_model}"$blue" | product: "$green"${adb_dev_product} "$blue")"; $rclr;
+}
+
+# try and retrieve saved/persistant ADB device choice
+get_saved_adb_device () {
+    local p
+    local v
+    for p in "adb_dev_choice" "adb_dev_model" "adb_dev_product"
+    do
+        v="$(defaults read "${plist}" ${p} 2>/dev/null)"
+        if [[ $? -ne 0 ]]; then :
+        else
+            eval $p=\${v}
+        fi
+    done
+}
+
 # generate adb device information for header
 gen_adb_device_info () {
     if [[ -n $adb_dev_choice ]] && [[ -n $adb_dev_model ]] && [[ -n $adb_dev_product ]]; then
-        echo $green"${adb_dev_choice}"$blue" (model: "$green"${adb_dev_model}"$blue" | product: "$green"${adb_dev_product} "$blue")"; $rclr;
+        adb_device_display_text
     else
-        echo $green"No ADB device connected"
+        get_saved_adb_device
+        if [[ -z $adb_dev_choice ]] || [[ -z $adb_dev_model ]] || [[ -z $adb_dev_product ]]; then
+            echo $green"No ADB device connected"
+        else
+            adb_device_display_text
+        fi
     fi
 }
 
@@ -75,7 +99,7 @@ gen_project_display_text () {
     fi
 }
 
-# generate debug information for display
+# generate basic debug information for display
 gen_debug_display_text () {
     if [[ ${v_mode} -ne 0 ]]; then
         printf "$bred%s"" VERBOSE MODE ENABLED (-v for entire script) "$white" | "

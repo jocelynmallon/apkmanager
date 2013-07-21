@@ -204,6 +204,13 @@ adb_nodevice_error () {
     adbanykey
 }
 
+# adb device missing info error
+adb_device_missing_info_error () {
+    echo $bred"ERROR: ADB device information is incomplete or"; $rclr;
+    echo $bred"corrupted. Please re-select ADB device and try again."; $rclr;
+    adbanykey
+}
+
 # ANDROID_SDK_ROOT unset, error message
 android_sdk_root_err () {
     echo $bred"WARNING: ANDROID_SDK_ROOT is not set. This"

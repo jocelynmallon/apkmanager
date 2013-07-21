@@ -129,6 +129,18 @@ clean_pngtool () {
     pngtoolset
 }
 
+# Clean/reset persistant adb device choice
+clean_adb_device () {
+    echo "clean_adb_device (resetting adb device choice)" 1>> "$log"
+    defaults delete "${plist}" adb_dev_choice 2>/dev/null
+    defaults delete "${plist}" adb_dev_model 2>/dev/null
+    defaults delete "${plist}" adb_dev_product 2>/dev/null
+    unset adb_dev_choice
+    unset adb_dev_model
+    unset adb_dev_product
+    gen_adb_device_info
+}
+
 # Clean/reset apktool.jar symlink
 clean_apktjar () {
     echo "clean_apktjar (resetting apktool.jar to newest version)" 1>> "$log"

@@ -73,9 +73,10 @@ clean_menu () {
     echo $bgreen"  12  "$white"Reset \"persistent\" Zip compression level"$blue" (If enabled)";
     echo $bgreen"  13  "$white"Reset \"persistent\" keystore selection"$blue" (If enabled)";
     echo $bgreen"  14  "$white"Reset \"persistent\" png optimization tool selection";
-    echo $bgreen"  15  "$white"Reset apktool to newest version"$blue" (Can be set manually in the debug menu)";
-    echo $bgreen"  16  "$white"Reset \"debug\" information"$blue" (Next launch of debug menu will be slow)";
-    echo $bgreen"  17  "$white"Reset/Change terminal color scheme selection";
+    echo $bgreen"  15  "$white"Reset \"persistent\" adb device selection"$blue" (If enabled)";
+    echo $bgreen"  16  "$white"Reset apktool to newest version"$blue" (Can be set manually in the debug menu)";
+    echo $bgreen"  17  "$white"Reset \"debug\" information"$blue" (Next launch of debug menu will be slow)";
+    echo $bgreen"  18  "$white"Reset/Change terminal color scheme selection";
     echo $bgreen"  Q   "$white"Return to Main Menu";
     echo $bgreen"$apkmftr";
     printf "$bwhite%s""Please select an option from above: "; $rclr;
@@ -95,9 +96,10 @@ clean_menu () {
         12)  clean_complvl ;;
         13)  clean_keystore ;;
         14)  clean_pngtool ;;
-        15)  clean_apktjar ;;
-        16)  clean_debug ;;
-        17)  clean_color ;;
+        15)  clean_adb_device ;;
+        16)  clean_apktjar ;;
+        17)  clean_debug ;;
+        18)  clean_color ;;
         96)  toggle_trace ;;
         97)  toggle_verbose ;;
         98)  toggle_error ;;
@@ -216,7 +218,7 @@ adb_menu () {
     case "$input" in
          1)  adb_devices_menu; adb_menu  ;;
          2)  adb_wireless_connect; adb_menu  ;;
-         3)  adb_menu  ;;
+         3)  adb_save_device_pref; adb_menu  ;;
          4)  adb_log_device_check; adb_menu  ;;
          5)  extended_adb_log=1; adb_log_device_check; adb_menu  ;;
          6)  adb_shell; adb_menu  ;;
@@ -228,7 +230,6 @@ adb_menu () {
         98)  toggle_error; adb_menu  ;;
         99)  basic_debug; adb_menu  ;;
       [qQ])  ;;
-#      [qQ])  adb_menu_cleanup ;;
          *)  input_err; adb_menu ;;
     esac
 }

@@ -395,6 +395,32 @@ adb_log_device_check () {
     unset adbstatus
 }
 
+# make the preferred adb device setting persistant
+adb_save_device_pref () {
+    if [[ -z "${adb_dev_choice}" ]] || [[ "${adb_dev_choice}" = *List* ]] || [[ "${adb_dev_choice}" = *daemon* ]]; then
+        adb_nodevice_error
+    else
+        if [[ -n $adb_dev_choice ]] && [[ -n $adb_dev_model ]] && [[ -n $adb_dev_product ]]; then
+            echo $green" Saving unique ADB serial..."
+            local key="adb_dev_choice"
+            local value="${adb_dev_choice}"
+            write_preference
+            echo $green" Saving device model..."
+            local key="adb_dev_model"
+            local value="${adb_dev_model}"
+            write_preference
+            echo $green" Saving device product..."
+            local key="adb_dev_product"
+            local value="${adb_dev_product}"
+            write_preference
+            echo $bgreen" Done! Press any key to return to ADB menu."
+            wait
+        else
+            adb_device_missing_info_error
+        fi
+    fi
+}
+
 # Generate apktool version information
 getapktver () {
     local key="apktool"
