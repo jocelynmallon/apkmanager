@@ -54,6 +54,12 @@ updateanykey () {
     wait
 }
 
+# adb menu, press-any-key string
+adbanykey () {
+    printf "$bred%s""press any key to return to ADB menu\n"; $rclr;
+    wait
+}
+
 # fatal error press-any-key string
 fatalpanykey () {
     printf "$bred%s""press any key to exit...\n"; $rclr;
@@ -188,8 +194,14 @@ no_branches_err () {
 
 # had to change branches message/error string
 git_branch_change () {
-        echo $bgreen"APK Manager had to switch branches"; $rclr;
-        echo $bgreen"during the update, and will now exit."; $rclr;
+    echo $bgreen"APK Manager had to switch branches"; $rclr;
+    echo $bgreen"during the update, and will now exit."; $rclr;
+}
+
+# no preferred adb device error
+adb_nodevice_error () {
+    echo $bred"ERROR: no preferred ADB device selected"; $rclr;
+    adbanykey
 }
 
 # ANDROID_SDK_ROOT unset, error message

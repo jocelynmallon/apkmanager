@@ -300,25 +300,44 @@ adb_wireless_connect () {
     echo $bgreen"    "$white" enter it after the IP address like normal:"$green" e.g. 192.168.1.10"$bred":5678";
     echo ""
     echo $bgreen"$apkmftr"; $rclr;
-    echo ""
-    echo $bwhite"Press "$bgreen"Q"$bwhite" and enter to go back to debug menu, or press";
+    echo $bwhite"Press "$bgreen"Q"$bwhite" and enter to go back to ADB menu.";
     adb_wireless_connect_prompt
     echo "adb_wireless_connect function complete" 1>> "$log"
 }
 
-# Quick check to make sure timeout is not null
+# set time in seconds to run adb logcat
 set_adb_log_timeout () {
-    if [[ -z $logtimeout ]] || [[ $logtimeout = 0 ]]; then
-         (( logtimeout=10 ))
+    if [[ ${extended_adb_log} -eq 1 ]]; then
+        printf "$bwhite%s""Please enter time ("$bgreen"in seconds, up to 180"$white") to run adb logcat: "; $rclr;
+        read input
+        if [[ $input = [qQ] ]]; then
+            (( logtimeout=10 ))
+        elif [[ ! ${input} =~ ^[0-9]+$ ]]; then
+            echo $bred"Error: ${input} is not a number, press any key to try again"; $rclr;
+            wait
+            set_adb_log_timeout
+        elif [[ ${input} -gt 180 ]]; then
+            echo $bred"Error: ${input} is greater than 180 seconds, press any key to try again"; $rclr;
+            wait
+            set_adb_log_timeout
+        else
+            (( logtimeout=${input} ))
+        fi
+        unset input
+        unset extended_adb_log
+    else
+        if [[ -z $logtimeout ]] || [[ $logtimeout = 0 ]]; then
+            (( logtimeout=10 ))
+        fi
     fi
 }
 
 # Create an adb logcat file
 adblog () {
     echo "adblog (generate adb logcat txt file) function" 1>> "$log"
+    set_adb_log_timeout
     clear
     menu_header
-    set_adb_log_timeout
     echo $bgreen"----------------------------------------adblog.txt generator----------------------------------------" ; $rclr;
     echo ""
     echo $white" selected android device:";
@@ -331,22 +350,22 @@ adblog () {
     echo $green"  model:"$bgreen" ${adb_dev_model}";
     echo $green"  product:"$bgreen" ${adb_dev_product}";
     echo ""
-    echo $bred" if it \"hangs\" on starting adb, please unplug your device";
+    echo $bred" if it \"hangs\" on waiting for device, please unplug your device";
     echo $bred" and make sure \"usb debugging\" is enabled before reconnecting"
     echo $bred" your android device's usb cable."
     echo ""
     echo $white" it will then run adb logcat for "$bgreen"${logtimeout}"$white" seconds."
     echo ""
     echo $bgreen"$apkmftr"; $rclr;
-    echo ""
     echo $bwhite"Press "$bgreen"Q"$bwhite" and enter to go back to debug menu, or press";
     printf "$bwhite%s""any other key to start adb log process... "; $rclr;
     read input
     if [[ $input = [qQ] ]]; then :
     else
-        echo "starting adb logcat..."
-        timeout3 -t $logtimeout adb logcat 1> "${maindir}/ADBLOG.txt"
+        echo "running adb logcat..."
+        timeout3 -t $logtimeout adb -s ${adb_dev_choice} wait-for-device logcat 1> "${maindir}/ADBLOG.txt"
     fi
+    unset logtimeout
     echo "adblog function complete" 1>> "$log"
 }
 
@@ -364,18 +383,15 @@ adb_device_status () {
 }
 
 # check for adb device connection
-adb_device_check () {
+adb_log_device_check () {
     adbstatus="${adb_dev_choice##*[[:space:]]}"
     adbstatus="${adb_dev_choice##*'\n'}"
     if [[ -z "${adb_dev_choice}" ]] || [[ "${adb_dev_choice}" = *List* ]] || [[ "${adb_dev_choice}" = *daemon* ]]; then
-        adb_dev_choice="no device detected"
-        adbstatus="no device detected"
-        adblog
+        adb_nodevice_error
     else
         adb_device_status
         adblog
     fi
-    unset logtimeout
     unset adbstatus
 }
 

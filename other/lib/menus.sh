@@ -217,8 +217,8 @@ adb_menu () {
          1)  adb_devices_menu; adb_menu  ;;
          2)  adb_wireless_connect; adb_menu  ;;
          3)  adb_menu  ;;
-         4)  adb_device_check; adb_menu  ;;
-         5)  (( logtimeout=13 )); adb_device_check ; adb_menu  ;;
+         4)  adb_log_device_check; adb_menu  ;;
+         5)  extended_adb_log=1; adb_log_device_check; adb_menu  ;;
          6)  adb_shell; adb_menu  ;;
          7)  adb_menu  ;;
          8)  toggle_adb_kill_on_quit; adb_menu  ;;
