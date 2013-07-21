@@ -55,7 +55,7 @@ startup_fatal_err () {
 
 # In-depth startup necessary file check
 sourced_files_check () {
-    files=( "${bindir}/rm" "${bindir}/runj" "${bindir}/newttab" "${bindir}/preftool" "${bindir}/timeout" "${bindir}/JD-GUI.app" "${aptdir}/apktool_143.jar" )
+    files=( "${bindir}/rm" "${bindir}/runj" "${bindir}/newttab" "${bindir}/preftool" "${bindir}/timeout3" "${bindir}/JD-GUI.app" "${aptdir}/apktool_143.jar" )
     files+=( $(awk '/source\ / { print $0}' "${maindir}/other/main.sh" | sed 's/^[ \t]*//;s/[ \t]*$//' | sed 's/source\ //g' | sed 's/\"//g' | sed "s,\$libdir,${libdir},g") )
     local i
     for ((i=0; i < ${#files[*]}; i++)); do
