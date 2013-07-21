@@ -71,6 +71,24 @@ toggle_adb_kill_on_quit () {
     write_preference
 }
 
+# generate system memory information
+gen_system_memory_info () {
+    local free_blocks=$(vm_stat | grep free | awk '{ print $3 }' | sed 's/\.//')
+    local inactive_blocks=$(vm_stat | grep inactive | awk '{ print $3 }' | sed 's/\.//')
+    local speculative_blocks=$(vm_stat | grep speculative | awk '{ print $3 }' | sed 's/\.//')
+    local active_blocks=$(vm_stat | grep -m1 active | awk '{ print $3 }' | sed 's/\.//')
+    local wired_blocks=$(vm_stat | grep wired | awk '{ print $4 }' | sed 's/\.//')
+    local reactive_blocks=$(vm_stat | grep -m1 reactivated | awk '{ print $3 }' | sed 's/\.//')
+    local active=$(($active_blocks*4096/1048576))
+    local reactive=$(($reactive_blocks*4096/1048576))
+    local wired=$(($wired_blocks*4096/1048576))
+    local free=$((($free_blocks+speculative_blocks)*4096/1048576))
+    local inactive=$(($inactive_blocks*4096/1048576))
+    totalfree=$((($free+$inactive)))
+    totalactive=$((($wired+$active+reactive)))
+    sysmem=$((($free+$inactive+$active+$wired+$reactive)))
+}
+
 # Format and view git commit log
 view_git_log () {
     clear

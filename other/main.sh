@@ -484,10 +484,39 @@ capp_test () {
 
 # Set max java heap size
 heap_size () {
+    clear
+    gen_system_memory_info
+    menu_header
+    echo $bgreen"----------------------------------------Set Java Heap Memory----------------------------------------"
+    echo ""
+    echo $white" For stability and reliability, it is best that this value is large"
+    echo $white" enough to prevent Java from crashing (e.g. at least ~256MB)"
+    echo $white" but for best performance, this should be smaller than"
+    echo $white" your average free memory, to prevent VM/paging to disk."
+    echo ""
+    echo $bgreen" APK Manager will not allow you to set heap sizes larger than"
+    echo $bgreen" total system memory, or smaller than 64MB."
+    echo ""
+    echo $bblue" Current system memory usage: "
+    echo $white"   "$green"Active: "$bred"${totalactive}"$red" MB";
+    echo $white"   "$green"Free:   "$bred"${totalfree}"$red" MB";
+    echo $white"   "$green"Total:  "$bred"${sysmem}"$red" MB";
+    echo ""
+    echo $bgreen"$apkmftr";
+    echo $bwhite"Press "$bgreen"Q"$bwhite" and enter to go back to main menu.";
     printf "$white%s""Enter max size for java heap memory in megabytes ("$bgreen"eg 512"$white"): "; $rclr;
     read input
-    if [[ ! ${input} =~ ^[0-9]+$ ]]; then
+    if [[ $input = [qQ] ]]; then :
+    elif [[ ! ${input} =~ ^[0-9]+$ ]]; then
         echo $bred"Error: ${input} is not a number, press any key to try again"; $rclr;
+        wait
+        heap_size
+    elif [[ ${input} -lt 64 ]]; then
+        echo $bred"Error: ${input} is less than 64MB, press any key to try again"; $rclr;
+        wait
+        heap_size
+    elif [[ ${input} -ge ${sysmem} ]]; then
+        echo $bred"Error: ${input} is greater than total system memory, press any key to try again"; $rclr;
         wait
         heap_size
     else
@@ -500,6 +529,9 @@ heap_size () {
         echo "==> Jave Heap Size set to: ${heapy}" 1>> "$log" 2>&1
     fi
     unset input
+    unset totalfree
+    unset totalactive
+    unset sysmem
 }
 
 # Set compression level
@@ -523,9 +555,11 @@ comp_level () {
     echo $green" problems, but if you do have problems, please try again using a lower level."
     echo ""
     echo $bgreen"$apkmftr";
+    echo $bwhite"Press "$bgreen"Q"$bwhite" and enter to go back to main menu.";
     printf "$white%s""Enter Maximum Compression Level ("$bgreen"0-9"$white"): "; $rclr;
     read input
-    if [[ ! ${input} =~ ^[0-9]$ ]]; then
+    if [[ $input = [qQ] ]]; then :
+    elif [[ ! ${input} =~ ^[0-9]$ ]]; then
         echo $bred"Error: ${input} is not a valid compression level, press any key to try again."; $rclr;
         wait
         comp_level
