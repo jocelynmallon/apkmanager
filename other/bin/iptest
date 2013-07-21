@@ -1,0 +1,59 @@
+#!/bin/sh
+#
+#Written by:Paul Podolny 26.4.2009
+#Purpose: The script checks a passed IPv4 IP address and determines it's class.
+
+
+
+#Check that input is passed in the form of IPv4 IP address
+if [ ! "$(echo $1 | grep '[0-9]\{1,3\}[.][0-9]\{1,3\}[.][0-9]\{1,3\}[.][0-9]\{1,3\}')" ]
+then
+echo "Usage: '$0' "
+exit 1
+fi
+
+DOTSCHK=`echo $1 | awk '{gsub("[0-9]","");print}' | wc -c`
+if [ $DOTSCHK -ne 4 ];then
+echo "illegal input"
+exit 1
+fi
+
+
+for n in $(seq 1 4);do
+
+OCTET=`echo $1 | awk -F "." '{print $'$n'}'`
+if [ $OCTET -lt 0 -o $OCTET -gt 255 ]; then #check if the octet range is between 0 & 255
+echo "$1 is not legal IP address"
+exit 1
+fi
+done
+
+echo "$1 is legal IP address"
+
+
+#Check wether IP is external or internal + determines it's class.
+case $1 in
+
+192.168.*.*)
+echo "$1 is class C internal IP address"
+;;
+
+172.*.*.*)
+SCND=`echo $1 | awk -F "." '{print $2}'`
+if [ $SCND -ge 16 -a $SCND -le 31 ];then
+echo "$1 is class B internal IP address"
+fi
+;;
+
+10.*.*.*)
+echo "$1 is class A internal IP address"
+;;
+
+169.254.*.*)
+echo "$1 is an APIPA IP address"
+;;
+
+*)
+echo "$1 is an external IP address"
+;;
+esac
