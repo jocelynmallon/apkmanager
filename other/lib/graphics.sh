@@ -54,9 +54,18 @@ adb_kill_display () {
     fi
 }
 
-# generate ADB killing on quit status for display
+# generate ADB screenshot enabled status for display
 adb_screencap_display () {
     if [[ ${adb_screencap} -eq 1 ]]; then
+        echo $bgreen"ON"$blue")"; $rclr;
+    else
+        echo $bred"OFF"$blue")"; $rclr;
+    fi
+}
+
+# generate ADB connect on start status for display
+adb_connect_start_display () {
+    if [[ ${adb_connect_on_start} -eq 1 ]]; then
         echo $bgreen"ON"$blue")"; $rclr;
     else
         echo $bred"OFF"$blue")"; $rclr;

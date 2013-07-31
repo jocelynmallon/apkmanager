@@ -265,6 +265,19 @@ adb_screencap_toggle () {
     write_preference
 }
 
+# toggle hidden SS menu option to take screenshots
+adb_connect_on_start_toggle () {
+    local key="adb_connect_on_start"
+    if [[ $adb_connect_on_start -ne 0 ]]; then
+        adb_connect_on_start=0
+        local value="false"
+    elif [[ $adb_connect_on_start -eq 0 ]]; then
+        adb_connect_on_start=1
+        local value="true"
+    fi
+    write_preference
+}
+
 # Read ADB logcat file if it exists
 read_adb_log () {
     if [[ -e "${maindir}/ADBLOG.txt" ]]; then

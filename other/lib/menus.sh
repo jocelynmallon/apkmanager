@@ -219,6 +219,7 @@ adb_menu () {
     echo $bgreen"  7   "$white"Toggle killing ADB daemon on quit" $blue"(currently: "$(adb_kill_display);
     echo $bgreen"  8   "$white"Restart ADB daemon" $blue"(must reconnect wireless ADB sessions afterwards)";
     echo $bgreen"  9   "$white"Enable \"hidden\" option "$green"SS"$white" to take an ADB screencap from most menus "$blue"(currently: "$(adb_screencap_display);
+    echo $bgreen"  10  "$white"Toggle checking/connecting to saved ADV device on startup" $blue"(currently: "$(adb_connect_start_display)
 #    echo $bgreen"  10  "$white"Setup advanced ADB command line options "$bred"(MAY HAVE UNINTENDED CONSEQUENCES)";
     echo $bgreen"  Q   "$white"Return to Debug Menu";
     echo $bgreen"$apkmftr";
@@ -234,6 +235,7 @@ adb_menu () {
          7)  toggle_adb_kill_on_quit; adb_menu  ;;
          8)  adb kill-server; adb start-server >/dev/null; adb_menu  ;;
          9)  adb_screencap_toggle; adb_menu ;;
+        10)  adb_connect_on_start_toggle; adb_menu  ;;
 #        10)  adb_menu  ;;
         96)  toggle_trace; adb_menu  ;;
         97)  toggle_verbose; adb_menu  ;;
