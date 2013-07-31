@@ -7,7 +7,7 @@
 # http://girlintroverted.wordpress.com
 #
 # version: 3.1b
-# Sun. Jul 21, 2013
+# Wed. Jul 31, 2013
 # -----------------------------------------------------------------------
 
 # cleanup and unset all variables used
@@ -234,7 +234,7 @@ buildmenu () {
     get_mmenu_input
 }
 
-# parse the adb devices command
+# parse the ADB devices command
 populate_adb_devices () {
     adb devices -l | while read line;
     do
@@ -301,7 +301,7 @@ git_branches_menu () {
     mmcleanup
 }
 
-# adb connected devices menu
+# ADB connected devices menu
 adb_devices_menu () {
     check_files_set
     mkey="adbdev"

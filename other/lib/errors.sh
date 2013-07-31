@@ -7,7 +7,7 @@
 # http://girlintroverted.wordpress.com
 #
 # version: 3.1b
-# Tue. Jul 30, 2013
+# Wed. Jul 31, 2013
 # -----------------------------------------------------------------------
 
 # Unknown input error string
@@ -54,7 +54,7 @@ updateanykey () {
     wait
 }
 
-# adb menu, press-any-key string
+# ADB menu, press-any-key string
 adbanykey () {
     printf "$bred%s""press any key to return to ADB menu\n"; $rclr;
     wait
@@ -198,7 +198,7 @@ git_branch_change () {
     echo $bgreen"during the update, and will now exit."; $rclr;
 }
 
-# no preferred adb device error
+# no preferred ADB device error
 adb_saved_device_error () {
     echo $bred"ERROR: APK Manager found an invalid setting for"; $rclr;
     echo $bred"your saved ADB device preference: ${adb_dev_choice}"; $rclr;
@@ -206,7 +206,7 @@ adb_saved_device_error () {
     genericpanykey
 }
 
-# no preferred adb device error
+# no preferred ADB device error
 adb_saved_device_state_error () {
     echo $bred"ERROR: When attempting to connect to: ${adb_dev_choice}"; $rclr;
     echo $bred"APK Manager found ADB device status: ${adbstat}"; $rclr;
@@ -216,7 +216,7 @@ adb_saved_device_state_error () {
     genericpanykey
 }
 
-# failed to connect to wireless adb device
+# failed to connect to wireless ADB device
 adb_wireless_connection_error () {
     echo $bred"ERROR: APK Manager failed to connect to: ${adb_dev_choice}"; $rclr;
     echo $bred"Within the default 5 second timeout. Please ensure"; $rclr;
@@ -228,13 +228,13 @@ adb_wireless_connection_error () {
     genericpanykey
 }
 
-# no preferred adb device error
+# no preferred ADB device error
 adb_nodevice_error () {
     echo $bred"ERROR: no preferred ADB device selected"; $rclr;
     adbanykey
 }
 
-# adb device missing info error
+# ADB device missing info error
 adb_device_missing_info_error () {
     echo $bred"ERROR: ADB device information is incomplete or"; $rclr;
     echo $bred"corrupted. Please re-select ADB device and try again."; $rclr;

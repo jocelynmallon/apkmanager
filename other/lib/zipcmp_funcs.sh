@@ -6,8 +6,8 @@
 # by Jocelyn Mallon CC by-nc-sa 2012
 # http://girlintroverted.wordpress.com
 #
-# version: 3.0
-# Sun. Oct 07, 2012
+# version: 3.1b
+# Wed. Jul 31, 2013
 # -----------------------------------------------------------------------
 
 # Zip/compress a system apk file
@@ -71,11 +71,11 @@ install_apk () {
             echo $bred"Please use \"sign apk\" option first"; $rclr;
             pressanykey
         else
-            adb devices
+            timeout3 -t 5 adb devices | grep "${adb_dev_choice}"
             echo ""
             printf "$bwhite%s""Press any key to continue "; $rclr;
             wait
-            adb install -r "$mod_dir/signed-$capp"
+            adb -s "${adb_dev_choice}" wait-for-device install -r "$mod_dir/signed-$capp"
             printf "$bwhite%s""Press any key to continue "; $rclr;
             wait
         fi

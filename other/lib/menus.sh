@@ -75,7 +75,7 @@ clean_menu () {
     echo $bgreen"  12  "$white"Reset \"persistent\" Zip compression level"$blue" (If enabled)";
     echo $bgreen"  13  "$white"Reset \"persistent\" keystore selection"$blue" (If enabled)";
     echo $bgreen"  14  "$white"Reset \"persistent\" png optimization tool selection";
-    echo $bgreen"  15  "$white"Reset \"persistent\" adb device selection"$blue" (If enabled)";
+    echo $bgreen"  15  "$white"Reset \"persistent\" ADB device selection"$blue" (If enabled)";
     echo $bgreen"  16  "$white"Reset apktool to newest version"$blue" (Can be set manually in the debug menu)";
     echo $bgreen"  17  "$white"Reset \"debug\" information"$blue" (Next launch of debug menu will be slow)";
     echo $bgreen"  18  "$white"Reset/Change terminal color scheme selection";
@@ -211,14 +211,14 @@ adb_menu () {
     debug_header
     echo $bgreen"$apkmspr"
     echo $bgreen"  1   "$white"Select default ADB device "$blue"(temporary, resets on every launch)";
-    echo $bgreen"  2   "$white"Connect a device over wireless adb "$blue"(ensure you know the IP address and port of device)";
+    echo $bgreen"  2   "$white"Connect a device over wireless ADB "$blue"(ensure you know the IP address and port of device)";
     echo $bgreen"  3   "$white"Make default ADB device persistent "$bred"(IF USING WIRELESS ADB, MUST HAVE STATIC IP)";
-    echo $bgreen"  4   "$white"Quick adb log file "$blue"(capture adb logcat for 10 seconds)";
-    echo $bgreen"  5   "$white"Extended adb log file "$blue"(capture adb logcat for a user specified number of seconds)";
-    echo $bgreen"  6   "$white"Open an ADB shell session "$blue"(select a default adb device first)";
+    echo $bgreen"  4   "$white"Quick ADB log file "$blue"(capture ADB logcat for 10 seconds)";
+    echo $bgreen"  5   "$white"Extended ADB log file "$blue"(capture ADB logcat for a user specified number of seconds)";
+    echo $bgreen"  6   "$white"Open an ADB shell session "$blue"(select a default ADB device first)";
     echo $bgreen"  7   "$white"Toggle killing ADB daemon on quit" $blue"(currently: "$(adb_kill_display);
-    echo $bgreen"  8   "$white"Restart ADB daemon" $blue"(must reconnect wireless adb sessions afterwards)";
-    echo $bgreen"  9   "$white"Enable \"hidden\" option "$green"SS"$white" to take an adb screencap from most menus "$blue"(currently: "$(adb_screencap_display);
+    echo $bgreen"  8   "$white"Restart ADB daemon" $blue"(must reconnect wireless ADB sessions afterwards)";
+    echo $bgreen"  9   "$white"Enable \"hidden\" option "$green"SS"$white" to take an ADB screencap from most menus "$blue"(currently: "$(adb_screencap_display);
 #    echo $bgreen"  10  "$white"Setup advanced ADB command line options "$bred"(MAY HAVE UNINTENDED CONSEQUENCES)";
     echo $bgreen"  Q   "$white"Return to Debug Menu";
     echo $bgreen"$apkmftr";

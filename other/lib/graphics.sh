@@ -45,7 +45,7 @@ version_banner () {
     echo $bgreen"${title_fill// /*}"; $rclr;
 }
 
-# generate adb killing on quit status for display
+# generate ADB killing on quit status for display
 adb_kill_display () {
     if [[ ${adb_kill} -eq 1 ]]; then
         echo $bred"ON"$blue")"; $rclr;
@@ -54,7 +54,7 @@ adb_kill_display () {
     fi
 }
 
-# generate adb killing on quit status for display
+# generate ADB killing on quit status for display
 adb_screencap_display () {
     if [[ ${adb_screencap} -eq 1 ]]; then
         echo $bgreen"ON"$blue")"; $rclr;
@@ -82,7 +82,7 @@ get_saved_adb_device () {
     trap 'err_trap_handler ${LINENO} $? ${FUNCNAME}' ERR
 }
 
-# generate adb device information for header
+# generate ADB device information for header
 gen_adb_device_info () {
     if [[ -n $adb_dev_choice ]] && [[ -n $adb_dev_model ]] && [[ -n $adb_dev_product ]]; then
         echo $green"${adb_dev_choice}"$blue" (model: "$green"${adb_dev_model}"$blue" | product: "$green"${adb_dev_product} "$blue")"; $rclr;

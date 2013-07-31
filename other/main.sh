@@ -35,7 +35,7 @@ gen_date () {
     echo "$(date +"%T %Z") - $(date +"%b. %d, %Y")\c"
 }
 
-# Check if we're killing adb on quit
+# Check if we're killing ADB on quit
 gen_adb_kill_status () {
     if [[ -z ${adb_kill} ]]; then
         adb_kill="$(defaults read "${plist}" adbkillonquit 2>/dev/null)"
@@ -45,7 +45,7 @@ gen_adb_kill_status () {
     fi
 }
 
-# Check if we have adb screenshots enabled
+# Check if we have ADB screenshots enabled
 gen_adb_screencap_status () {
     if [[ -z ${adb_screencap} ]]; then
         adb_screencap="$(defaults read "${plist}" adb_screencap 2>/dev/null)"
@@ -465,9 +465,9 @@ adb_device_integrity_sub () {
     fi
 }
 
-# check for connected adb device
+# check for connected ADB device
 adb_device_integrity_check () {
-    echo "adb_device_startup_check (checking for saved adb device)" 1>> "$log"
+    echo "adb_device_startup_check (checking for saved ADB device)" 1>> "$log"
     if [[ -z $adb_dev_choice ]] || [[ -z $adb_dev_model ]] || [[ -z $adb_dev_product ]]; then
         echo "No preferred ADB device setting found" 1>> "$log" 2>&1
     elif [[ "${adb_dev_choice}" = *List* ]] || [[ "${adb_dev_choice}" = *daemon* ]]; then
@@ -772,7 +772,7 @@ adb_device_integrity_check
 # run check to see if we should enable screenshots
 gen_adb_screencap_status
 
-# check if we're going to kill adb on exit
+# check if we're going to kill ADB on exit
 gen_adb_kill_status
 
 # startup complete, write divider to log

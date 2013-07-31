@@ -58,7 +58,7 @@ toggle_error () {
     fi
 }
 
-# Toggle killing adb daemon on APKM quit
+# Toggle killing ADB daemon on APKM quit
 toggle_adb_kill_on_quit () {
     local key="adbkillonquit"
     if [[ ${adb_kill} -ne 0 ]]; then
@@ -236,7 +236,7 @@ draw_nine () {
     fi
 }
 
-# generate an adb screenshot
+# generate an ADB screenshot
 adb_screenshot () {
     if [[ $adb_screencap -ne 0 ]]; then
         local file="$(/bin/date +"%d-%b-%Y_%I.%M.%S").png"
@@ -244,7 +244,7 @@ adb_screenshot () {
         if [[ ! -d $dir ]]; then
             mkdir -p "${dir}"
         fi
-        echo $green"trying to generate an adb screencap..."; $rclr;
+        echo $green"trying to generate an ADB screencap..."; $rclr;
         timeout3 -t 8 adb shell screencap -p | perl -pe 's/\x0D\x0A/\x0A/g' > "$dir/$file"
     else
         input_err
@@ -265,7 +265,7 @@ adb_screencap_toggle () {
     write_preference
 }
 
-# Read adb logcat file if it exists
+# Read ADB logcat file if it exists
 read_adb_log () {
     if [[ -e "${maindir}/ADBLOG.txt" ]]; then
         txt="${maindir}/ADBLOG.txt" 2>> "$log"
@@ -276,20 +276,20 @@ read_adb_log () {
     fi
 }
 
-# Open an adb shell
+# Open an ADB shell
 adb_shell () {
     if [[ $(command -v adb) ]]; then
         local apkmopt="adb -s ${adb_dev_choice} wait-for-device shell; exit"
         newttab "${apkmopt}" "$log"
     elif [[ ! $(command -v adb) ]]; then
-        echo $bred"ERROR: adb not found on the system."
+        echo $bred"ERROR: ADB not found on the system."
         debuganykey
     fi
 }
 
-# actually try and connect to the wireless adb device
+# actually try and connect to the wireless ADB device
 adb_wireless_try_connect () {
-    echo "adb_wireless_try_connect (try to connect to wireless adb device)" 1>> "$log"
+    echo "adb_wireless_try_connect (try to connect to wireless ADB device)" 1>> "$log"
     if [[ -n $adb_ip ]] && [[ -n $adb_port ]]; then
         adb_dev_choice="${adb_ip}:${adb_port}"
     fi
@@ -329,7 +329,7 @@ adb_wireless_connect_prompt () {
     unset input
 }
 
-# setup an wireless adb connection
+# setup an wireless ADB connection
 adb_wireless_connect () {
     echo "adb_wireless_connect (setup wireless adb) function" 1>> "$log"
     clear
@@ -337,7 +337,7 @@ adb_wireless_connect () {
     echo $bgreen"-----------------------------------------Wireless ADB Setup-----------------------------------------" ; $rclr;
     echo ""
     echo $bgreen"  1)"$white" Ensure wireless ADB is running on your android device";
-    echo $bgreen"  2)"$white" Make note of the IP address of the device wireless adb is running on";
+    echo $bgreen"  2)"$white" Make note of the IP address of the device wireless ADB is running on";
     echo $bgreen"  3)"$white" Enter the IP address, including periods/dots, when prompted.";
     echo $bgreen"  4)"$white" If you setup a non-standard port (e.g. anything other than 5555) then";
     echo $bgreen"    "$white" enter it after the IP address like normal:"$green" e.g. 192.168.1.10"$bred":5678";
@@ -348,10 +348,10 @@ adb_wireless_connect () {
     echo "adb_wireless_connect function complete" 1>> "$log"
 }
 
-# set time in seconds to run adb logcat
+# set time in seconds to run ADB logcat
 set_adb_log_timeout () {
     if [[ ${extended_adb_log} -eq 1 ]]; then
-        printf "$bwhite%s""Please enter time ("$bgreen"in seconds, up to 180"$white") to run adb logcat: "; $rclr;
+        printf "$bwhite%s""Please enter time ("$bgreen"in seconds, up to 180"$white") to run ADB logcat: "; $rclr;
         read input
         if [[ $input = [qQ] ]]; then
             (( logtimeout=10 ))
@@ -375,9 +375,9 @@ set_adb_log_timeout () {
     fi
 }
 
-# Create an adb logcat file
+# Create an ADB logcat file
 adblog () {
-    echo "adblog (generate adb logcat txt file) function" 1>> "$log"
+    echo "adblog (generate ADB logcat txt file) function" 1>> "$log"
     set_adb_log_timeout
     clear
     menu_header
@@ -397,22 +397,22 @@ adblog () {
     echo $bred" and make sure \"usb debugging\" is enabled before reconnecting"
     echo $bred" your android device's usb cable."
     echo ""
-    echo $white" it will then run adb logcat for "$bgreen"${logtimeout}"$white" seconds."
+    echo $white" it will then run ADB logcat for "$bgreen"${logtimeout}"$white" seconds."
     echo ""
     echo $bgreen"$apkmftr"; $rclr;
     echo $bwhite"Press "$bgreen"Q"$bwhite" and enter to go back to debug menu, or press";
-    printf "$bwhite%s""any other key to start adb log process... "; $rclr;
+    printf "$bwhite%s""any other key to start ADB log process... "; $rclr;
     read input
     if [[ $input = [qQ] ]]; then :
     else
-        echo "running adb logcat..."
+        echo "running ADB logcat..."
         timeout3 -t $logtimeout adb -s ${adb_dev_choice} wait-for-device logcat 1> "${maindir}/ADBLOG.txt"
     fi
     unset logtimeout
     echo "adblog function complete" 1>> "$log"
 }
 
-# check if adb connection is wired or wireless
+# check if ADB connection is wired or wireless
 adb_device_status () {
     if [[ ${adb_dev_choice} = *.* ]]; then
         if [[ "${adbstatus}" = *offline* ]]; then
@@ -425,7 +425,7 @@ adb_device_status () {
     fi
 }
 
-# check for adb device connection
+# check for ADB device connection
 adb_log_device_check () {
     adbstatus="${adb_dev_choice##*[[:space:]]}"
     adbstatus="${adb_dev_choice##*'\n'}"
@@ -438,7 +438,7 @@ adb_log_device_check () {
     unset adbstatus
 }
 
-# make the preferred adb device setting persistant
+# make the preferred ADB device setting persistant
 adb_save_device_pref () {
     if [[ -z "${adb_dev_choice}" ]] || [[ "${adb_dev_choice}" = *List* ]] || [[ "${adb_dev_choice}" = *daemon* ]]; then
         adb_nodevice_error

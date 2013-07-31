@@ -7,7 +7,7 @@
 # http://girlintroverted.wordpress.com
 #
 # version: 3.1b
-# Sun. Jul 21, 2013
+# Wed. Jul 31, 2013
 # -----------------------------------------------------------------------
 
 # Cleanup for 'cleaning' functions
@@ -129,9 +129,9 @@ clean_pngtool () {
     pngtoolset
 }
 
-# Clean/reset persistant adb device choice
+# Clean/reset persistant ADB device choice
 clean_adb_device () {
-    echo "clean_adb_device (resetting adb device choice)" 1>> "$log"
+    echo "clean_adb_device (resetting ADB device choice)" 1>> "$log"
     defaults delete "${plist}" adb_dev_choice 2>/dev/null
     defaults delete "${plist}" adb_dev_model 2>/dev/null
     defaults delete "${plist}" adb_dev_product 2>/dev/null

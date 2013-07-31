@@ -7,7 +7,7 @@
 # http://girlintroverted.wordpress.com
 #
 # version: 3.1b
-# Tue. Jul 30, 2013
+# Wed. Jul 31, 2013
 # -----------------------------------------------------------------------
 
 # Prompt user for android.jar location
@@ -150,7 +150,7 @@ compile_9patch () {
 # Pull a file from device with adb
 adb_pull () {
     echo "adb_pull function" 1>> "$log"
-    echo $bwhite"Where do you want adb to pull the apk/jar from? ";
+    echo $bwhite"Where do you want ADB to pull the apk/jar from? ";
     echo $green"Example of input : /system/app/launcher.apk";
     echo $green"(leave blank and press enter to return to main menu)"; $rclr;
     read input
@@ -230,35 +230,35 @@ zalign_file () {
     echo "zalign_file function complete" 1>> "$log"
 }
 
-# Normal adb push
+# Normal ADB push
 norm_push () {
-    adb push "${maindir}/${mod_dir}/unsigned-${capp}" "${input}"
+    adb -s "${adb_dev_choice}" wait-for-device push "${maindir}/${mod_dir}/unsigned-${capp}" "${input}"
     printf "$bwhite%s""Press any key to continue "; $rclr;
     wait
 }
 
-# Advanced adb push
+# Advanced ADB push
 adv_push () {
-    adb shell stop
+    adb -s "${adb_dev_choice}" wait-for-device shell stop
     norm_push
-    adb shell start
+    adb -s "${adb_dev_choice}" wait-for-device shell start
 }
 
-# Prompt for adb push destination
+# Prompt for ADB push destination
 push_prompt () {
     echo "push_prompt (push destination prompt) function" 1>> "$log"
     clear
-    echo $bwhite"Where do you want adb to push to and as what name: ";
+    echo $bwhite"Where do you want ADB to push to and as what name: ";
     echo $green"(leave blank and press enter to return to main menu)";
     echo ""
     echo $green"Example of input : /system/app/launcher.apk "; $rclr;
     read input
     if [[ -z $input ]]; then :
     else
-        adb devices
+        timeout3 -t 5 adb devices | grep "${adb_dev_choice}"
         printf "$bwhite%s""Press any key to continue "; $rclr;
         wait
-        adb remount
+        adb -s "${adb_dev_choice}" wait-for-device remount
         if [[ ${push_type} = normal ]]; then
             norm_push
         elif [[ ${push_type} = advanced ]]; then
@@ -268,13 +268,13 @@ push_prompt () {
     echo "push_prompt function complete" 1>> "$log"
 }
 
-# Cleanup variables used in adb push functions
+# Cleanup variables used in ADB push functions
 push_cleanup () {
     unset input
     unset push_type
 }
 
-# Prompt for adb push type
+# Prompt for ADB push type
 adb_push () {
     echo "adb_push (push type prompt) function" 1>> "$log"
     capp_test
@@ -286,9 +286,9 @@ adb_push () {
         echo $bred"Please use \"zip\" or \"compile\" options first"; $rclr;
         pressanykey
     else
-        echo $bwhite"Which adb push option would you like to perform?";
-        echo $bgreen"  1 "$white"  Simple  "$green"(adb push only)";
-        echo $bgreen"  2 "$white"  Advanced  "$green"(adb shell stop, push, shell start)";
+        echo $bwhite"Which ADB push option would you like to perform?";
+        echo $bgreen"  1 "$white"  Simple  "$green"(ADB push only)";
+        echo $bgreen"  2 "$white"  Advanced  "$green"(ADB shell stop, push, shell start)";
         printf "$bwhite%s""Please make your decision: "; $rclr;
         read input
         case "$input" in
