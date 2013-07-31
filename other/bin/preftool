@@ -13,12 +13,12 @@
 
 # Write 'string' type user preferences
 write_string () {
-    defaults write "${plist}" "${key}" "${value}" 2>/dev/null
+    /usr/bin/defaults write "${plist}" "${key}" "${value}" 2>/dev/null
 }
 
 # Write 'boolean' type user preferences
 write_boolean () {
-    defaults write "${plist}" "${key}" -bool "${value}" 2>/dev/null
+    /usr/bin/defaults write "${plist}" "${key}" -bool "${value}" 2>/dev/null
 }
 
 # Check the type of pref to write
