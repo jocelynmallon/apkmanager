@@ -7,7 +7,7 @@
 # http://girlintroverted.wordpress.com
 #
 # version: 3.1b
-# Sun. Jul 21, 2013
+# Tue. Jul 30, 2013
 # -----------------------------------------------------------------------
 
 # define colors for pretty output
@@ -54,13 +54,9 @@ adb_kill_display () {
     fi
 }
 
-# actual adb device info string for display
-adb_device_display_text () {
-    echo $green"${adb_dev_choice}"$blue" (model: "$green"${adb_dev_model}"$blue" | product: "$green"${adb_dev_product} "$blue")"; $rclr;
-}
-
 # try and retrieve saved/persistant ADB device choice
 get_saved_adb_device () {
+    trap - 0 ERR
     local p
     local v
     for p in "adb_dev_choice" "adb_dev_model" "adb_dev_product"
@@ -71,19 +67,19 @@ get_saved_adb_device () {
             eval $p=\${v}
         fi
     done
+    if [[ -z $adb_dev_choice ]] && [[ -z $adb_dev_model ]] && [[ -z $adb_dev_product ]]; then
+        adb_dev_choice="none"
+    fi
+    trap 'err_trap_handler ${LINENO} $? ${FUNCNAME}' ERR
 }
 
 # generate adb device information for header
 gen_adb_device_info () {
     if [[ -n $adb_dev_choice ]] && [[ -n $adb_dev_model ]] && [[ -n $adb_dev_product ]]; then
-        adb_device_display_text
+        echo $green"${adb_dev_choice}"$blue" (model: "$green"${adb_dev_model}"$blue" | product: "$green"${adb_dev_product} "$blue")"; $rclr;
     else
-        get_saved_adb_device
-        if [[ -z $adb_dev_choice ]] || [[ -z $adb_dev_model ]] || [[ -z $adb_dev_product ]]; then
-            echo $green"No ADB device connected"
-        else
-            adb_device_display_text
-        fi
+        adb_dev_choice="none"
+        echo $green"No ADB device connected"
     fi
 }
 
@@ -152,6 +148,10 @@ menu_header () {
 
 # Debug/settings menu sub-header
 debug_header () {
+    echo "adb_dev_choice: $adb_dev_choice"
+    if [[ -z $adb_dev_choice ]] && [[ -z $adb_dev_model ]] && [[ -z $adb_dev_product ]]; then
+        get_saved_adb_device
+    fi
     echo $bgreen"------------------------------------Debug Info and Misc Settings------------------------------------";
     echo $white" Current System: "$green"Mac OS X ${osx_ver} ${osx_bld} ${arch_ver}";
     echo $white" APK Manager install type: "$green"${installtype}";
