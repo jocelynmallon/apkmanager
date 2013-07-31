@@ -7,7 +7,7 @@
 # http://girlintroverted.wordpress.com
 #
 # version: 3.1b
-# Sun. Jul 21, 2013
+# Tue. Jul 30, 2013
 # -----------------------------------------------------------------------
 
 debug_cleanup () {
@@ -258,6 +258,20 @@ adb_shell () {
     fi
 }
 
+# actually try and connect to the wireless adb device
+adb_wireless_try_connect () {
+    echo "adb_wireless_try_connect (try to connect to wireless adb device)" 1>> "$log"
+    if [[ -n $adb_ip ]] && [[ -n $adb_port ]]; then
+        adb_dev_choice="${adb_ip}:${adb_port}"
+    fi
+    echo $green"Trying to connect wireless ADB on: "$bgreen"${adb_dev_choice}"
+    timeout3 -t 5 adb connect "${adb_dev_choice}" 1> /dev/null 2>&1
+    if [[ $? -ne 0 ]]; then
+        adb_wireless_connection_error
+        unset adb_dev_choice
+    fi
+}
+
 # test if the IP address is valid
 adb_wireless_ip_test () {
     local adb_port="${input##*:}"
@@ -271,7 +285,7 @@ adb_wireless_ip_test () {
         if [[ ${adb_port} = ${adb_ip} ]]; then
             adb_port=5555
         fi
-        adb connect "${adb_ip}:${adb_port}" 1> /dev/null 2>&1
+        adb_wireless_try_connect
     fi
 }
 
@@ -371,7 +385,7 @@ adblog () {
 
 # check if adb connection is wired or wireless
 adb_device_status () {
-    if [[ ${adbtmp} = *.* ]]; then
+    if [[ ${adb_dev_choice} = *.* ]]; then
         if [[ "${adbstatus}" = *offline* ]]; then
             adbstatus="Wireless, OFFLINE"
         else

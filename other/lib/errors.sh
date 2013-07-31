@@ -7,7 +7,7 @@
 # http://girlintroverted.wordpress.com
 #
 # version: 3.1b
-# Sun. Jul 21, 2013
+# Tue. Jul 30, 2013
 # -----------------------------------------------------------------------
 
 # Unknown input error string
@@ -196,6 +196,36 @@ no_branches_err () {
 git_branch_change () {
     echo $bgreen"APK Manager had to switch branches"; $rclr;
     echo $bgreen"during the update, and will now exit."; $rclr;
+}
+
+# no preferred adb device error
+adb_saved_device_error () {
+    echo $bred"ERROR: APK Manager found an invalid setting for"; $rclr;
+    echo $bred"your saved ADB device preference: ${adb_dev_choice}"; $rclr;
+    echo $bred"APK Manager will reset your saved ADB device."; $rclr;
+    genericpanykey
+}
+
+# no preferred adb device error
+adb_saved_device_state_error () {
+    echo $bred"ERROR: When attempting to connect to: ${adb_dev_choice}"; $rclr;
+    echo $bred"APK Manager found ADB device status: ${adbstat}"; $rclr;
+    echo $bred"Please try re-connecting your ADB device before using"; $rclr;
+    echo $bred"any ADB options (e.g. push, pull, shell, etc.)"; $rclr;
+    echo $bred"APK Manager will reset your saved ADB device now too."; $rclr;
+    genericpanykey
+}
+
+# failed to connect to wireless adb device
+adb_wireless_connection_error () {
+    echo $bred"ERROR: APK Manager failed to connect to: ${adb_dev_choice}"; $rclr;
+    echo $bred"Within the default 5 second timeout. Please ensure"; $rclr;
+    echo $bred"Wireelss ADB is running on your device, and the device"; $rclr;
+    echo $bred"is connected to the same network as your computer"; $rclr;
+    if [[ -n $adb_startup_check ]]; then
+        echo $bred"APK Manager will reset your saved ADB device now too."; $rclr;
+    fi
+    genericpanykey
 }
 
 # no preferred adb device error
