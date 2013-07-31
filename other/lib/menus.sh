@@ -7,7 +7,7 @@
 # http://girlintroverted.wordpress.com
 #
 # version: 3.1b
-# Sun. Jul 21, 2013
+# Tue. Jul 30, 2013
 # -----------------------------------------------------------------------
 
 # Advanced signing menu
@@ -48,6 +48,7 @@ sign_menu () {
         98)  toggle_error; sign_menu ;;
         99)  basic_debug; sign_menu ;;
       [qQ])  signcleanup ;;
+  [qQ][qQ])  quit ;;
          *)  input_err; sign_menu ;;
     esac
 }
@@ -105,6 +106,7 @@ clean_menu () {
         98)  toggle_error ;;
         99)  basic_debug ;;
       [qQ])  cmcleanup  ;;
+  [qQ][qQ])  quit ;;
          *)  input_err; clean_menu ;;
     esac
 }
@@ -156,6 +158,7 @@ textapp_menu () {
         98)  toggle_error ;;
         99)  basic_debug ;;
       [qQ])  ;;
+  [qQ][qQ])  quit ;;
          *)  input_err; textapp_menu ;;
     esac
 }
@@ -192,6 +195,7 @@ updates_menu () {
         98)  toggle_error; updates_menu  ;;
         99)  basic_debug; updates_menu  ;;
       [qQ])  updates_cleanup ;;
+  [qQ][qQ])  quit ;;
          *)  input_err; updates_menu ;;
     esac
 }
@@ -230,6 +234,7 @@ adb_menu () {
         98)  toggle_error; adb_menu  ;;
         99)  basic_debug; adb_menu  ;;
       [qQ])  ;;
+  [qQ][qQ])  quit ;;
          *)  input_err; adb_menu ;;
     esac
 }
@@ -292,6 +297,7 @@ debug_menu () {
         98)  toggle_error; debug_menu ;;
         99)  basic_debug; debug_menu ;;
       [qQ])  debug_cleanup ;;
+  [qQ][qQ])  quit ;;
          *)  input_err; debug_menu ;;
     esac
 }
@@ -365,6 +371,7 @@ restart () {
         98)  toggle_error ;;
         99)  basic_debug ;;
       [qQ])  quit ;;
+  [qQ][qQ])  quit ;;
          *)  input_err ;;
     esac
 }
