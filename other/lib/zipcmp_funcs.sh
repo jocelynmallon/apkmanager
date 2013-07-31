@@ -65,7 +65,10 @@ install_apk () {
     elif [[ ! ${prjext} = [Aa][Pp][Kk] ]]; then
         jarext_err
     else
-        if [[ ! -e "${maindir}/${mod_dir}/signed-${capp}" ]]; then
+        adb_multiple_devices_check
+        if [[ $? -ne 0 ]]; then
+            return 1
+        elif [[ ! -e "${maindir}/${mod_dir}/signed-${capp}" ]]; then
             echo $bred"Error, cannot find file: signed-${capp}";
             echo "Error, cannot find file: signed-${capp}" 1>> "$log"
             echo $bred"Please use \"sign apk\" option first"; $rclr;

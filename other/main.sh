@@ -715,6 +715,9 @@ source "${libdir}/misc_funcs.sh"
 # include compile & all-in-one functions
 source "${libdir}/zipcmp_funcs.sh"
 
+# include ADB related functions
+source "${libdir}/adb_funcs.sh"
+
 # include basic "batch" functions
 source "${libdir}/batch_funcs.sh"
 

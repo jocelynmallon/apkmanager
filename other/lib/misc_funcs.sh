@@ -147,26 +147,6 @@ compile_9patch () {
     echo "compile_9patch function complete" 1>> "$log"
 }
 
-# Pull a file from device with adb
-adb_pull () {
-    echo "adb_pull function" 1>> "$log"
-    echo $bwhite"Where do you want ADB to pull the apk/jar from? ";
-    echo $green"Example of input : /system/app/launcher.apk";
-    echo $green"(leave blank and press enter to return to main menu)"; $rclr;
-    read input
-    if [[ -z $input ]]; then :
-    else
-        local outfile="$(basename "${input}")"
-        adb -s "${adb_dev_choice}" wait-for-device pull "$input" "${maindir}/${mod_dir}/${outfile}"
-        if [[ $? -ne 0 ]]; then
-            echo $bred"Error: while pulling ${outfile}"; $rclr;
-            pressanykey
-        fi
-    fi
-    unset input
-    echo "adb_pull function complete" 1>> "$log"
-}
-
 # Optimize png images inisde a project folder
 opt_apk_png () {
     echo "opt_apk_png (optimize images inside apk) function" 1>> "$log"
@@ -228,77 +208,6 @@ zalign_file () {
         done
     fi
     echo "zalign_file function complete" 1>> "$log"
-}
-
-# Normal ADB push
-norm_push () {
-    adb -s "${adb_dev_choice}" wait-for-device push "${maindir}/${mod_dir}/unsigned-${capp}" "${input}"
-    printf "$bwhite%s""Press any key to continue "; $rclr;
-    wait
-}
-
-# Advanced ADB push
-adv_push () {
-    adb -s "${adb_dev_choice}" wait-for-device shell stop
-    norm_push
-    adb -s "${adb_dev_choice}" wait-for-device shell start
-}
-
-# Prompt for ADB push destination
-push_prompt () {
-    echo "push_prompt (push destination prompt) function" 1>> "$log"
-    clear
-    echo $bwhite"Where do you want ADB to push to and as what name: ";
-    echo $green"(leave blank and press enter to return to main menu)";
-    echo ""
-    echo $green"Example of input : /system/app/launcher.apk "; $rclr;
-    read input
-    if [[ -z $input ]]; then :
-    else
-        timeout3 -t 5 adb devices | grep "${adb_dev_choice}"
-        printf "$bwhite%s""Press any key to continue "; $rclr;
-        wait
-        adb -s "${adb_dev_choice}" wait-for-device remount
-        if [[ ${push_type} = normal ]]; then
-            norm_push
-        elif [[ ${push_type} = advanced ]]; then
-            adv_push
-        fi
-    fi
-    echo "push_prompt function complete" 1>> "$log"
-}
-
-# Cleanup variables used in ADB push functions
-push_cleanup () {
-    unset input
-    unset push_type
-}
-
-# Prompt for ADB push type
-adb_push () {
-    echo "adb_push (push type prompt) function" 1>> "$log"
-    capp_test
-    if [[ ${capp} = "None" ]]; then
-        echo "no project selected, aborting" 1>> "$log"
-        return 1
-    elif [[ ! -f "${maindir}/${mod_dir}/unsigned-${capp}" ]]; then
-        echo $bred"Error, cannot find file: unsigned-${capp}";
-        echo $bred"Please use \"zip\" or \"compile\" options first"; $rclr;
-        pressanykey
-    else
-        echo $bwhite"Which ADB push option would you like to perform?";
-        echo $bgreen"  1 "$white"  Simple  "$green"(ADB push only)";
-        echo $bgreen"  2 "$white"  Advanced  "$green"(ADB shell stop, push, shell start)";
-        printf "$bwhite%s""Please make your decision: "; $rclr;
-        read input
-        case "$input" in
-            1)  push_type="normal"; push_prompt ;;
-            2)  push_type="advanced"; push_prompt ;;
-            *)  input_err; adb_push ;;
-        esac
-    fi
-    push_cleanup
-    echo "adb_push function complete" 1>> "$log"
 }
 
 # Open a text file with log viewing app

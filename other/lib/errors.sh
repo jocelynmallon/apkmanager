@@ -234,6 +234,14 @@ adb_nodevice_error () {
     adbanykey
 }
 
+# no preferred ADB device error
+adb_multiple_devices_error () {
+    echo $bred"ERROR: APK Maanger found multiple ADB devices"; $rclr;
+    echo $bred"connected to this computer. Please select a"; $rclr;
+    echo $bred"specific ADB device to use for ADB functions."; $rclr;
+    genericpanykey
+}
+
 # ADB device missing info error
 adb_device_missing_info_error () {
     echo $bred"ERROR: ADB device information is incomplete or"; $rclr;
