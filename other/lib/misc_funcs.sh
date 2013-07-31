@@ -6,8 +6,8 @@
 # by Jocelyn Mallon CC by-nc-sa 2012
 # http://girlintroverted.wordpress.com
 #
-# version: 3.0
-# Sun. Oct 07, 2012
+# version: 3.1b
+# Tue. Jul 30, 2013
 # -----------------------------------------------------------------------
 
 # Prompt user for android.jar location
@@ -157,7 +157,7 @@ adb_pull () {
     if [[ -z $input ]]; then :
     else
         local outfile="$(basename "${input}")"
-        adb pull "$input" "${maindir}/${mod_dir}/${outfile}"
+        adb -s "${adb_dev_choice}" wait-for-device pull "$input" "${maindir}/${mod_dir}/${outfile}"
         if [[ $? -ne 0 ]]; then
             echo $bred"Error: while pulling ${outfile}"; $rclr;
             pressanykey
