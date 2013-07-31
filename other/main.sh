@@ -7,7 +7,7 @@
 # http://girlintroverted.wordpress.com
 #
 # version: 3.1b
-# Tue. Jul 30, 2013
+# Wed. Jul 31, 2013
 # -----------------------------------------------------------------------
 
 # define default directories to function
@@ -41,6 +41,16 @@ gen_adb_kill_status () {
         adb_kill="$(defaults read "${plist}" adbkillonquit 2>/dev/null)"
         if [[ $? -ne 0 ]]; then
             adb_kill=0
+        fi
+    fi
+}
+
+# Check if we have adb screenshots enabled
+gen_adb_screencap_status () {
+    if [[ -z ${adb_screencap} ]]; then
+        adb_screencap="$(defaults read "${plist}" adb_screencap 2>/dev/null)"
+        if [[ $? -ne 0 ]]; then
+            adb_screencap=0
         fi
     fi
 }
@@ -758,6 +768,9 @@ set_current_pid
 # check if we have a saved ADB device
 get_saved_adb_device
 adb_device_integrity_check
+
+# run check to see if we should enable screenshots
+gen_adb_screencap_status
 
 # check if we're going to kill adb on exit
 gen_adb_kill_status

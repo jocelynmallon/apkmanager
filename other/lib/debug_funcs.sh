@@ -7,7 +7,7 @@
 # http://girlintroverted.wordpress.com
 #
 # version: 3.1b
-# Tue. Jul 30, 2013
+# Wed. Jul 31, 2013
 # -----------------------------------------------------------------------
 
 debug_cleanup () {
@@ -234,6 +234,35 @@ draw_nine () {
         echo $bred"ERROR: draw9patch not found on the system."
         debuganykey
     fi
+}
+
+# generate an adb screenshot
+adb_screenshot () {
+    if [[ $adb_screencap -ne 0 ]]; then
+        local file="$(/bin/date +"%d-%b-%Y_%I.%M.%S").png"
+        local dir="${maindir}/screencaps"
+        if [[ ! -d $dir ]]; then
+            mkdir -p "${dir}"
+        fi
+        echo $green"trying to generate an adb screencap..."; $rclr;
+        timeout3 -t 8 adb shell screencap -p | perl -pe 's/\x0D\x0A/\x0A/g' > "$dir/$file"
+    else
+        input_err
+        ${ret_menu}
+    fi
+}
+
+# toggle hidden SS menu option to take screenshots
+adb_screencap_toggle () {
+    local key="adb_screencap"
+    if [[ $adb_screencap -ne 0 ]]; then
+        adb_screencap=0
+        local value="false"
+    elif [[ $adb_screencap -eq 0 ]]; then
+        adb_screencap=1
+        local value="true"
+    fi
+    write_preference
 }
 
 # Read adb logcat file if it exists

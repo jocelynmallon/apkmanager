@@ -7,7 +7,7 @@
 # http://girlintroverted.wordpress.com
 #
 # version: 3.1b
-# Tue. Jul 30, 2013
+# Wed. Jul 31, 2013
 # -----------------------------------------------------------------------
 
 # define colors for pretty output
@@ -48,9 +48,18 @@ version_banner () {
 # generate adb killing on quit status for display
 adb_kill_display () {
     if [[ ${adb_kill} -eq 1 ]]; then
-        echo $bred"ON"$blue" )"; $rclr;
+        echo $bred"ON"$blue")"; $rclr;
     else
-        echo $bgreen"OFF"$blue" )"; $rclr;
+        echo $bgreen"OFF"$blue")"; $rclr;
+    fi
+}
+
+# generate adb killing on quit status for display
+adb_screencap_display () {
+    if [[ ${adb_screencap} -eq 1 ]]; then
+        echo $bgreen"ON"$blue")"; $rclr;
+    else
+        echo $bred"OFF"$blue")"; $rclr;
     fi
 }
 
@@ -148,7 +157,7 @@ menu_header () {
 
 # Debug/settings menu sub-header
 debug_header () {
-    echo "adb_dev_choice: $adb_dev_choice"
+#    echo "adb_dev_choice: $adb_dev_choice"
     if [[ -z $adb_dev_choice ]] && [[ -z $adb_dev_model ]] && [[ -z $adb_dev_product ]]; then
         get_saved_adb_device
     fi

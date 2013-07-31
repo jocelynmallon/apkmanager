@@ -7,7 +7,7 @@
 # http://girlintroverted.wordpress.com
 #
 # version: 3.1b
-# Tue. Jul 30, 2013
+# Wed. Jul 31, 2013
 # -----------------------------------------------------------------------
 
 # Advanced signing menu
@@ -47,6 +47,7 @@ sign_menu () {
         97)  toggle_verbose; sign_menu ;;
         98)  toggle_error; sign_menu ;;
         99)  basic_debug; sign_menu ;;
+  [sS][sS])  ret_menu="sign_menu"; adb_screenshot; unset ret_menu ;;
       [qQ])  signcleanup ;;
   [qQ][qQ])  quit ;;
          *)  input_err; sign_menu ;;
@@ -105,6 +106,7 @@ clean_menu () {
         97)  toggle_verbose ;;
         98)  toggle_error ;;
         99)  basic_debug ;;
+  [sS][sS])  ret_menu="clean_menu"; adb_screenshot; unset ret_menu ;;
       [qQ])  cmcleanup  ;;
   [qQ][qQ])  quit ;;
          *)  input_err; clean_menu ;;
@@ -157,6 +159,7 @@ textapp_menu () {
         97)  toggle_verbose ;;
         98)  toggle_error ;;
         99)  basic_debug ;;
+  [sS][sS])  ret_menu="textapp_menu"; adb_screenshot; unset ret_menu ;;
       [qQ])  ;;
   [qQ][qQ])  quit ;;
          *)  input_err; textapp_menu ;;
@@ -194,6 +197,7 @@ updates_menu () {
         97)  toggle_verbose; updates_menu  ;;
         98)  toggle_error; updates_menu  ;;
         99)  basic_debug; updates_menu  ;;
+  [sS][sS])  ret_menu="updates_menu"; adb_screenshot; unset ret_menu ;;
       [qQ])  updates_cleanup ;;
   [qQ][qQ])  quit ;;
          *)  input_err; updates_menu ;;
@@ -214,7 +218,8 @@ adb_menu () {
     echo $bgreen"  6   "$white"Open an ADB shell session "$blue"(select a default adb device first)";
     echo $bgreen"  7   "$white"Toggle killing ADB daemon on quit" $blue"(currently: "$(adb_kill_display);
     echo $bgreen"  8   "$white"Restart ADB daemon" $blue"(must reconnect wireless adb sessions afterwards)";
-#    echo $bgreen"  9   "$white"Setup advanced ADB command line options "$bred"(MAY HAVE UNINTENDED CONSEQUENCES)";
+    echo $bgreen"  9   "$white"Enable \"hidden\" option "$green"SS"$white" to take an adb screencap from most menus "$blue"(currently: "$(adb_screencap_display);
+#    echo $bgreen"  10  "$white"Setup advanced ADB command line options "$bred"(MAY HAVE UNINTENDED CONSEQUENCES)";
     echo $bgreen"  Q   "$white"Return to Debug Menu";
     echo $bgreen"$apkmftr";
     printf "$bwhite%s""Please select an option from above: "; $rclr;
@@ -228,11 +233,13 @@ adb_menu () {
          6)  adb_shell; adb_menu  ;;
          7)  toggle_adb_kill_on_quit; adb_menu  ;;
          8)  adb kill-server; adb start-server >/dev/null; adb_menu  ;;
-#         9)  adb_menu  ;;
+         9)  adb_screencap_toggle; adb_menu ;;
+#        10)  adb_menu  ;;
         96)  toggle_trace; adb_menu  ;;
         97)  toggle_verbose; adb_menu  ;;
         98)  toggle_error; adb_menu  ;;
         99)  basic_debug; adb_menu  ;;
+  [sS][sS])  ret_menu="adb_menu"; adb_screenshot; unset ret_menu ;;
       [qQ])  ;;
   [qQ][qQ])  quit ;;
          *)  input_err; adb_menu ;;
@@ -296,6 +303,7 @@ debug_menu () {
         97)  toggle_verbose; debug_menu ;;
         98)  toggle_error; debug_menu ;;
         99)  basic_debug; debug_menu ;;
+  [sS][sS])  ret_menu="debug_menu"; adb_screenshot; unset ret_menu ;;
       [qQ])  debug_cleanup ;;
   [qQ][qQ])  quit ;;
          *)  input_err; debug_menu ;;
@@ -370,6 +378,7 @@ restart () {
         97)  toggle_verbose ;;
         98)  toggle_error ;;
         99)  basic_debug ;;
+  [sS][sS])  ret_menu=""; adb_screenshot; unset ret_menu ;;
       [qQ])  quit ;;
   [qQ][qQ])  quit ;;
          *)  input_err ;;
