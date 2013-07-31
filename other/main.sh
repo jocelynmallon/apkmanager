@@ -465,7 +465,7 @@ adb_device_integrity_sub () {
     if [[ -z $adb_dev_choice ]]; then
         adb_device_integrity_failure
     else
-        local adbstat=$(timeout3 -t 5 adb get-state "${adb_dev_choice}")
+        local adbstat="$(timeout3 -t 5 adb -s ${adb_dev_choice} get-state)"
         if [[ ! ${adbstat} = "device" ]]; then
             adb_saved_device_state_error
             adb_device_integrity_failure
