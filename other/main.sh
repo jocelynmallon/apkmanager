@@ -455,48 +455,6 @@ logvchk () {
     logvset
 }
 
-# Failed to find ADB device, clear settings
-adb_device_integrity_failure () {
-    echo "==> BAD saved ADB device, resetting..." 1>> "$log" 2>&1
-    clean_adb_device
-}
-
-adb_device_integrity_sub () {
-    if [[ -z $adb_dev_choice ]]; then
-        adb_device_integrity_failure
-    else
-        local adbstat="$(timeout3 -t 5 adb -s ${adb_dev_choice} get-state)"
-        if [[ ! ${adbstat} = "device" ]]; then
-            adb_saved_device_state_error
-            adb_device_integrity_failure
-        else
-            echo "==> ADB device ${adb_dev_choice} connected" 1>> "$log" 2>&1
-        fi
-    fi
-}
-
-# check for connected ADB device
-adb_device_integrity_check () {
-    echo "adb_device_startup_check (checking for saved ADB device)" 1>> "$log"
-    if [[ $adb_connect_on_start -ne 1 ]]; then :
-    else
-        if [[ -z $adb_dev_choice ]] || [[ -z $adb_dev_model ]] || [[ -z $adb_dev_product ]]; then
-            echo "No preferred ADB device setting found" 1>> "$log" 2>&1
-        elif [[ "${adb_dev_choice}" = *List* ]] || [[ "${adb_dev_choice}" = *daemon* ]]; then
-            adb_saved_device_error
-            adb_device_integrity_failure
-        else
-            if [[ $adb_dev_choice = *.* ]]; then
-                echo "saved device pref is for wireless adb, trying to connect..." 1>> "$log"
-                local adb_startup_check=1
-                adb_wireless_try_connect
-            fi
-            echo "trying to get state of saved device..." 1>> "$log"
-            adb_device_integrity_sub
-        fi
-    fi
-}
-
 defpngtool () {
     pngtool="optipng"
     local key="pngtool"

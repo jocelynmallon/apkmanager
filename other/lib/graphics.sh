@@ -72,29 +72,10 @@ adb_connect_start_display () {
     fi
 }
 
-# try and retrieve saved/persistant ADB device choice
-get_saved_adb_device () {
-    trap - 0 ERR
-    local p
-    local v
-    for p in "adb_dev_choice" "adb_dev_model" "adb_dev_product"
-    do
-        v="$(defaults read "${plist}" ${p} 2>/dev/null)"
-        if [[ $? -ne 0 ]]; then :
-        else
-            eval $p=\${v}
-        fi
-    done
-    if [[ -z $adb_dev_choice ]] && [[ -z $adb_dev_model ]] && [[ -z $adb_dev_product ]]; then
-        adb_dev_choice="none"
-    fi
-    trap 'err_trap_handler ${LINENO} $? ${FUNCNAME}' ERR
-}
-
 # generate ADB device information for header
 gen_adb_device_info () {
-    if [[ -n $adb_dev_choice ]] && [[ -n $adb_dev_model ]] && [[ -n $adb_dev_product ]]; then
-        echo $green"${adb_dev_choice}"$blue" (model: "$green"${adb_dev_model}"$blue" | product: "$green"${adb_dev_product} "$blue")"; $rclr;
+    if [[ -n $adb_dev_choice ]] && [[ -n $adb_dev_model ]] && [[ -n $adb_dev_product ]] && [[ -n $adb_dev_device ]]; then
+        echo $green"${adb_dev_choice}"$blue" (model: "$green"${adb_dev_model}"$blue" | device: "$green"${adb_dev_device}"$blue" | product: "$green"${adb_dev_product} "$blue")"; $rclr;
     else
         adb_dev_choice="none"
         echo $green"No ADB device connected"

@@ -135,10 +135,12 @@ clean_adb_device () {
     defaults delete "${plist}" adb_dev_choice 2>/dev/null
     defaults delete "${plist}" adb_dev_model 2>/dev/null
     defaults delete "${plist}" adb_dev_product 2>/dev/null
+    defaults delete "${plist}" adb_dev_device 2>/dev/null
     unset adb_dev_choice
     unset adb_dev_model
     unset adb_dev_product
-    gen_adb_device_info
+    unset adb_dev_device
+    adb_dev_choice="none"
 }
 
 # Clean/reset apktool.jar symlink

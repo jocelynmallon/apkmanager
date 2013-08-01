@@ -11,6 +11,67 @@
 # -----------------------------------------------------------------------
 
 
+# Failed to find ADB device, clear settings
+adb_device_integrity_failure () {
+    echo "==> BAD saved ADB device, resetting..." 1>> "$log" 2>&1
+    clean_adb_device
+}
+
+adb_device_integrity_sub () {
+    if [[ -z $adb_dev_choice ]]; then
+        adb_device_integrity_failure
+    else
+        local adbstat="$(timeout3 -t 5 adb -s ${adb_dev_choice} get-state)"
+        if [[ ! ${adbstat} = "device" ]]; then
+            adb_saved_device_state_error
+            adb_device_integrity_failure
+        else
+            echo "==> ADB device ${adb_dev_choice} connected" 1>> "$log" 2>&1
+        fi
+    fi
+}
+
+# check for connected ADB device
+adb_device_integrity_check () {
+    echo "adb_device_startup_check (checking for saved ADB device)" 1>> "$log"
+    if [[ $adb_connect_on_start -ne 1 ]]; then :
+    else
+        if [[ -z $adb_dev_choice ]] || [[ -z $adb_dev_model ]] || [[ -z $adb_dev_product ]] || [[ -z $adb_dev_device ]]; then
+            echo "No preferred ADB device setting found" 1>> "$log" 2>&1
+        elif [[ "${adb_dev_choice}" = *List* ]] || [[ "${adb_dev_choice}" = *daemon* ]]; then
+            adb_saved_device_error
+            adb_device_integrity_failure
+        else
+            if [[ $adb_dev_choice = *.* ]]; then
+                echo "saved device pref is for wireless adb, trying to connect..." 1>> "$log"
+                local adb_startup_check=1
+                adb_wireless_try_connect
+            fi
+            echo "trying to get state of saved device..." 1>> "$log"
+            adb_device_integrity_sub
+        fi
+    fi
+}
+
+# try and retrieve saved/persistant ADB device choice
+get_saved_adb_device () {
+    trap - 0 ERR
+    local p
+    local v
+    for p in "adb_dev_choice" "adb_dev_model" "adb_dev_product" "adb_dev_device"
+    do
+        v="$(defaults read "${plist}" ${p} 2>/dev/null)"
+        if [[ $? -ne 0 ]]; then :
+        else
+            eval $p=\${v}
+        fi
+    done
+    if [[ -z $adb_dev_choice ]] && [[ -z $adb_dev_model ]] && [[ -z $adb_dev_product ]] && [[ -z $adb_dev_device ]]; then
+        adb_dev_choice="none"
+    fi
+    trap 'err_trap_handler ${LINENO} $? ${FUNCNAME}' ERR
+}
+
 # Pull a file from device with adb
 adb_pull () {
     echo "adb_pull function" 1>> "$log"
@@ -291,6 +352,7 @@ adblog () {
     echo ""
     echo $white" device model/product info:";
     echo $green"  model:"$bgreen" ${adb_dev_model}";
+    echo $green"  device:"$bgreen" ${adb_dev_device}";
     echo $green"  product:"$bgreen" ${adb_dev_product}";
     echo ""
     echo $bred" if it \"hangs\" on waiting for device, please unplug your device";
@@ -348,7 +410,7 @@ adb_save_device_pref () {
     if [[ -z "${adb_dev_choice}" ]] || [[ "${adb_dev_choice}" = *List* ]] || [[ "${adb_dev_choice}" = *daemon* ]]; then
         adb_nodevice_error
     else
-        if [[ -n $adb_dev_choice ]] && [[ -n $adb_dev_model ]] && [[ -n $adb_dev_product ]]; then
+        if [[ -n $adb_dev_choice ]] && [[ -n $adb_dev_model ]] && [[ -n $adb_dev_product ]] && [[ -n $adb_dev_device ]]; then
             echo $green" Saving unique ADB serial..."
             local key="adb_dev_choice"
             local value="${adb_dev_choice}"
@@ -360,6 +422,10 @@ adb_save_device_pref () {
             echo $green" Saving device product..."
             local key="adb_dev_product"
             local value="${adb_dev_product}"
+            write_preference
+            echo $green" Saving device name..."
+            local key="adb_dev_device"
+            local value="${adb_dev_device}"
             write_preference
             echo $bgreen" Done! Press any key to return to ADB menu."
             wait
@@ -373,10 +439,9 @@ adb_save_device_pref () {
 set_adb_device_info () {
     adb_dev_choice="${adb_dev_choice%%[[:space:]]*}"
     adb_dev_choice="${adb_dev_choice##*'\n'}"
-    adb_dev_model="$(echo ${adb_dev_model} | awk '{print $5}' )"
-    adb_dev_model="${adb_dev_model##*:}"
-    adb_dev_product="$(echo ${adb_dev_product} | awk '{print $4}' )"
-    adb_dev_product="${adb_dev_product##*:}"
+    adb_dev_model="$(echo ${adb_dev_model} | grep -i "[[:space:]]device[[:space:]]" | sed 's/.*model://g' | cut -d ' ' -f1 )"
+    adb_dev_product="$(echo ${adb_dev_product} | grep -i "[[:space:]]device[[:space:]]" | sed 's/.*product://g' | cut -d ' ' -f1 )"
+    adb_dev_device="$(echo ${adb_dev_device} | grep -i "[[:space:]]device[[:space:]]" | sed 's/.*device://g' | cut -d ' ' -f1 )"
 }
 
 # setup temporary adb device if only one is connected
@@ -384,16 +449,22 @@ set_temporary_adb_device () {
     adb_dev_choice="$(populate_adb_devices)"
     adb_dev_model="$(populate_adb_devices)"
     adb_dev_product="$(populate_adb_devices)"
+    adb_dev_device="$(populate_adb_devices)"
     set_adb_device_info
 }
 
 # Try and see if we have more than one ADB device connected
 adb_multiple_devices_check () {
-    adb remount 1>/dev/null 2>&1
-    if [[ $? -ne 0 ]]; then
-        adb_multiple_devices_error
+    if [[ -z $adb_dev_choice ]]; then
+        adb remount 1>/dev/null 2>&1
+        if [[ $? -ne 0 ]]; then
+            adb_multiple_devices_error
+            return 1
+        else
+            set_temporary_adb_device
+        fi
+    elif [[ $adb_dev_choice = *none* ]]; then
+        adb_nodevice_error
         return 1
-    else
-        set_temporary_adb_device
     fi
 }

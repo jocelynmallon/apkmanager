@@ -231,7 +231,7 @@ adb_wireless_connection_error () {
 # no preferred ADB device error
 adb_nodevice_error () {
     echo $bred"ERROR: no preferred ADB device selected"; $rclr;
-    adbanykey
+    genericpanykey
 }
 
 # no preferred ADB device error
