@@ -79,6 +79,8 @@ get_mmenu_input () {
     read input
     if [[ ${input} = [qQ] ]]; then
         mmcleanup
+    elif [[ ${input} = [qQ][qQ] ]]; then
+        quit
     elif [[ ${input} = [nN] ]]; then
         if [[ ${pindex} -lt ${pages} ]]; then
             pindex="$((pindex + 1))"
