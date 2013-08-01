@@ -74,6 +74,7 @@ install_apk () {
             echo $bred"Please use \"sign apk\" option first"; $rclr;
             pressanykey
         else
+            echo "Attempting to install signed-${capp} to:"
             timeout3 -t 5 adb devices | grep "${adb_dev_choice}"
             echo ""
             printf "$bwhite%s""Press any key to continue "; $rclr;
