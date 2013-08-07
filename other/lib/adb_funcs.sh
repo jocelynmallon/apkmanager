@@ -366,7 +366,7 @@ adb_wireless_ip_test () {
     if [[ $? -ne 0 ]]; then
         echo $bred"Error: ${adb_ip} is invalid, press any key to try again"; $rclr;
         wait
-        adb_wireless_connect_prompt
+        adb_wireless_connect_input
     else
         if [[ ${adb_port} = ${adb_ip} ]]; then
             adb_port=5555
@@ -376,7 +376,7 @@ adb_wireless_ip_test () {
 }
 
 # prompt for IP address to try and connect to
-adb_wireless_connect_prompt () {
+adb_wireless_connect_input () {
     printf "$bwhite%s""Please enter IP address of your device: "; $rclr;
     read input
     if [[ $input = [qQ] ]]; then :
@@ -386,8 +386,8 @@ adb_wireless_connect_prompt () {
     unset input
 }
 
-# setup an wireless ADB connection
-adb_wireless_connect () {
+# Prompt for connecting new wireless adb devices
+adb_wireless_connect_prompt () {
     echo "adb_wireless_connect (setup wireless adb) function" 1>> "$log"
     clear
     menu_header
@@ -401,8 +401,19 @@ adb_wireless_connect () {
     echo ""
     echo $bgreen"$apkmftr"; $rclr;
     echo $bwhite"Press "$bgreen"Q"$bwhite" and enter to go back to ADB menu.";
-    adb_wireless_connect_prompt
+    adb_wireless_connect_input
     echo "adb_wireless_connect function complete" 1>> "$log"
+}
+
+# setup an wireless ADB connection
+adb_wireless_connect () {
+    if [[ $adbsaved -eq 1 ]]; then
+        if [[ -n $adb_dev_choice ]] && [[ -n $adb_dev_model ]] && [[ -n $adb_dev_product ]] && [[ -n $adb_dev_device ]]; then
+            adb_wireless_try_connect
+        fi
+    else
+        adb_wireless_connect_prompt
+    fi
 }
 
 # set time in seconds to run ADB logcat

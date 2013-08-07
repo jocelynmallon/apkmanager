@@ -209,18 +209,19 @@ adb_menu () {
     clear
     menu_header
     debug_header
-    echo $bgreen"$apkmspr"
+    echo $bgreen"--------------------------------------"$bwhite"ADB tools, settings, etc"$bgreen"--------------------------------------";
     echo $bgreen"  1   "$white"Select default ADB device "$blue"(temporary, resets on every launch)";
     echo $bgreen"  2   "$white"Connect a new device over wireless ADB "$blue"(ensure you know the IP address and port of device)";
-    echo $bgreen"  3   "$white"Make default ADB device persistent "$bred"(IF USING WIRELESS ADB, MUST HAVE STATIC IP)";
-    echo $bgreen"  4   "$white"Quick ADB log file "$blue"(capture ADB logcat for 10 seconds)";
-    echo $bgreen"  5   "$white"Extended ADB log file "$blue"(capture ADB logcat for a user specified number of seconds)";
-    echo $bgreen"  6   "$white"Open an ADB shell session "$blue"(select a default ADB device first)";
-    echo $bgreen"  7   "$white"Manually restart ADB daemon on device as "$bpink"root "$blue"(select a default ADB device first)";
-    echo $bgreen"  8   "$white"Toggle killing ADB daemon on quit" $blue"(currently: "$(adb_kill_display);
-    echo $bgreen"  9   "$white"Restart ADB daemon" $blue"(must reconnect wireless ADB sessions afterwards)";
-    echo $bgreen"  10  "$white"Enable \"hidden\" "$bpink"SS"$white" option to take an ADB screencap from most menus "$blue"(currently: "$(adb_screencap_display);
-    echo $bgreen"  11  "$white"Toggle checking/connecting to saved ADV device on startup" $blue"(currently: "$(adb_connect_start_display)
+    echo $bgreen"  3   "$white"Connect to saved device over wireless ADB "$blue"(Only if saved device was using wireless ADB)";
+    echo $bgreen"  4   "$white"Make default ADB device persistent "$bred"(IF USING WIRELESS ADB, MUST HAVE STATIC IP)";
+    echo $bgreen"  5   "$white"Quick ADB log file "$blue"(capture ADB logcat for 10 seconds)";
+    echo $bgreen"  6   "$white"Extended ADB log file "$blue"(capture ADB logcat for a user specified number of seconds)";
+    echo $bgreen"  7   "$white"Open an ADB shell session "$blue"(select a default ADB device first)";
+    echo $bgreen"  8   "$white"Manually restart ADB daemon on device as "$bpink"root "$blue"(select a default ADB device first)";
+    echo $bgreen"  9   "$white"Toggle killing ADB daemon on quit" $blue"(currently: "$(adb_kill_display);
+    echo $bgreen"  10  "$white"Restart ADB daemon" $blue"(must reconnect wireless ADB sessions afterwards)";
+    echo $bgreen"  11  "$white"Enable \"hidden\" "$bpink"SS"$white" option to take an ADB screencap from most menus "$blue"(currently: "$(adb_screencap_display);
+    echo $bgreen"  12  "$white"Toggle checking/connecting to saved ADV device on startup" $blue"(currently: "$(adb_connect_start_display)
     echo $bgreen"  Q   "$white"Return to Debug Menu";
     echo $bgreen"$apkmftr";
     printf "$bwhite%s""Please select an option from above: "; $rclr;
@@ -228,15 +229,16 @@ adb_menu () {
     case "$input" in
          1)  adb_devices_menu; adb_menu  ;;
          2)  adb_wireless_connect; adb_menu  ;;
-         3)  adb_save_device_pref; adb_menu  ;;
-         4)  adb_log_device_check; adb_menu  ;;
-         5)  extended_adb_log=1; adb_log_device_check; adb_menu  ;;
-         6)  adb_shell; adb_menu  ;;
-         7)  adbrootforce=1; adb_root_setup; unset adbrootforce; adb_menu  ;;
-         8)  toggle_adb_kill_on_quit; adb_menu  ;;
-         9)  adb kill-server; adb start-server >/dev/null; adb_menu  ;;
-        10)  adb_screencap_toggle; adb_menu ;;
-        11)  adb_connect_on_start_toggle; adb_menu  ;;
+         3)  adbsaved=1; adb_wireless_connect; unset adbsaved; adb_menu  ;;
+         4)  adb_save_device_pref; adb_menu  ;;
+         5)  adb_log_device_check; adb_menu  ;;
+         6)  extended_adb_log=1; adb_log_device_check; adb_menu  ;;
+         7)  adb_shell; adb_menu  ;;
+         8)  adbrootforce=1; adb_root_setup; unset adbrootforce; adb_menu  ;;
+         9)  toggle_adb_kill_on_quit; adb_menu  ;;
+        10)  adb kill-server; adb start-server >/dev/null; adb_menu  ;;
+        11)  adb_screencap_toggle; adb_menu ;;
+        12)  adb_connect_on_start_toggle; adb_menu  ;;
         96)  toggle_trace; adb_menu  ;;
         97)  toggle_verbose; adb_menu  ;;
         98)  toggle_error; adb_menu  ;;
