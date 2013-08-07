@@ -537,6 +537,8 @@ heap_size () {
     printf "$white%s""Enter max size for java heap memory in megabytes ("$bgreen"eg 512"$white"): "; $rclr;
     read input
     if [[ $input = [qQ] ]]; then :
+    elif [[ $input = [qQ][qQ] ]]; then
+        quit
     elif [[ ! ${input} =~ ^[0-9]+$ ]]; then
         echo $bred"Error: ${input} is not a number, press any key to try again"; $rclr;
         wait
@@ -589,6 +591,8 @@ comp_level () {
     printf "$white%s""Enter Maximum Compression Level ("$bgreen"0-9"$white"): "; $rclr;
     read input
     if [[ $input = [qQ] ]]; then :
+    elif [[ $input = [qQ][qQ] ]]; then
+        quit
     elif [[ ! ${input} =~ ^[0-9]$ ]]; then
         echo $bred"Error: ${input} is not a valid compression level, press any key to try again."; $rclr;
         wait

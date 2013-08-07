@@ -109,6 +109,7 @@ view_git_log () {
      [gG])  view_github_commits ;;
      [wW])  view_github_wiki ;;
      [qQ])  ;;
+ [qQ][qQ])  quit ;;
         *)  input_err; view_git_log ;;
     esac
     unset input
