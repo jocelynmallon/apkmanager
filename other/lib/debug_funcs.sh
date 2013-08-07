@@ -89,15 +89,21 @@ gen_system_memory_info () {
     sysmem=$((($free+$inactive+$active+$wired+$reactive)))
 }
 
-# Format and view git commit log
-view_git_log () {
+
+git_parse_commit_detail () {
+    git log --name-status --pretty --diff-filter="[A|C|D|M|R|T]" -1 -U "${commit_detail}"
+}
+
+# detail view for selected git commit
+git_commit_detail_view () {
     clear
     menu_header
-    debug_header
     echo $bgreen"$apkmspr"; $rclr;
-    echo $white"Viewing last "$bgreen"14"$white" commits/changes made to APK Manager..."
     echo ""
-    echo "$(git log --pretty=format:"%Cred%h%Creset | %Cgreen%ad%Creset | %s" --date=short --max-count=14)"
+    echo $bwhite"Viewing commit detail for: "$bgreen"${commit_detail}"; $rclr;
+    echo ""
+    cd "${maindir}"
+    echo "$(git_parse_commit_detail)"
     echo ""
     echo $bgreen"$apkmftr";
     echo $white"press "$bgreen"G"$white" to open commit history on github.com"; $rclr;
@@ -110,7 +116,7 @@ view_git_log () {
      [wW])  view_github_wiki ;;
      [qQ])  ;;
  [qQ][qQ])  quit ;;
-        *)  input_err; view_git_log ;;
+        *)  input_err; git_commit_detail_view ;;
     esac
     unset input
 }
@@ -128,7 +134,7 @@ view_github_commits () {
 # View changelog/git-log
 view_changelog () {
     if [[ $(command -v git) ]] && [[ -d "${maindir}/.git" ]]; then
-        view_git_log
+        git_log_menu
     else
         view_github_wiki
     fi

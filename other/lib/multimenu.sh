@@ -44,6 +44,15 @@ sign_finish () {
 }
 
 # branch menu finish function
+gitc_finish () {
+    commit_detail="${files[$input]}"
+    commit_detail="$(echo "${commit_detail}" | cut -d ' ' -f1)"
+    commit_detail="$(echo $commit_detail | sed -E "s/\[([0-9]{1,2}(;[0-9]{1,2})?)?[m|K]//g")"
+    git_commit_detail_view
+    unset commit_detail
+}
+
+# branch menu finish function
 gitb_finish () {
     local saved_channel="${files[$input]}"
     local key="updates_branch"
@@ -92,6 +101,7 @@ get_mmenu_input () {
                  signing)  input_err; listpkeys ;;
                 branches)  input_err; git_branches_menu ;;
                   adbdev)  input_err; adb_devices_menu ;;
+                 commits)  input_err; git_log_menu ;;
             esac
         fi
     elif [[ ${input} = [bB] ]]; then
@@ -105,6 +115,7 @@ get_mmenu_input () {
                  signing)  input_err; listpkeys ;;
                 branches)  input_err; git_branches_menu ;;
                   adbdev)  input_err; adb_devices_menu ;;
+                 commits)  input_err; git_log_menu ;;
             esac
         fi
     elif [[ ! ${input} =~ ^[0-9]+$ ]]; then
@@ -114,6 +125,7 @@ get_mmenu_input () {
              signing)  input_err; listpkeys ;;
             branches)  input_err; git_branches_menu ;;
               adbdev)  input_err; adb_devices_menu ;;
+             commits)  input_err; git_log_menu ;;
         esac
     elif [[ ${input} -lt ${scount} ]] || [[ ${input} -gt ${limit} ]]; then
         case ${mkey} in
@@ -122,6 +134,7 @@ get_mmenu_input () {
              signing)  input_err; listpkeys ;;
             branches)  input_err; git_branches_menu ;;
               adbdev)  input_err; adb_devices_menu ;;
+             commits)  input_err; git_log_menu ;;
         esac
     else
         case ${mkey} in
@@ -130,6 +143,7 @@ get_mmenu_input () {
              signing)  sign_finish ;;
             branches)  gitb_finish ;;
               adbdev)  adbd_finish ;;
+             commits)  gitc_finish ;;
         esac
     fi
 }
@@ -213,6 +227,11 @@ buildmenu () {
         echo $bgreen"---------------------------------------"$bwhite"Select a keystore menu"$bgreen"---------------------------------------";
         echo $white" Current Keystore: "$bgreen"${keystore}"
         echo $bgreen"$apkmspr"
+    elif [[ ${mkey} = commits ]]; then
+        updates_header
+        echo $bgreen"--------------------------------"$bwhite"Select commit to view detail history"$bgreen"--------------------------------";
+        echo $green" Enter list number to see detailed commit information for the selected commit."
+        echo $bgreen"$apkmspr"
     elif [[ ${mkey} = branches ]]; then
         updates_header
         echo $bgreen"----------------------------------------"$bwhite"Select update branch"$bgreen"----------------------------------------";
@@ -241,6 +260,14 @@ populate_adb_devices () {
         else
             echo "${line}"
         fi
+    done
+}
+
+# parse the git log/commits history
+populate_git_commits () {
+    git log --pretty=format:"%Cred%h%Creset | %Cgreen%ad%Creset | %s" --date=short | while read line;
+    do
+        echo "${line}"
     done
 }
 
@@ -292,9 +319,24 @@ git_branches_menu () {
     check_files_set
     mkey="branches"
     cd "${maindir}/.git/refs/remotes/origin"
-    files[0]="change_branch_menu - YOU SHOULD NOT SEE THIS"
+    files[0]="git_branches_menu - YOU SHOULD NOT SEE THIS"
     files+=( $(ls -1) )
     pnum=20
+    buildmenu
+    mmcleanup
+}
+
+# git log/commit history menu
+git_log_menu () {
+    check_files_set
+    mkey="commits"
+    cd "${maindir}"
+    OLDIFS=$IFS
+    IFS=$'\n'
+    files[0]="git_branches_menu - YOU SHOULD NOT SEE THIS"
+    files+=( $(populate_git_commits) )
+    IFS=$OLDIFS
+    pnum=19
     buildmenu
     mmcleanup
 }
