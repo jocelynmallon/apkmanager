@@ -18,7 +18,7 @@ sign_menu () {
     cd "${maindir}"
     clear
     menu_header
-    echo $bgreen"--------------------------------------Advanced Signing Options--------------------------------------"
+    echo $bgreen"--------------------------------------"$bwhite"Advanced Signing Options"$bgreen"--------------------------------------"
     echo $white" Current Keystore: "$bgreen"${keystore}"; $rclr;
     echo $green" (if \"None\" displayed, please use create new private key option first)"
     echo $bgreen"$apkmspr"
@@ -59,7 +59,7 @@ clean_menu () {
     cd "${maindir}"
     clear
     menu_header
-    echo $bgreen"---------------------------------------Clean Files or Folders---------------------------------------";
+    echo $bgreen"---------------------------------------"$bwhite"Clean Files or Folders"$bgreen"---------------------------------------";
     echo $bgreen"  1   "$white"Clean This Project's Folder";
     echo $bgreen"  2   "$white"Clean All Files in Modding Folder";
     echo $bgreen"  3   "$white"Clean All Files in OGG Folder";
@@ -69,7 +69,7 @@ clean_menu () {
     echo $bgreen"  7   "$white"Clean APKtool framework files";
     echo $bgreen"  8   "$white"Clean All Files/Folders "$blue"(Executes options 1-7)";
     echo $bgreen"  9   "$white"Clean LOG.txt and adblog.txt Files";
-    echo $bgreen"--------------------------------------Reset Persistent Options--------------------------------------";
+    echo $bgreen"--------------------------------------"$bwhite"Reset Persistent Options"$bgreen"--------------------------------------";
     echo $bgreen"  10  "$white"Reset log viewer app";
     echo $bgreen"  11  "$white"Reset \"persistent\" Java heap memory size"$blue" (If enabled)";
     echo $bgreen"  12  "$white"Reset \"persistent\" Zip compression level"$blue" (If enabled)";
@@ -119,7 +119,7 @@ textapp_menu () {
     clear
     menu_header
     debug_header
-    echo $bgreen"------------------------------------Set editor for log/txt files------------------------------------";
+    echo $bgreen"------------------------------------"$bwhite"Set editor for log/txt files"$bgreen"------------------------------------";
     echo $bgreen"  1   "$white"Apple TextEdit"$blue" (Default)";
     echo $bgreen"  2   "$white"TextMate";
     echo $bgreen"  3   "$white"SubEthaEdit";
@@ -218,9 +218,9 @@ adb_menu () {
     echo $bgreen"  6   "$white"Open an ADB shell session "$blue"(select a default ADB device first)";
     echo $bgreen"  7   "$white"Toggle killing ADB daemon on quit" $blue"(currently: "$(adb_kill_display);
     echo $bgreen"  8   "$white"Restart ADB daemon" $blue"(must reconnect wireless ADB sessions afterwards)";
-    echo $bgreen"  9   "$white"Enable \"hidden\" option "$green"SS"$white" to take an ADB screencap from most menus "$blue"(currently: "$(adb_screencap_display);
+    echo $bgreen"  9   "$white"Enable \"hidden\" "$bpink"SS"$white" option to take an ADB screencap from most menus "$blue"(currently: "$(adb_screencap_display);
     echo $bgreen"  10  "$white"Toggle checking/connecting to saved ADV device on startup" $blue"(currently: "$(adb_connect_start_display)
-#    echo $bgreen"  10  "$white"Setup advanced ADB command line options "$bred"(MAY HAVE UNINTENDED CONSEQUENCES)";
+#    echo $bgreen"  11  "$white"Setup advanced ADB command line options "$bred"(MAY HAVE UNINTENDED CONSEQUENCES)";
     echo $bgreen"  Q   "$white"Return to Debug Menu";
     echo $bgreen"$apkmftr";
     printf "$bwhite%s""Please select an option from above: "; $rclr;
@@ -236,7 +236,7 @@ adb_menu () {
          8)  adb kill-server; adb start-server >/dev/null; adb_menu  ;;
          9)  adb_screencap_toggle; adb_menu ;;
         10)  adb_connect_on_start_toggle; adb_menu  ;;
-#        10)  adb_menu  ;;
+#        11)  adb_menu  ;;
         96)  toggle_trace; adb_menu  ;;
         97)  toggle_verbose; adb_menu  ;;
         98)  toggle_error; adb_menu  ;;
@@ -268,7 +268,7 @@ debug_menu () {
     echo $bgreen"  7   "$white"View ADBLOG.txt "$blue"(if file exists)";
     echo $bgreen"  8   "$white"Configure automatic updates "$blue"(Requires you have \"git\" installed)";
     echo $bgreen"  9   "$white"Toggle command line use "$blue"(create/delete \"apkm\" symlink in /usr/local/bin)";
-    echo $bgreen"-----------------------------------------Other misc options-----------------------------------------";
+    echo $bgreen"-----------------------------------------"$bwhite"Other misc options"$bgreen"-----------------------------------------";
     echo $bgreen"  10  "$white"Enable persistent Java Heap memory size";
     echo $bgreen"  11  "$white"Enable persistent Zip Compression Level";
     echo $bgreen"  12  "$white"Use \"optipng\" for PNG optimization "$green"(Persistent) "$blue"(default APK Manager tool)";
@@ -316,7 +316,7 @@ debug_menu () {
 restart () {
     cd "${maindir}"
     menu_header
-    echo $bgreen"---------------------------------Simple Tasks Such As Image Editing---------------------------------";
+    echo $bgreen"---------------------------------"$bwhite"Simple Tasks Such As Image Editing"$bgreen"---------------------------------";
     echo $bgreen"  1   "$white"Adb pull "$blue"(Pulls file into \"${mod_dir}\" folder)";
     echo $bgreen"  2   "$white"Extract apk ";
     echo $bgreen"  3   "$white"Optimize images inside "$blue"(Only if \"Extract Apk\" was selected)";
@@ -327,7 +327,7 @@ restart () {
     echo $bgreen"  8   "$white"Install apk "$bred"(DON'T do this if system apk, do adb push)";
     echo $bgreen"  9   "$white"Zip / Sign / Install apk "$blue"(All in one step)" $bred"(apk files only)";
     echo $bgreen"  10  "$white"Adb push "$bred"(Only for system apk/jar file)";
-    echo $bgreen"--------------------------------Advanced Tasks Such As Code Editing---------------------------------";
+    echo $bgreen"--------------------------------"$bwhite"Advanced Tasks Such As Code Editing"$bgreen"---------------------------------";
     echo $bgreen"  11  "$white"Decompile "$blue"(Supports both apk and jar files)";
     echo $bgreen"  12  "$white"Decompile with dependencies"$blue" (For propietary rom apks)" $bred"(apk files only)";
     echo $bgreen"  13  "$white"Advanced Decompile APK "$blue"(Uses baksmali for code, apktool for resources)";
@@ -335,7 +335,7 @@ restart () {
     echo $bgreen"  15  "$white"Compile / Sign / Install "$blue"(All in one step) "$bred"(apk files only)";
     echo $bgreen"  16  "$white"Advanced \"All-in-one\" "$blue"(Zip/Compile, sign with private keys, install)";
     echo $bgreen"  17  "$white"View Java Source "$blue"(apk and jar support) "$bred"(CANNOT be recompiled)";
-    echo $bgreen"-------------------------------------------Other Options--------------------------------------------";
+    echo $bgreen"-------------------------------------------"$bwhite"Other Options"$bgreen"--------------------------------------------";
     echo $bgreen"  18  "$white"Advanced signing options "$blue"(Use your own keystore, verify signatures, etc.)";
     echo $bgreen"  19  "$white"Batch Optimize files "$blue"(Inside \"${bat_dir}\" folder)";
     echo $bgreen"  20  "$white"Batch Sign apk files "$blue"(With test keys, inside \"${sig_dir}\" folder)";

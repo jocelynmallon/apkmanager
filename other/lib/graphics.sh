@@ -17,6 +17,10 @@ green='\033[0;32m'
 bgreen='\033[1;32m'
 blue='\033[0;34m'
 bblue='\033[1;34m'
+pink='\033[0;35m'
+bpink='\033[1;35m'
+yellow='\033[0;33m'
+byellow='\033[1;33m'
 rclr='tput sgr0'
 
 # set some graphical variables for easy pretty menus and logs
@@ -97,13 +101,13 @@ gen_project_display_text () {
 # generate basic debug information for display
 gen_debug_display_text () {
     if [[ ${v_mode} -ne 0 ]]; then
-        printf "$bred%s"" VERBOSE MODE ENABLED (-v for entire script) "$white" | "
+        printf "$bred%s"" VERBOSE MODE ENABLED (-v for entire script) "$bwhite" | "
     fi
     if [[ ${t_mode} -ne 0 ]]; then
-        printf "$bred%s"" TRACE MODE ENABLED (-x for entire script) "$white" | "
+        printf "$bred%s"" TRACE MODE ENABLED (-x for entire script) "$bwhite" | "
     fi
     if [[ ${e_mode} -ne 0 ]]; then
-        printf "$bred%s"" -e"$white" |"
+        printf "$bred%s"" -e"$bwhite" |"
         local emode=5
     fi
     if [[ ${debugstate} -ne 0 ]]; then
@@ -113,10 +117,10 @@ gen_debug_display_text () {
         local pidw="$$"
         if [[ -z ${errcode} ]]; then
             errcode=0
-            local err_string="${white}| \$?: ${bred}${errcode}"
+            local err_string="${bwhite}| \$?: ${bred}${errcode}"
             local pwdfill=28
         else
-            local err_string="${white}| ${bred}${errfunc} ${white}\$?: ${bred}${errcode} ${white}line: ${bred}${errline}"
+            local err_string="${bwhite}| ${bred}${errfunc} ${bwhite}\$?: ${bred}${errcode} ${bwhite}line: ${bred}${errline}"
             local pwdfill=36
         fi
         local maxlength="$((100 - (((((${#errfunc} + ${#errcode}) + ${#errline}) + ${#pidw}) + ${emode} ) + ${pwdfill} )))"
@@ -126,7 +130,7 @@ gen_debug_display_text () {
         else
             newpwd="$(pwd)"
         fi
-        printf "$white%s"" PID: "$bred"$$"$white" ${err_string}"$white" | Last 'cd': "$bred"${newpwd}\n"; $rclr;
+        printf "$bwhite%s"" PID: "$bred"$$"$bwhite" ${err_string}"$bwhite" | Last 'cd': "$bred"${newpwd}\n"; $rclr;
         unset errcode
         unset errline
         unset errfunc
@@ -140,18 +144,17 @@ menu_header () {
     local trunc_symbol="..."
     echo ""
     version_banner
-    echo $white" Compression-Level: "$bgreen"${uscr}"$white"  |  Heap Size: "$bgreen"${heapy}""mb"$white"  |  Project:"$bgreen $(gen_project_display_text); $rclr;
+    echo $bwhite" Compression-Level: "$bgreen"${uscr}"$bwhite"  |  Heap Size: "$bgreen"${heapy}""mb"$bwhite"  |  Project:"$bgreen $(gen_project_display_text); $rclr;
     echo $bgreen"$apkmspr"; $rclr;
     gen_debug_display_text
 }
 
 # Debug/settings menu sub-header
 debug_header () {
-#    echo "adb_dev_choice: $adb_dev_choice"
     if [[ -z $adb_dev_choice ]] && [[ -z $adb_dev_model ]] && [[ -z $adb_dev_product ]]; then
         get_saved_adb_device
     fi
-    echo $bgreen"------------------------------------Debug Info and Misc Settings------------------------------------";
+    echo $bgreen"------------------------------------"$bwhite"Debug Info and Misc Settings"$bgreen"------------------------------------";
     echo $white" Current System: "$green"Mac OS X ${osx_ver} ${osx_bld} ${arch_ver}";
     echo $white" APK Manager install type: "$green"${installtype}";
     echo $white" APK Manager root dir: "$green"${maindir}";
@@ -164,7 +167,7 @@ debug_header () {
 
 # automatic updates menu header
 updates_header () {
-    echo $bgreen"-------------------------------------Automatic Updates Settings-------------------------------------";
+    echo $bgreen"-------------------------------------"$bwhite"Automatic Updates Settings"$bgreen"-------------------------------------";
     local updatestate="$(defaults read "${plist}" updates 2>/dev/null)"
     if [[ $? -ne 0 ]]; then
         updatestate=0
@@ -177,6 +180,7 @@ updates_header () {
         local commit
         commit="$(get_commit_ver)"
         commit="${commit:0:8}"
+        commit="${commit} $(echo $blue"(")$(git log --pretty=format:"%s" --max-count=1)$(echo ")")"
         update_prompt_state
         if [[ ${upromptstate} -eq 1 ]]; then
             local uprompt="${green}ON"
@@ -192,10 +196,11 @@ updates_header () {
         fi
         echo $white" Updates status: "$green"ON"; $rclr;
         echo $white" Updates prompt: $uprompt"; $rclr;
-        echo $white" Current branch: "$green"${saved_channel}"; $rclr;
-        echo $white" Current commit: "$green"${commit}"; $rclr;
         echo $white" Update frequency: "$green"${updfreq}"; $rclr;
         echo $white" Last update check: "$green"${last_check}"; $rclr;
+        echo $bgreen"$apkmspr"; $rclr;
+        echo $white" Current branch: "$green"${saved_channel}"; $rclr;
+        echo $white" Current commit: "$green"${commit}"; $rclr;
     else
         echo $white" Updates status: "$bred"OFF"; $rclr;
     fi

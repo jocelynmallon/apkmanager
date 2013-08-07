@@ -95,9 +95,9 @@ view_git_log () {
     menu_header
     debug_header
     echo $bgreen"$apkmspr"; $rclr;
-    echo $white"Viewing last "$bgreen"15"$white" commits/changes made to APK Manager..."
+    echo $white"Viewing last "$bgreen"14"$white" commits/changes made to APK Manager..."
     echo ""
-    echo "$(git log --pretty=format:"%Cred%h%Creset | %Cgreen%ad%Creset | %s" --date=short --max-count=15)"
+    echo "$(git log --pretty=format:"%Cred%h%Creset | %Cgreen%ad%Creset | %s" --date=short --max-count=14)"
     echo ""
     echo $bgreen"$apkmftr";
     echo $white"press "$bgreen"G"$white" to open commit history on github.com"; $rclr;
@@ -358,7 +358,7 @@ debug_display () {
     clear
     menu_header
     debug_header
-    echo $bgreen"-----------------------------------Binary version info, path, etc-----------------------------------";
+    echo $bgreen"-----------------------------------"$bwhite"Binary version info, path, etc"$bgreen"-----------------------------------";
     echo $white" smali version: "$green"${smali_ver}"
     echo $white" baksmali version: "$green"${baksmali_ver}"
     echo $white" dex2jar version: "$green"${dex2jar_ver}"

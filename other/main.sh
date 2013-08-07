@@ -517,7 +517,7 @@ heap_size () {
     clear
     gen_system_memory_info
     menu_header
-    echo $bgreen"----------------------------------------Set Java Heap Memory----------------------------------------"
+    echo $bgreen"----------------------------------------"$bwhite"Set Java Heap Memory"$bgreen"----------------------------------------"
     echo ""
     echo $white" For stability and reliability, it is best that this value is large"
     echo $white" enough to prevent Java from crashing (e.g. at least ~256MB)"
@@ -570,7 +570,7 @@ heap_size () {
 comp_level () {
     clear
     menu_header
-    echo $bgreen"---------------------------------Set level for zip/compress options---------------------------------"
+    echo $bgreen"---------------------------------"$bwhite"Set level for zip/compress options"$bgreen"---------------------------------"
     echo ""
     echo $white" Basic information on most common options:"
     echo ""

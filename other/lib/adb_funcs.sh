@@ -295,7 +295,7 @@ adb_wireless_connect () {
     echo "adb_wireless_connect (setup wireless adb) function" 1>> "$log"
     clear
     menu_header
-    echo $bgreen"-----------------------------------------Wireless ADB Setup-----------------------------------------" ; $rclr;
+    echo $bgreen"-----------------------------------------"$bwhite"Wireless ADB Setup"$bgreen"-----------------------------------------" ; $rclr;
     echo ""
     echo $bgreen"  1)"$white" Ensure wireless ADB is running on your android device";
     echo $bgreen"  2)"$white" Make note of the IP address of the device wireless ADB is running on";
@@ -342,7 +342,7 @@ adblog () {
     set_adb_log_timeout
     clear
     menu_header
-    echo $bgreen"----------------------------------------adblog.txt generator----------------------------------------" ; $rclr;
+    echo $bgreen"----------------------------------------"$bwhite"adblog.txt generator"$bgreen"----------------------------------------" ; $rclr;
     echo ""
     echo $white" selected android device:";
     echo $bgreen"  ${adb_dev_choice}";

@@ -121,7 +121,7 @@ compile_9patch () {
     temp_dir_setup
     clear
     menu_header
-    echo $bgreen"-----------------------------Compile nine-patch and/or binary xml files----------------------------- "
+    echo $bgreen"-----------------------------"$bwhite"Compile nine-patch and/or binary xml files"$bgreen"----------------------------- "
     echo $white" APK Manager has the ability to compile \"nine-patch\" png files"
     echo $white" and binary xml files without needing a working eclipse project,"
     echo $white" or using/hijacking an already decompiled apk file."

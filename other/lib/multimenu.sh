@@ -200,22 +200,22 @@ buildmenu () {
     clear
     menu_header
     if [[ ${mkey} = projects ]]; then
-        echo $bgreen"-----------------------------------Select project file to work on-----------------------------------";
+        echo $bgreen"-----------------------------------"$bwhite"Select project file to work on"$bgreen"-----------------------------------";
     elif [[ ${mkey} = adbdev ]]; then
         debug_header
-        echo $bgreen"----------------------------------------Select an ADB Device----------------------------------------";
+        echo $bgreen"----------------------------------------"$bwhite"Select an ADB Device"$bgreen"----------------------------------------";
         echo $bred" If Menu is empty, try reconnecting your devices USB cable, or setup a wireless adb connection."
         echo $bgreen"$apkmspr"
     elif [[ ${mkey} = apktool ]]; then
         debug_header
-        echo $bgreen"------------------------------------------APKtool Versions------------------------------------------";
+        echo $bgreen"------------------------------------------"$bwhite"APKtool Versions"$bgreen"------------------------------------------";
     elif [[ ${mkey} = signing ]]; then
-        echo $bgreen"---------------------------------------Select a keystore menu---------------------------------------";
+        echo $bgreen"---------------------------------------"$bwhite"Select a keystore menu"$bgreen"---------------------------------------";
         echo $white" Current Keystore: "$bgreen"${keystore}"
         echo $bgreen"$apkmspr"
     elif [[ ${mkey} = branches ]]; then
         updates_header
-        echo $bgreen"----------------------------------------Select update branch----------------------------------------";
+        echo $bgreen"----------------------------------------"$bwhite"Select update branch"$bgreen"----------------------------------------";
         echo $bred" Warning: APK Manager will automatically quit once the new branch has been checked out."
         echo $bgreen"$apkmspr"
     fi
