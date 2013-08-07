@@ -6,8 +6,8 @@
 # by Jocelyn Mallon CC by-nc-sa 2012
 # http://girlintroverted.wordpress.com
 #
-# version: 3.1b
-# Wed. Jul 31, 2013
+# version: 3.2b
+# Wed. Aug 7, 2013
 # -----------------------------------------------------------------------
 
 debug_cleanup () {
@@ -215,13 +215,27 @@ apkt_menu_check () {
     fi
 }
 
-# Launch ddms if it exists
+# Launch ddms/monitor if it exists
 launch_ddms () {
     if [[ $(command -v monitor) ]]; then
         local apkmopt="monitor; exit"
         newttab "${apkmopt}" "$log"
-    elif [[ ! $(command -v monitor) ]]; then
+    elif [[ $(command -v ddms) ]] && [[ ! $(command -v monitor) ]]; then
+        local apkmopt="ddms; exit"
+        newttab "${apkmopt}" "$log"
+    elif [[ ! $(command -v monitor) ]] && [[ ! $(command -v ddms) ]]; then
         echo $bred"ERROR: Android Device Monitor not found on the system."
+        debuganykey
+    fi
+}
+
+# Launch android sdk manager if it exists
+launch_sdk_manager () {
+    if [[ $(command -v android) ]]; then
+        local apkmopt="android; exit"
+        newttab "${apkmopt}" "$log"
+    elif [[ ! $(command -v android) ]]; then
+        echo $bred"ERROR: Android SDK Manager not found on the system."
         debuganykey
     fi
 }

@@ -6,8 +6,8 @@
 # by Jocelyn Mallon CC by-nc-sa 2012
 # http://girlintroverted.wordpress.com
 #
-# version: 3.1b
-# Wed. Jul 31, 2013
+# version: 3.2b
+# Wed. Aug 7, 2013
 # -----------------------------------------------------------------------
 
 # Unknown input error string
@@ -231,6 +231,33 @@ adb_wireless_connection_error () {
 # no preferred ADB device error
 adb_nodevice_error () {
     echo $bred"ERROR: no preferred ADB device selected"; $rclr;
+    genericpanykey
+}
+
+# failed to restart adb daemon as root error
+adb_device_root_error () {
+    echo $bred"ERROR: failed to restart ADB Daemon on: ${adb_dev_choice}"; $rclr;
+    echo $bred"as root. Please ensure that your device has root access,"; $rclr;
+    echo $bred"and root for ADB shell is enabled, then try again."; $rclr;
+    genericpanykey
+}
+
+# Project APK not found on device to uninstall
+apk_not_installed_err () {
+    echo $bred"ERROR: APK Maanger did not find an installed APK"; $rclr;
+    echo $bred"with package name: "$bpink"${apk_package}"; $rclr;
+    echo $bred"to uninstall from your device. Please ensure the"; $rclr;
+    echo $bred"package names match, or try uninstalling"; $rclr;
+    echo $bred"the app from your device manually."; $rclr;
+    genericpanykey
+}
+
+# failed to uninstall selected APK error
+apk_uninstall_failed_err () {
+    echo $bred"ERROR: Something went wrong while attempting"; $rclr;
+    echo $bred"to uninstall: ${apk_package}"; $rclr;
+    echo $bred"Please ensure the app is installed, and not"; $rclr;
+    echo $bred"a system app, and try again."; $rclr;
     genericpanykey
 }
 

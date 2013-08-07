@@ -6,8 +6,8 @@
 # by Jocelyn Mallon CC by-nc-sa 2012
 # http://girlintroverted.wordpress.com
 #
-# version: 3.1b
-# Wed. Jul 31, 2013
+# version: 3.2b
+# Wed. Aug 7, 2013
 # -----------------------------------------------------------------------
 
 # Zip/compress a system apk file

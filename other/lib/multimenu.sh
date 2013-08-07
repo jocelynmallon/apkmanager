@@ -6,8 +6,8 @@
 # by Jocelyn Mallon CC by-nc-sa 2012
 # http://girlintroverted.wordpress.com
 #
-# version: 3.1b
-# Wed. Jul 31, 2013
+# version: 3.2b
+# Wed. Aug 7, 2013
 # -----------------------------------------------------------------------
 
 # cleanup and unset all variables used
@@ -258,7 +258,7 @@ projects_menu () {
     cd "${maindir}/${mod_dir}"
     files[0]="projects_menu - YOU SHOULD NOT SEE THIS"
     files+=( $(ls *.[aA][pP][kK] *.[jJ][aA][rR]) )
-    pnum=28
+    pnum=29
     buildmenu
     mmcleanup
 }
@@ -270,7 +270,7 @@ listpkeys () {
     cd "${HOME}/.apkmanager/.keystores"
     files[0]="listpkeys - YOU SHOULD NOT SEE THIS"
     files+=( $(ls *.[kK][eE][yY][sS][tT][oO][rR][eE]) )
-    pnum=26
+    pnum=27
     buildmenu
     mmcleanup
 }
@@ -282,7 +282,7 @@ apktool_menu () {
     cd "${aptdir}"
     files[0]="apktool_menu - YOU SHOULD NOT SEE THIS"
     files+=( $(ls [aA][pP][kK][tT][oO][oO][lL]_*.[jJ][aA][rR]) )
-    pnum=19
+    pnum=20
     buildmenu
     mmcleanup
 }
@@ -294,7 +294,7 @@ git_branches_menu () {
     cd "${maindir}/.git/refs/remotes/origin"
     files[0]="change_branch_menu - YOU SHOULD NOT SEE THIS"
     files+=( $(ls -1) )
-    pnum=19
+    pnum=20
     buildmenu
     mmcleanup
 }
@@ -309,7 +309,7 @@ adb_devices_menu () {
     files[0]="adb_devices_menu - YOU SHOULD NOT SEE THIS"
     files+=( $(populate_adb_devices) )
     IFS=$OLDIFS
-    pnum=17
+    pnum=18
     buildmenu
     mmcleanup
 }

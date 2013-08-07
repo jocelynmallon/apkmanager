@@ -6,8 +6,8 @@
 # by Jocelyn Mallon CC by-nc-sa 2012
 # http://girlintroverted.wordpress.com
 #
-# version: 3.1b
-# Wed. Jul 31, 2013
+# version: 3.2b
+# Wed. Aug 7, 2013
 # -----------------------------------------------------------------------
 
 # Advanced signing menu
@@ -211,16 +211,16 @@ adb_menu () {
     debug_header
     echo $bgreen"$apkmspr"
     echo $bgreen"  1   "$white"Select default ADB device "$blue"(temporary, resets on every launch)";
-    echo $bgreen"  2   "$white"Connect a device over wireless ADB "$blue"(ensure you know the IP address and port of device)";
+    echo $bgreen"  2   "$white"Connect a new device over wireless ADB "$blue"(ensure you know the IP address and port of device)";
     echo $bgreen"  3   "$white"Make default ADB device persistent "$bred"(IF USING WIRELESS ADB, MUST HAVE STATIC IP)";
     echo $bgreen"  4   "$white"Quick ADB log file "$blue"(capture ADB logcat for 10 seconds)";
     echo $bgreen"  5   "$white"Extended ADB log file "$blue"(capture ADB logcat for a user specified number of seconds)";
     echo $bgreen"  6   "$white"Open an ADB shell session "$blue"(select a default ADB device first)";
-    echo $bgreen"  7   "$white"Toggle killing ADB daemon on quit" $blue"(currently: "$(adb_kill_display);
-    echo $bgreen"  8   "$white"Restart ADB daemon" $blue"(must reconnect wireless ADB sessions afterwards)";
-    echo $bgreen"  9   "$white"Enable \"hidden\" "$bpink"SS"$white" option to take an ADB screencap from most menus "$blue"(currently: "$(adb_screencap_display);
-    echo $bgreen"  10  "$white"Toggle checking/connecting to saved ADV device on startup" $blue"(currently: "$(adb_connect_start_display)
-#    echo $bgreen"  11  "$white"Setup advanced ADB command line options "$bred"(MAY HAVE UNINTENDED CONSEQUENCES)";
+    echo $bgreen"  7   "$white"Manually restart ADB daemon on device as "$bpink"root "$blue"(select a default ADB device first)";
+    echo $bgreen"  8   "$white"Toggle killing ADB daemon on quit" $blue"(currently: "$(adb_kill_display);
+    echo $bgreen"  9   "$white"Restart ADB daemon" $blue"(must reconnect wireless ADB sessions afterwards)";
+    echo $bgreen"  10  "$white"Enable \"hidden\" "$bpink"SS"$white" option to take an ADB screencap from most menus "$blue"(currently: "$(adb_screencap_display);
+    echo $bgreen"  11  "$white"Toggle checking/connecting to saved ADV device on startup" $blue"(currently: "$(adb_connect_start_display)
     echo $bgreen"  Q   "$white"Return to Debug Menu";
     echo $bgreen"$apkmftr";
     printf "$bwhite%s""Please select an option from above: "; $rclr;
@@ -232,11 +232,11 @@ adb_menu () {
          4)  adb_log_device_check; adb_menu  ;;
          5)  extended_adb_log=1; adb_log_device_check; adb_menu  ;;
          6)  adb_shell; adb_menu  ;;
-         7)  toggle_adb_kill_on_quit; adb_menu  ;;
-         8)  adb kill-server; adb start-server >/dev/null; adb_menu  ;;
-         9)  adb_screencap_toggle; adb_menu ;;
-        10)  adb_connect_on_start_toggle; adb_menu  ;;
-#        11)  adb_menu  ;;
+         7)  adbrootforce=1; adb_root_setup; unset adbrootforce; adb_menu  ;;
+         8)  toggle_adb_kill_on_quit; adb_menu  ;;
+         9)  adb kill-server; adb start-server >/dev/null; adb_menu  ;;
+        10)  adb_screencap_toggle; adb_menu ;;
+        11)  adb_connect_on_start_toggle; adb_menu  ;;
         96)  toggle_trace; adb_menu  ;;
         97)  toggle_verbose; adb_menu  ;;
         98)  toggle_error; adb_menu  ;;
@@ -275,9 +275,10 @@ debug_menu () {
     echo $bgreen"  13  "$white"Use \"pngcrush\" for PNG optimization "$green"(Persistent) "$blue"(tool used by CyanogenMod)";
     echo $bgreen"  14  "$white"Use \"pngout\" for PNG optimization "$green"(Persistent) "$blue"(used in commercial plugins)";
     echo $bgreen"  15  "$white"Launch draw9patch "$blue"(Requires you have Android SDK installed)";
-    echo $bgreen"  16  "$white"Launch Android Device Monitor "$blue"(Requires you have Android SDK installed)";
-    echo $bgreen"  17  "$white"Choose APKtool version "$blue"(For decompiling/compiling apk files)";
+    echo $bgreen"  16  "$white"Launch Android Device Monitor "$blue"(previously ddms, Requires you have Android SDK installed)";
+    echo $bgreen"  17  "$white"Launch Android SDK Manager "$blue"(Requires you have Android SDK installed)";
     echo $bgreen"  18  "$white"ADB Tools "$blue"(logcat, shell, wireless ADB setup, etc.)";
+    echo $bgreen"  19  "$white"Choose APKtool version "$blue"(For decompiling/compiling apk files)";
     echo $bgreen"  Q   "$white"Return to Main Menu";
     echo $bgreen"$apkmftr";
     printf "$bwhite%s""Please select an option from above: "; $rclr;
@@ -299,8 +300,9 @@ debug_menu () {
         14)  pngout_check; debug_menu ;;
         15)  draw_nine; debug_menu ;;
         16)  launch_ddms; debug_menu ;;
-        17)  apkt_menu_check; debug_menu ;;
+        17)  launch_sdk_manager; debug_menu ;;
         18)  adb_menu; debug_menu ;;
+        19)  apkt_menu_check; debug_menu ;;
         96)  toggle_trace; debug_menu ;;
         97)  toggle_verbose; debug_menu ;;
         98)  toggle_error; debug_menu ;;
@@ -317,34 +319,35 @@ restart () {
     cd "${maindir}"
     menu_header
     echo $bgreen"---------------------------------"$bwhite"Simple Tasks Such As Image Editing"$bgreen"---------------------------------";
-    echo $bgreen"  1   "$white"Adb pull "$blue"(Pulls file into \"${mod_dir}\" folder)";
-    echo $bgreen"  2   "$white"Extract apk ";
-    echo $bgreen"  3   "$white"Optimize images inside "$blue"(Only if \"Extract Apk\" was selected)";
+    echo $bgreen"  1   "$white"ADB pull "$blue"(Pulls file into \"${mod_dir}\" folder)";
+    echo $bgreen"  2   "$white"Extract APK ";
+    echo $bgreen"  3   "$white"Optimize images inside "$blue"(Only if \"Extract APK\" was selected)";
     echo $bgreen"  4   "$white"Compile \".9.png\" and/or binary xml files";
-    echo $bgreen"  5   "$white"Zip apk ";
-    echo $bgreen"  6   "$white"Sign apk "$blue"(With test keys) "$bred"(DON'T do this if its a system apk)";
-    echo $bgreen"  7   "$white"Zipalign apk "$blue"(Do this after apk is zipped / signed)";
-    echo $bgreen"  8   "$white"Install apk "$bred"(DON'T do this if system apk, do adb push)";
-    echo $bgreen"  9   "$white"Zip / Sign / Install apk "$blue"(All in one step)" $bred"(apk files only)";
-    echo $bgreen"  10  "$white"Adb push "$bred"(Only for system apk/jar file)";
+    echo $bgreen"  5   "$white"Zip APK ";
+    echo $bgreen"  6   "$white"Sign APK "$blue"(With test keys) "$bred"(DON'T do this if its a system apk)";
+    echo $bgreen"  7   "$white"Zipalign APK "$blue"(Do this after apk is zipped / signed)";
+    echo $bgreen"  8   "$white"Install APK "$bred"(DON'T do this if system apk, do adb push)";
+    echo $bgreen"  9   "$white"Zip / Sign / Install APK "$blue"(All in one step)" $bred"(apk files only)";
+    echo $bgreen"  10  "$white"ADB push "$bred"(Only for system apk/jar file)";
     echo $bgreen"--------------------------------"$bwhite"Advanced Tasks Such As Code Editing"$bgreen"---------------------------------";
     echo $bgreen"  11  "$white"Decompile "$blue"(Supports both apk and jar files)";
-    echo $bgreen"  12  "$white"Decompile with dependencies"$blue" (For propietary rom apks)" $bred"(apk files only)";
+    echo $bgreen"  12  "$white"Decompile with dependencies"$blue" (For propietary rom APKs)" $bred"(APK files only)";
     echo $bgreen"  13  "$white"Advanced Decompile APK "$blue"(Uses baksmali for code, apktool for resources)";
     echo $bgreen"  14  "$white"Compile "$blue"(For use with decompile options: 11, 12, 13)";
     echo $bgreen"  15  "$white"Compile / Sign / Install "$blue"(All in one step) "$bred"(apk files only)";
     echo $bgreen"  16  "$white"Advanced \"All-in-one\" "$blue"(Zip/Compile, sign with private keys, install)";
-    echo $bgreen"  17  "$white"View Java Source "$blue"(apk and jar support) "$bred"(CANNOT be recompiled)";
+    echo $bgreen"  17  "$white"Uninstall APK "$blue"(Only for non-system apps)";
+    echo $bgreen"  18  "$white"View Java Source "$blue"(apk and jar support) "$bred"(CANNOT be recompiled)";
+    echo $bgreen"  19  "$white"Advanced signing options "$blue"(Use your own keystore, verify signatures, etc.)";
     echo $bgreen"-------------------------------------------"$bwhite"Other Options"$bgreen"--------------------------------------------";
-    echo $bgreen"  18  "$white"Advanced signing options "$blue"(Use your own keystore, verify signatures, etc.)";
-    echo $bgreen"  19  "$white"Batch Optimize files "$blue"(Inside \"${bat_dir}\" folder)";
-    echo $bgreen"  20  "$white"Batch Sign apk files "$blue"(With test keys, inside \"${sig_dir}\" folder)";
-    echo $bgreen"  21  "$white"Batch optimize ogg files "$blue"(Inside \"${ogg_dir}\" only)";
-    echo $bgreen"  22  "$white"Select compression level for zipping files";
-    echo $bgreen"  23  "$white"Set max Java heap memory size "$blue"(If getting stuck at decompiling/compiling)";
-    echo $bgreen"  24  "$white"Debug Info and Misc Settings "$blue"(Persistent heap, set log viewing app, etc.)";
-    echo $bgreen"  25  "$white"Clean Files/Folders, Reset settings, etc. "
-    echo $bgreen"  26  "$white"Select Current Project";
+    echo $bgreen"  20  "$white"Batch Optimize files "$blue"(Inside \"${bat_dir}\" folder)";
+    echo $bgreen"  21  "$white"Batch Sign APK files "$blue"(With test keys, inside \"${sig_dir}\" folder)";
+    echo $bgreen"  22  "$white"Batch optimize ogg files "$blue"(Inside \"${ogg_dir}\" only)";
+    echo $bgreen"  23  "$white"Select compression level for zipping files";
+    echo $bgreen"  24  "$white"Set max Java heap memory size "$blue"(If getting stuck at decompiling/compiling)";
+    echo $bgreen"  25  "$white"Debug Info and Misc Settings "$blue"(Persistent heap, set log viewing app, etc.)";
+    echo $bgreen"  26  "$white"Clean Files/Folders, Reset settings, etc. "
+    echo $bgreen"  27  "$white"Select Current Project";
     echo $bgreen"  Q   "$white"Quit APK Manager";
     echo $bgreen"$apkmftr";
     printf "$bwhite%s""Please select an option from above: "; $rclr;
@@ -366,16 +369,17 @@ restart () {
         14)  compile ;;
         15)  co_sign_install ;;
         16)  adv_all_in_one ;;
-        17)  d2j_check ;;
-        18)  sign_menu ;;
-        19)  batch_opt; batch_cleanup ;;
-        20)  batch_sign_tk; batch_cleanup ;;
-        21)  batch_ogg; batch_cleanup ;;
-        22)  comp_level ;;
-        23)  heap_size ;;
-        24)  debug_menu ;;
-        25)  clean_menu ;;
-        26)  projects_menu ;;
+        17)  adb_uninstall_apk ;;
+        18)  d2j_check ;;
+        19)  sign_menu ;;
+        10)  batch_opt; batch_cleanup ;;
+        21)  batch_sign_tk; batch_cleanup ;;
+        22)  batch_ogg; batch_cleanup ;;
+        23)  comp_level ;;
+        24)  heap_size ;;
+        25)  debug_menu ;;
+        26)  clean_menu ;;
+        27)  projects_menu ;;
         96)  toggle_trace ;;
         97)  toggle_verbose ;;
         98)  toggle_error ;;

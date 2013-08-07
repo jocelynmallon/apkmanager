@@ -6,8 +6,8 @@
 # by Jocelyn Mallon CC by-nc-sa 2012
 # http://girlintroverted.wordpress.com
 #
-# version: 3.0
-# Sun. Oct 07, 2012
+# version: 3.2b
+# Wed. Aug 7, 2013
 # -----------------------------------------------------------------------
 
 
@@ -72,6 +72,97 @@ get_saved_adb_device () {
     trap 'err_trap_handler ${LINENO} $? ${FUNCNAME}' ERR
 }
 
+# make sure ADB is running as root for push, pull, etc.
+adb_root_setup () {
+    echo $green"Attempting to restart ADB daemon on "$bgreen"${adb_dev_choice}"$green" as root..."
+    local adbroot="$(adb -s ${adb_dev_choice} root 2>&1)"
+    if [[ $adbroot = *error* ]]; then
+        adb_nodevice_error
+        return 1
+    elif [[ $adbroot = *already* ]]; then
+        echo $green"ADB daemon on "$bgreen"${adb_dev_choice}"$green" already running as root"; $rclr;
+        if [[ -n $adbrootforce ]]; then
+            genericpanykey
+        fi
+        return 0
+    elif [[ $adbroot = *restarting* ]]; then
+        local adbroot="$(timeout -t 5 adb -s ${adb_dev_choice} shell ps | grep -i adbd | cut -d ' ' -f1)"
+        if [[ ! $adbroot = *root* ]]; then
+            adb_device_root_error
+            return 1
+        else
+            echo $green"ADB daemon on "$bgreen"${adb_dev_choice}"$green" restarted as root"; $rclr;
+            if [[ -n $adbrootforce ]]; then
+                genericpanykey
+            fi
+            return 0
+        fi
+    fi
+}
+
+# sub-routine to actually uninstall an APK file
+adb_uninstall_sub () {
+    local apk_package="$(aapt dump badging "${maindir}/${mod_dir}/${capp}" | grep -1 -m1 "package: name=" | cut -d \' -f2)"
+    adb -s ${adb_dev_choice} shell pm list packages -f | grep -i "$apk_package" >/dev/null
+    if [[ $? -ne 0 ]]; then
+        apk_not_installed_err
+        return 1
+    else
+        adb -s ${adb_dev_choice} uninstall "${apk_package}"
+        if [[ $? -ne 0 ]]; then
+            apk_uninstall_failed_err
+            return 1
+        else
+            echo $bgreen"${apk_package} uninstalled from ${adb_dev_choice}"
+            echo "==> uninstalled ${apk_package} from ${adb_dev_choice}" 1>> "$log"
+            genericpanykey
+            return 0
+        fi
+    fi
+}
+
+# uninstall selected project from device
+adb_uninstall_apk () {
+    echo "adb_uninstall_apk function" 1>> "$log"
+    capp_test
+    if [[ ${capp} = "None" ]]; then
+        echo "no project selected, aborting" 1>> "$log"
+        return 1
+    elif [[ ! ${prjext} = [Aa][Pp][Kk] ]]; then
+        jarext_err
+        return 1
+    else
+        adb_multiple_devices_check
+        if [[ $? -ne 0 ]]; then
+            return 1
+        fi
+        adb_root_setup
+        if [[ $? -ne 0 ]]; then
+            return 1
+        else
+            adb_uninstall_sub
+        fi
+    fi
+    echo "adb_uninstall_apk function complete" 1>> "$log"
+}
+
+# sub-prompt for ADB pull function
+adb_pull_sub () {
+    echo $bwhite"Where do you want ADB to pull the apk/jar from? ";
+    echo $green"Example of input : /system/app/launcher.apk";
+    echo $green"(leave blank and press enter to return to main menu)"; $rclr;
+    read input
+    if [[ -z $input ]]; then :
+    else
+        local outfile="$(basename "${input}")"
+        adb -s "${adb_dev_choice}" wait-for-device pull "$input" "${maindir}/${mod_dir}/${outfile}"
+        if [[ $? -ne 0 ]]; then
+            echo $bred"Error: while pulling ${outfile}"; $rclr;
+            pressanykey
+        fi
+    fi
+}
+
 # Pull a file from device with adb
 adb_pull () {
     echo "adb_pull function" 1>> "$log"
@@ -79,18 +170,11 @@ adb_pull () {
     if [[ $? -ne 0 ]]; then
         return 1
     else
-        echo $bwhite"Where do you want ADB to pull the apk/jar from? ";
-        echo $green"Example of input : /system/app/launcher.apk";
-        echo $green"(leave blank and press enter to return to main menu)"; $rclr;
-        read input
-        if [[ -z $input ]]; then :
+        adb_root_setup
+        if [[ $? -ne 0 ]]; then
+            return 1
         else
-            local outfile="$(basename "${input}")"
-            adb -s "${adb_dev_choice}" wait-for-device pull "$input" "${maindir}/${mod_dir}/${outfile}"
-            if [[ $? -ne 0 ]]; then
-                echo $bred"Error: while pulling ${outfile}"; $rclr;
-                pressanykey
-            fi
+            adb_pull_sub
         fi
     fi
     unset input
@@ -142,6 +226,22 @@ push_cleanup () {
     unset push_type
 }
 
+# sub-prompt for ADB push functions
+adb_push_sub () {
+    echo $bwhite"Which ADB push option would you like to perform?";
+    echo $white"(use "$bgreen"Q"$white" to quit)"; $rclr;
+    echo $bgreen"  1 "$white"  Simple  "$green"(ADB push only)";
+    echo $bgreen"  2 "$white"  Advanced  "$green"(ADB shell stop, push, shell start)";
+    printf "$bwhite%s""Please make your decision: "; $rclr;
+    read input
+    case "$input" in
+        1)  push_type="normal"; push_prompt ;;
+        2)  push_type="advanced"; push_prompt ;;
+     [qQ])  ;;
+        *)  input_err; adb_push ;;
+    esac
+}
+
 # Prompt for ADB push type
 adb_push () {
     echo "adb_push (push type prompt) function" 1>> "$log"
@@ -158,16 +258,12 @@ adb_push () {
         if [[ $? -ne 0 ]]; then
             return 1
         else
-            echo $bwhite"Which ADB push option would you like to perform?";
-            echo $bgreen"  1 "$white"  Simple  "$green"(ADB push only)";
-            echo $bgreen"  2 "$white"  Advanced  "$green"(ADB shell stop, push, shell start)";
-            printf "$bwhite%s""Please make your decision: "; $rclr;
-            read input
-            case "$input" in
-                1)  push_type="normal"; push_prompt ;;
-                2)  push_type="advanced"; push_prompt ;;
-                *)  input_err; adb_push ;;
-            esac
+            adb_root_setup
+            if [[ $? -ne 0 ]]; then
+                return 1
+            else
+                adb_push_sub
+            fi
         fi
     fi
     push_cleanup
