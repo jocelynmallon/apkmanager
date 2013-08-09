@@ -34,7 +34,7 @@ adbd_finish () {
     adb_dev_device="${files[$input]}"
     set_adb_device_info
     echo "==> Selected ADB device ID is: ${adb_dev_choice}" 1>> "$log" 2>&1
-    echo "==> ADB device product & model: ${adb_dev_product}, ${adb_dev_model}" 1>> "$log" 2>&1
+    echo "==> ADB device: ${adb_dev_device}, model: ${adb_dev_model}, product: ${adb_dev_product}" 1>> "$log" 2>&1
 }
 
 # keystore menu finish function
