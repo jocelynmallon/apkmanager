@@ -86,7 +86,7 @@ adb_root_setup () {
         fi
         return 0
     elif [[ $adbroot = *restarting* ]]; then
-        local adbroot="$(timeout -t 5 adb -s ${adb_dev_choice} shell ps | grep -i adbd | cut -d ' ' -f1)"
+        local adbroot="$(timeout3 -t 5 adb -s ${adb_dev_choice} shell ps | grep -i adbd | cut -d ' ' -f1)"
         if [[ ! $adbroot = *root* ]]; then
             adb_device_root_error
             return 1
