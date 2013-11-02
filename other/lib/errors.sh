@@ -66,6 +66,13 @@ fatalpanykey () {
     wait
 }
 
+# fatal error while checking for required programs string
+startup_check_fatal_err () {
+    echo $bred"The program ${prg} is missing or is not in your"
+    echo $bred"\$PATH, please install it or fix your \$PATH."
+    echo "${prg} is missing or not in PATH" 1>> "$log" 2>&1
+}
+
 # .jar file extension error string
 jarext_err () {
     echo $bred"Error, this option only available for APK files"; $rclr;

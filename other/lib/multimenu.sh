@@ -7,7 +7,7 @@
 # http://girlintroverted.wordpress.com
 #
 # version: 3.2b
-# Wed. Aug 7, 2013
+# Sat. Nov 2, 2013
 # -----------------------------------------------------------------------
 
 # cleanup and unset all variables used
@@ -24,6 +24,7 @@ mmcleanup () {
     unset total
     unset pnum
     unset apktver
+    unset sdkrev
 }
 
 # keystore menu finish function
@@ -83,6 +84,34 @@ apkt_finish () {
     getapktver
 }
 
+# android studio menu finish function
+ands_finish () {
+    if [[ -z $sdkrev ]]; then
+        local sdkrev="${files[$input]}"
+    fi
+    ln -s "/Applications/Android Studio.app/sdk/build-tools/$sdkrev/aapt" "${maindir}/other/bin/aapt"
+    if [[ $? -ne 0 ]]; then
+        echo "==> ERROR: aapt not found in Android Studio sdk" 1>> "$log" 2>&1
+    else
+        echo "==> linking /Applications/Android Studio.app/sdk/build-tools/$sdkrev/aapt" 1>> "$log" 2>&1
+    fi
+    for prg in "android" "ddms" "draw9patch" "monitor" "zipalign"
+    do
+        if [[ -e "/Applications/Android Studio.app/sdk/tools/${prg}" ]]; then
+            ln -s "/Applications/Android Studio.app/sdk/tools/${prg}" "${maindir}/other/bin/${prg}"
+            echo "==> linking /Applications/Android Studio.app/sdk/tools/${prg}" 1>> "$log" 2>&1
+        else
+            echo "==> ERROR: ${prg} not found in Android Studio sdk" 1>> "$log" 2>&1
+        fi
+    done
+    ln -s "/Applications/Android Studio.app/sdk/platform-tools/adb" "${maindir}/other/bin/adb"
+    if [[ $? -ne 0 ]]; then
+        echo "==> ERROR: adb not found in Android Studio sdk" 1>> "$log" 2>&1
+    else
+        echo "==> linking /Applications/Android Studio.app/sdk/platform-tools/adb" 1>> "$log" 2>&1
+    fi
+}
+
 # read and check user input
 get_mmenu_input () {
     read input
@@ -102,6 +131,7 @@ get_mmenu_input () {
                 branches)  input_err; git_branches_menu ;;
                   adbdev)  input_err; adb_devices_menu ;;
                  commits)  input_err; git_log_menu ;;
+               andstudio)  input_err; android_studio_menu ;;
             esac
         fi
     elif [[ ${input} = [bB] ]]; then
@@ -116,6 +146,7 @@ get_mmenu_input () {
                 branches)  input_err; git_branches_menu ;;
                   adbdev)  input_err; adb_devices_menu ;;
                  commits)  input_err; git_log_menu ;;
+               andstudio)  input_err; android_studio_menu ;;
             esac
         fi
     elif [[ ! ${input} =~ ^[0-9]+$ ]]; then
@@ -126,6 +157,7 @@ get_mmenu_input () {
             branches)  input_err; git_branches_menu ;;
               adbdev)  input_err; adb_devices_menu ;;
              commits)  input_err; git_log_menu ;;
+           andstudio)  input_err; android_studio_menu ;;
         esac
     elif [[ ${input} -lt ${scount} ]] || [[ ${input} -gt ${limit} ]]; then
         case ${mkey} in
@@ -135,6 +167,7 @@ get_mmenu_input () {
             branches)  input_err; git_branches_menu ;;
               adbdev)  input_err; adb_devices_menu ;;
              commits)  input_err; git_log_menu ;;
+           andstudio)  input_err; android_studio_menu ;;
         esac
     else
         case ${mkey} in
@@ -144,6 +177,7 @@ get_mmenu_input () {
             branches)  gitb_finish ;;
               adbdev)  adbd_finish ;;
              commits)  gitc_finish ;;
+           andstudio)  ands_finish ;;
         esac
     fi
 }
@@ -212,7 +246,11 @@ check_mkey_set () {
 buildmenu () {
     check_mkey_set
     clear
-    menu_header
+    if [[ ${mkey} = andstudio ]]; then
+        version_banner
+    else
+        menu_header
+    fi
     if [[ ${mkey} = projects ]]; then
         echo $bgreen"-----------------------------------"$bwhite"Select project file to work on"$bgreen"-----------------------------------";
     elif [[ ${mkey} = adbdev ]]; then
@@ -236,6 +274,15 @@ buildmenu () {
         updates_header
         echo $bgreen"----------------------------------------"$bwhite"Select update branch"$bgreen"----------------------------------------";
         echo $bred" Warning: APK Manager will automatically quit once the new branch has been checked out."
+        echo $bgreen"$apkmspr"
+    elif [[ ${mkey} = andstudio ]]; then
+        echo ""
+        echo $bgreen"-------------------------------"$bwhite"Select Android Studio Platform Version"$bgreen"-------------------------------";
+        echo $bred" Note: due to the way updates are handled to the Android SDK, most tools (adb, zipalign, monitor,"
+        echo $bred"       draw9patch )will always be from the newest platform installed, regardless of your choice."
+        echo $bred"       The choice here will effect which version of \"aapt\" is used."
+        echo $bgreen"$apkmspr"
+        echo $bred" Note: the \"android-4.2.2\" option is API level 17."
         echo $bgreen"$apkmspr"
     fi
     page_check
@@ -276,6 +323,19 @@ check_files_set () {
     if [[ $files ]]; then
         unset files
     fi
+}
+
+# android studio platforms default only check
+and_studio_platforms_check () {
+#    if [[ ${files[1]} = "android-4.2.2" ]]; then
+    if [[ ${#files[@]} -eq 2 ]]; then
+        sdkrev="${files[1]}"
+        ands_finish
+    else
+        pnum=19
+        buildmenu
+    fi
+    mmcleanup
 }
 
 # Projects menu
@@ -339,6 +399,19 @@ git_log_menu () {
     pnum=19
     buildmenu
     mmcleanup
+}
+
+# android studio platform selection menu
+android_studio_menu () {
+    check_files_set
+    mkey="andstudio"
+    cd "/Applications/Android Studio.app/sdk/build-tools"
+    OLDIFS=$IFS
+    IFS=$'\n'
+    files[0]="android_studio_menu - YOU SHOULD NOT SEE THIS"
+    files+=( $(ls | sort) )
+    IFS=$OLDIFS
+    and_studio_platforms_check
 }
 
 # ADB connected devices menu

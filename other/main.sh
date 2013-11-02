@@ -7,7 +7,7 @@
 # http://girlintroverted.wordpress.com
 #
 # version: 3.2b
-# Wed. Aug 7, 2013
+# Sat. Nov 2, 2013
 # -----------------------------------------------------------------------
 
 # define default directories to function
@@ -179,10 +179,28 @@ folderscheck () {
     done
 }
 
-# Check for required programs
+# Check if Android Studio is installed
+android_studio_check () {
+    echo "android_studio_check (checking for android studio)" 1>> "$log" 2>&1
+    if [[ -e "/Applications/Android Studio.app" ]]; then
+        echo $bgreen"Android Studio was found on this computer, would you like to use"
+        echo $bgreen"it's embedded SDK tools whenever APK Manager requires them?"
+        echo ""
+        printf "$white%s""Yes or No? ("$bgreen"y"$white"/"$bgreen"n"$white") "; $rclr;
+        read input
+        case "$input" in
+            [yY]) android_studio_menu ;;
+            [nN]) fatal_err=$(($fatal_err+1)) ;;
+        esac
+    fi
+    return $fatal_err
+}
+
+# Check for additional required programs
 startup_check () {
     echo "startup_check (checking for necessary binaries to run)" 1>> "$log" 2>&1
     local prg
+    local fatal_err
     for prg in "optipng" "pngcrush" "pngout" "7za" "java" "sudo" "adb" "aapt" "sox" "zipalign"
     do
         if [[ ! $(command -v ${prg}) ]]; then
@@ -196,17 +214,22 @@ startup_check () {
                     pngopts="disabled"
                     echo "\"optipng\", \"pngcrush\" & \"pngout\" missing; png options disabled" 1>> "$log" 2>&1
                 fi
-            elif [[ ${prg} = aapt ]]; then
-                if [[ $(command -v brew) ]] && [[ $(dirname "$(command -v android)") = /usr/local/bin ]]; then
-                    local sdkrev="$(brew list --versions android-sdk | sed s/android-sdk\ //g)"
-                    ln -s "/usr/local/Cellar/android-sdk/${sdkrev}/platform-tools/aapt" /usr/local/bin/aapt
+            elif [[ ${prg} = aapt ]] || [[ ${prg} = adb ]] || [[ ${prg} = zipalign ]]; then
+                android_studio_check
+                fatal_err=$(($fatal_err+$?))
+                if [[ $fatal_err -ne 0 ]]; then
+                    startup_check_fatal_err
+                    break
                 fi
+#            elif [[ ${prg} = aapt ]]; then
+#                if [[ $(command -v brew) ]] && [[ $(dirname "$(command -v android)") = /usr/local/bin ]]; then
+#                    local sdkrev="$(brew list --versions android-sdk | sed s/android-sdk\ //g)"
+#                    ln -s "/usr/local/Cellar/android-sdk/${sdkrev}/platform-tools/aapt" /usr/local/bin/aapt
+#                fi
             else
-                local fatal_err
                 fatal_err=$(($fatal_err+1))
-                echo "The program ${prg} is missing or is not in your"
-                echo "\$PATH, please install it or fix your \$PATH."
-                echo "${prg} is missing or not in PATH" 1>> "$log" 2>&1
+                startup_check_fatal_err
+                break
             fi
         fi
     done

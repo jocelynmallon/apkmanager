@@ -15,6 +15,10 @@ pngout
 adb
 zipalign
 sox
+android
+ddms
+draw9patch
+monitor
 jd-gui.cfg
 apktool.jar
 apktool_131.jar
