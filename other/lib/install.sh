@@ -6,8 +6,8 @@
 # by Jocelyn Mallon CC by-nc-sa 2012
 # http://girlintroverted.wordpress.com
 #
-# version: 3.0
-# Sun. Oct 07, 2012
+# version: 3.2b
+# Sat. Nov 2, 2013
 # -----------------------------------------------------------------------
 
 # cleanup variables used during installation
@@ -57,10 +57,11 @@ andsdk_error () {
     echo ""
     version_banner
     echo ""
-    echo $bred" WARNING: Android SDK was not found on this system."
+    echo $bred" WARNING: neither a standalone copy of the Android SDK"
+    echo $bred" or Android Studio were found on this system."
     echo ""
     echo $white" And APK Manager did not find \"homebrew\" to"
-    echo $white" install the SDK automaticall for you."
+    echo $white" install the SDK automatically for you."
     echo ""
     echo $white" Though not technically required to function, the"
     echo $white" Android SDK is incredibly useful, and will enable"
@@ -93,8 +94,6 @@ brew_install_error () {
 
 # pngout error message
 pngout_error () {
-#    echo $bred" WARNING: pngout was not found on this system,"
-#    echo $bred" and APK Manager did not find \"homebrew\" either."
     echo $bred" WARNING: pngout was not found on this system."
     echo $bred" To install pngout, please select pngout for"
     echo $bred" your optimization tool from the debug menu inside"
@@ -166,13 +165,6 @@ setup_homebrew () {
     declare -i count=1
     while [[ ${missing[$count]} ]]
     do
-#        if [[ ${missing[$count]} = pngout ]]; then
-#            if [[ ! $(brew tap | grep "adamv/alt") ]]; then
-#                echo $green" brew tap adamv/alt "$blue"(to install pngout)"
-#                btap="1"
-#            fi
-#            echo $green" brew install ${missing[$count]}"
-#        elif [[ ${missing[$count]} = android-sdk ]]; then
         if [[ ${missing[$count]} = android-sdk ]]; then
             needsdk="1"
             echo $green" brew install ${missing[$count]}"
@@ -433,7 +425,6 @@ installcheck () {
         sudo_error
     else
         declare -i count=0
-#        for p in "optipng" "sox" "pngcrush" "pngout" "7za" "adb" "aapt" "zipalign"
         for p in "optipng" "sox" "pngcrush" "7za" "adb" "aapt" "zipalign"
         do
             if [[ ! $(command -v ${p}) ]]; then
@@ -452,12 +443,6 @@ installcheck () {
                     elif [[ ${p} = adb ]] || [[ ${p} = zipalign ]]; then
                         and_sdk_sub
                     fi
-#                elif [[ ${p} = pngout ]]; then
-#                    if [[ $(command -v brew) ]]; then
-#                        missing[$count]="${p}"
-#                    else
-#                        pngout_error
-#                    fi
                 elif [[ ${p} = 7za ]]; then
                     p="p7zip"
                     missing[$count]="${p}"
