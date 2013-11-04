@@ -7,7 +7,7 @@
 # http://girlintroverted.wordpress.com
 #
 # version: 3.2b
-# Sat. Nov 2, 2013
+# Mon. Nov 4, 2013
 # -----------------------------------------------------------------------
 
 # define default directories to function
@@ -183,8 +183,16 @@ folderscheck () {
 android_studio_check () {
     echo "android_studio_check (checking for android studio)" 1>> "$log" 2>&1
     if [[ -e "/Applications/Android Studio.app" ]]; then
-        echo $bgreen"Android Studio was found on this computer, would you like to use"
+        echo $bgreen"APK Manager was unable to find the program "$bred"${prg}"$bgreen" which is"
+        echo $bgreen"necessary for APK Manager to function properly. However,"
+        echo $bgreen"Android Studio was found on this computer. Would you like to use"
         echo $bgreen"it's embedded SDK tools whenever APK Manager requires them?"
+        echo ""
+        echo $bgreen"This process will create a file with the paths to the SDK tools,"
+        echo $bgreen"and copy it into your /etc/paths.d directory, to make sure the"
+        echo $bgreen"tools are always available from any command line/shell."
+        echo ""
+        echo $bred"THIS WILL REQUIRE YOU ENTER YOUR ADMINISTRATOR PASSWORD."
         echo ""
         printf "$white%s""Yes or No? ("$bgreen"y"$white"/"$bgreen"n"$white") "; $rclr;
         read input

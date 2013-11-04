@@ -7,7 +7,7 @@
 # http://girlintroverted.wordpress.com
 #
 # version: 3.2b
-# Sat. Nov 2, 2013
+# Mon. Nov 4, 2013
 # -----------------------------------------------------------------------
 
 # cleanup and unset all variables used
@@ -25,6 +25,7 @@ mmcleanup () {
     unset pnum
     unset apktver
     unset sdkrev
+    unset spasswrd
 }
 
 # keystore menu finish function
@@ -89,33 +90,58 @@ ands_finish () {
     if [[ -z $sdkrev ]]; then
         local sdkrev="${files[$input]}"
     fi
-    ln -s "/Applications/Android Studio.app/sdk/build-tools/$sdkrev/aapt" "${maindir}/other/bin/aapt"
+    clear
+    version_banner
+    echo ""
+    echo $bgreen" You will need to enter your administrator password to continue."
+    echo ""
+    echo $green" First, APK Manager will generate a file with the fully qualified paths to the"
+    echo $green" Android SDK tools embedded inside Android Studio:"
+    echo ""
+    echo $blue" touch \"/tmp/.android_studio\""
+    echo $blue" echo \"/Applications/Android Studio.app/sdk/build-tools/${sdkrev}\" 1>> \"/tmp/.android_studio\""
+    echo $blue" echo \"/Applications/Android Studio.app/sdk/tools/\" 1>> \"/tmp/.android_studio\""
+    echo $blue" echo \"/Applications/Android Studio.app/sdk/platform-tools/\" 1>> \"/tmp/.android_studio\""
+    echo ""
+    echo $green" Then it will use SUDO/Administrator privilidges to copy the file to /etc/paths.d"
+    echo ""
+    echo $green" This is a special folder that the OSX path_helper tool checks whenever a new shell"
+    echo $green" is opened, and adds the paths it finds to your global \$PATH variable."
+    echo ""
+    echo $bgreen" SUDO will be used to run the following command ONLY:"
+    echo ""
+    echo $blue" sudo -S cp -f \"${maindir}/.android_studio\" \"/etc/paths.d/android_studio\""
+    echo ""
+    echo $bred" NOTE: your password is never recorded to disk, and is"
+    echo $bred" cleared from memory once this process completes."
+    echo ""
+    echo $bred" APK Manager will quit and need to be re-opened after this process completes."
+    echo ""
+    local spasswrd
+    printf "$bgreen%s""Enter administrator/sudo password:"; $rclr;
+    read -s spasswrd
+    echo ""
+    touch "/tmp/.android_studio"
+    echo "/Applications/Android Studio.app/sdk/build-tools/$sdkrev" 1>> "/tmp/.android_studio"
+    echo "/Applications/Android Studio.app/sdk/tools/" 1>> "/tmp/.android_studio"
+    echo "/Applications/Android Studio.app/sdk/platform-tools/" 1>> "/tmp/.android_studio"
+    echo $spasswrd | sudo -S cp -f "/tmp/.android_studio" "/etc/paths.d/android_studio"
     if [[ $? -ne 0 ]]; then
-        echo "==> ERROR: aapt not found in Android Studio sdk" 1>> "$log" 2>&1
+        echo "==> ERROR: unable to copy path file to /etc/paths.d/android_studio" 1>> "$log" 2>&1
     else
-        echo "==> linking /Applications/Android Studio.app/sdk/build-tools/$sdkrev/aapt" 1>> "$log" 2>&1
+        echo "==> Copied paths file to /etc/paths.d/android_studio" 1>> "$log" 2>&1
     fi
-    for prg in "android" "ddms" "draw9patch" "monitor" "zipalign"
-    do
-        if [[ -e "/Applications/Android Studio.app/sdk/tools/${prg}" ]]; then
-            ln -s "/Applications/Android Studio.app/sdk/tools/${prg}" "${maindir}/other/bin/${prg}"
-            echo "==> linking /Applications/Android Studio.app/sdk/tools/${prg}" 1>> "$log" 2>&1
-        else
-            echo "==> ERROR: ${prg} not found in Android Studio sdk" 1>> "$log" 2>&1
-        fi
-    done
-    ln -s "/Applications/Android Studio.app/sdk/platform-tools/adb" "${maindir}/other/bin/adb"
-    if [[ $? -ne 0 ]]; then
-        echo "==> ERROR: adb not found in Android Studio sdk" 1>> "$log" 2>&1
-    else
-        echo "==> linking /Applications/Android Studio.app/sdk/platform-tools/adb" 1>> "$log" 2>&1
-    fi
+    rm "/tmp/.android_studio"
+    exit 0
 }
 
 # read and check user input
 get_mmenu_input () {
     read input
     if [[ ${input} = [qQ] ]]; then
+        if [[ $mkey = andstudio ]]; then
+            fatal_err=$(($fatal_err+1))
+        fi
         mmcleanup
     elif [[ ${input} = [qQ][qQ] ]]; then
         quit
@@ -279,8 +305,8 @@ buildmenu () {
         echo ""
         echo $bgreen"-------------------------------"$bwhite"Select Android Studio Platform Version"$bgreen"-------------------------------";
         echo $bred" Note: due to the way updates are handled to the Android SDK, most tools (adb, zipalign, monitor,"
-        echo $bred"       draw9patch )will always be from the newest platform installed, regardless of your choice."
-        echo $bred"       The choice here will effect which version of \"aapt\" is used."
+        echo $bred"       draw9patch) will always be from the newest platform installed, regardless of your choice."
+        echo $bred"       The choice here will effect which version of \"aapt\" and other build-tools are used."
         echo $bgreen"$apkmspr"
         echo $bred" Note: the \"android-4.2.2\" option is API level 17."
         echo $bgreen"$apkmspr"
