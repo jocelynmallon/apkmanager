@@ -7,7 +7,7 @@
 # http://girlintroverted.wordpress.com
 #
 # version: 3.2b
-# Wed. Aug 7, 2013
+# Mon. Jan 27, 2014
 # -----------------------------------------------------------------------
 
 # Advanced signing menu
@@ -374,7 +374,7 @@ restart () {
         17)  adb_uninstall_apk ;;
         18)  d2j_check ;;
         19)  sign_menu ;;
-        10)  batch_opt; batch_cleanup ;;
+        20)  batch_opt; batch_cleanup ;;
         21)  batch_sign_tk; batch_cleanup ;;
         22)  batch_ogg; batch_cleanup ;;
         23)  comp_level ;;
