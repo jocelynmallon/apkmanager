@@ -283,6 +283,13 @@ adb_device_missing_info_error () {
     adbanykey
 }
 
+# Android Studio App not found error
+andstudio_notfound_err () {
+    echo $bred"ERROR: Android Studio was not found, or is not installed"; $rclr;
+    echo $bred"in default location (/Applications/Android Studio.app)"; $rclr;
+    genericpanykey
+}
+
 # ANDROID_SDK_ROOT unset, error message
 android_sdk_root_err () {
     echo $bred"WARNING: ANDROID_SDK_ROOT is not set. This"

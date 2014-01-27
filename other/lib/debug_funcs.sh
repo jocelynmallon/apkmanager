@@ -7,7 +7,7 @@
 # http://girlintroverted.wordpress.com
 #
 # version: 3.2b
-# Wed. Aug 7, 2013
+# Mon. Jan 27, 2014
 # -----------------------------------------------------------------------
 
 debug_cleanup () {
@@ -255,6 +255,46 @@ draw_nine () {
         echo $bred"ERROR: draw9patch not found on the system."
         debuganykey
     fi
+}
+
+# Check to make sure we used Android Studio SDK
+# before we try and launch the SDK tools menu
+andsdk_tools_check () {
+    if [[ -e "/Applications/Android Studio.app" ]]; then
+        android_studio_menu
+    else
+        andstudio_notfound_err
+    fi
+}
+
+# Select PNG optimization tool
+png_tool_menu () {
+    clear
+    menu_header
+    debug_header
+    echo $bgreen"$apkmspr";
+    echo $white" Please select a PNG optimization tool to use"
+    echo $white" with the "$bgreen"\"Optimize images inside\""$white" and"
+    echo $white" batch optimize PNG file functions."; $rclr;
+    echo ""
+    echo $bred" This setting is persistent."; $rclr;
+    echo $bgreen"$apkmspr";
+    echo $bgreen"  1  "$white"Optipng "$blue"(default APK Manager tool - Open Source)"
+    echo $bgreen"  2  "$white"Pngcrush "$blue"(the tool used by CyanogenMod - Open Source)"
+    echo $bgreen"  3  "$white"Pngout "$blue"(used in commercial plugins - "$bred"NOT OPEN SOURCE"$blue")"
+    echo $bgreen"  Q  "$white"Return to Debug Menu";
+    echo $bgreen"$apkmftr";
+    printf "$bwhite%s""Please select an option from above: "; $rclr;
+    read input
+    case "$input" in
+        1)  local key="pngtool" && local value="optipng" && write_preference && pngtoolset ;;
+        2)  local key="pngtool" && local value="pngcrush" && write_preference && pngtoolset ;;
+        3)  pngout_check ;;
+ [sS][sS])  ret_menu="png_tool_menu"; adb_screenshot; unset ret_menu ;;
+     [qQ])  ;;
+ [qQ][qQ])  quit ;;
+        *)  input_err; png_tool_menu ;;
+    esac
 }
 
 # Generate apktool version information
