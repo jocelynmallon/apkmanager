@@ -7,7 +7,7 @@
 # http://girlintroverted.wordpress.com
 #
 # version: 3.2b
-# Mon. Nov 4, 2013
+# Sun. Jun 1, 2014
 # -----------------------------------------------------------------------
 
 # cleanup and unset all variables used
@@ -123,8 +123,8 @@ ands_finish () {
     echo ""
     touch "/tmp/.android_studio"
     echo "/Applications/Android Studio.app/sdk/build-tools/$sdkrev" 1>> "/tmp/.android_studio"
-    echo "/Applications/Android Studio.app/sdk/tools/" 1>> "/tmp/.android_studio"
-    echo "/Applications/Android Studio.app/sdk/platform-tools/" 1>> "/tmp/.android_studio"
+    echo "/Applications/Android Studio.app/sdk/tools" 1>> "/tmp/.android_studio"
+    echo "/Applications/Android Studio.app/sdk/platform-tools" 1>> "/tmp/.android_studio"
     echo $spasswrd | sudo -S cp -f "/tmp/.android_studio" "/etc/paths.d/android_studio"
     if [[ $? -ne 0 ]]; then
         echo "==> ERROR: unable to copy path file to /etc/paths.d/android_studio" 1>> "$log" 2>&1

@@ -7,7 +7,7 @@
 # http://girlintroverted.wordpress.com
 #
 # version: 3.2b
-# Sat. Nov 2, 2013
+# Sun. Jun 1, 2014
 # -----------------------------------------------------------------------
 
 # cleanup variables used during installation
@@ -65,14 +65,23 @@ andsdk_error () {
     echo ""
     echo $white" Though not technically required to function, the"
     echo $white" Android SDK is incredibly useful, and will enable"
-    echo $white" APK Manager to launch ddms and draw9patch."
+    echo $white" APK Manager to launch debugging tools such as"
+    echo $white" \"monitor\" and \"draw9patch\"."
     echo ""
     echo $white" Please see the Android SDK installation page:"
     echo ""
     echo $bgreen" http://developer.android.com/sdk/index.html"
     echo ""
-    echo $bred" be sure to add both \"tools\" and \"platform-tools\""
-    echo $bred" to your \"\$PATH\" after installation finishes."
+    echo $bred" After you have installed the SDK, please re-start"
+    echo $bred" APK Manager and follow the prompts to configure"
+    echo $bred" your SDK installation location."
+    echo ""
+    echo $bred" Alternatively, you can manually add the following"
+    echo $bred" directories to your user \"\$PATH\" setup."
+    echo ""
+    echo $bblue" \"../SDK/tools\""
+    echo $bblue" \"../SDK/platform-tools\""
+    echo $bblue" \"../SDK/build-tools/version\""
     echo ""
     echo $bgreen"$apkmftr";
     printf "$bred%s"" PRESS ANY KEY TO CONTINUE..."; $rclr;
@@ -156,6 +165,7 @@ homebrew_finish () {
 
 # install programs with homebrew
 setup_homebrew () {
+    android_studio_check
     clear
     echo ""
     version_banner
@@ -171,8 +181,8 @@ setup_homebrew () {
         elif [[ ${missing[$count]} = sox ]]; then
             echo $green" brew install ${missing[$count]} "$blue"(opens a new terminal tab)"
             soxdeps="1"
-            unset missing[$count]
-            count=$((count-1))
+#            unset missing[$count]
+#            count=$((count-1))
         else
             echo $green" brew install ${missing[$count]}"
         fi
@@ -245,6 +255,7 @@ setup_homebrew () {
 
 # setup using precompiled/bundled programs
 setup_bundled () {
+    android_studio_check
     cd "${maindir}/other"
     clear
     echo ""
@@ -335,8 +346,64 @@ no_brew_text () {
     echo $white" then APK Manager can use pre-compiled binaries for your architecture."
 }
 
+# Check if we should use Android Studio SDK
+android_studio_text () {
+    clear
+    echo ""
+    version_banner
+    echo ""
+    echo $bgreen" Android Studio was found on this computer. Would you like to use"
+    echo $bgreen" it's embedded SDK tools whenever APK Manager requires them?"
+    echo ""
+    echo $bgreen" This process will create a file with the paths to the SDK tools,"
+    echo $bgreen" and copy it into your /etc/paths.d directory, to make sure the"
+    echo $bgreen" tools are always available from any command line/shell."
+    echo ""
+    if [[ $installtype = "homebrew" ]]; then
+        echo $bgreen" If you select NO, APK Manager will attempt to install the"
+        echo $bgreen" latest version of the Android SDK via homebrew."
+        echo ""
+    fi
+    echo $bred" If you have manually downloaded & installed the Android SDK"
+    echo $bred" please select NO, and you will be able to manually add the path"
+    echo $bred" to the required directories & tools in the next step."
+    echo ""
+    echo $bred" THIS WILL REQUIRE YOU ENTER YOUR ADMINISTRATOR PASSWORD."
+    echo ""
+    echo $bgreen"$apkmftr";
+    printf "$white%s""Yes or No? ("$bgreen"y"$white"/"$bgreen"n"$white") "; $rclr;
+    read input
+    case "$input" in
+        [yY]) android_studio_menu ;;
+        [nN]) android_studio_no ;;
+    esac
+}
+
+# What should we do if the user doesn't want to use Android Studio
+android_studio_no () {
+    if [[ $installtype = "homebrew" ]]; then
+        missing+=( "android-sdk" )
+    else
+        if [[ -z $err_shown ]]; then
+            andsdk_error
+        fi
+    fi
+}
+
+# Check if we found androd studio and should display the prompt
+android_studio_check () {
+    if [[ $andstudiofound -ne 0 ]]; then
+        android_studio_text
+        if [[ $fatal_err -ne 0 ]]; then
+            echo $bred"Something went wrong trying to setup the Android SDK"
+            exit 66
+        fi
+    fi
+}
+
 # use homebrew prompt/message
 brew_text () {
+    installtype="homebrew"
     echo $bgreen"$apkmspr"
     echo $white" APK Manager has detected that Homebrew is already setup on this system"
     echo $bred" however it did not find all the required programs it needs to function."
@@ -344,17 +411,11 @@ brew_text () {
     echo ""
     no_brew_text
     echo $bgreen"$apkmftr";
-    printf "$white%s""Would you like to use Homebrew? ("$bgreen"y"$white"/"$bgreen"n"$white") "; $rclr;
-    read input
-    case "$input" in
-     [yY])  setup_homebrew ;;
-     [nN])  setup_bundled ;;
-        *)  input_err; install ;;
-    esac
 }
 
 # default install prompt/message
 default_text () {
+    installtype="bundled"
     echo $bgreen"$apkmspr"
     echo $bred" APK Manager has detected that Homebrew is not setup on this system."
     echo $white" If you would like to use Homebrew, please follow the instructions here:"
@@ -365,14 +426,26 @@ default_text () {
     echo $bred" installation finishes, before running APK Manager again."
     echo ""
     no_brew_text
-    echo $bgreen"$apkmftr";
-    printf "$white%s""Would you like to use pre-compiled binaries? ("$bgreen"y"$white"/"$bgreen"n"$white") "; $rclr;
-    read input
-    case "$input" in
-     [yY])  setup_bundled ;;
-     [nN])  echo $bred"EXITING SETUP...\n"; $rclr; exit 1 ;;
-        *)  input_err; install ;;
-    esac
+}
+
+install_choices_selection () {
+    if [[ $installtype = "homebrew" ]]; then
+        printf "$white%s""Would you like to use Homebrew? ("$bgreen"y"$white"/"$bgreen"n"$white") "; $rclr;
+        read input
+        case "$input" in
+         [yY])  setup_homebrew ;;
+         [nN])  installtype="bundled" && setup_bundled ;;
+            *)  input_err; install ;;
+        esac
+    elif [[ $installtype = "bundled" ]]; then
+        printf "$white%s""Would you like to use pre-compiled binaries? ("$bgreen"y"$white"/"$bgreen"n"$white") "; $rclr;
+        read input
+        case "$input" in
+         [yY])  setup_bundled ;;
+         [nN])  echo $bred"EXITING SETUP...\n"; $rclr; exit 1 ;;
+            *)  input_err; install ;;
+        esac
+    fi
 }
 
 # main install skeleton function
@@ -399,20 +472,26 @@ install () {
     else
         default_text
     fi
+    install_choices_selection
     echo "install function complete" 1>> "$log"
 }
 
 # missing android sdk programs sub function
 and_sdk_sub () {
-    if [[ $(command -v brew) ]]; then
-        if [[ ! ${missing[$((count - 1))]} = "android-sdk" ]]; then
-            p="android-sdk"
-            missing[$count]="$p"
-        fi
+    if [[ -e "/Applications/Android Studio.app" ]]; then
+        andstudiofound="1"
     else
-        count=$((count-1))
-        if [[ -z $err_shown ]]; then
-            andsdk_error
+        andstudiofound="0"
+        if [[ $(command -v brew) ]]; then
+            if [[ ! ${missing[$((count - 1))]} = "android-sdk" ]]; then
+                p="android-sdk"
+                missing[$count]="$p"
+            fi
+        else
+            count=$((count-1))
+            if [[ -z $err_shown ]]; then
+                andsdk_error
+            fi
         fi
     fi
 }

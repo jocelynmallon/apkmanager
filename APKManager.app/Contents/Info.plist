@@ -10,16 +10,18 @@
 	<string>applet</string>
 	<key>CFBundleIconFile</key>
 	<string>applet</string>
+	<key>CFBundleIdentifier</key>
+	<string>com.apple.ScriptEditor.id.APKManager</string>
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
 	<key>CFBundleName</key>
 	<string>APKManager</string>
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
+	<key>CFBundleShortVersionString</key>
+	<string>3.2</string>
 	<key>CFBundleSignature</key>
 	<string>aplt</string>
-	<key>CFBundleShortVersionString</key>
-	<string>3.1</string>
 	<key>LSMinimumSystemVersionByArchitecture</key>
 	<dict>
 		<key>x86_64</key>
@@ -36,9 +38,9 @@
 		<key>name</key>
 		<string>ScriptWindowState</string>
 		<key>positionOfDivider</key>
-		<real>475</real>
+		<real>733</real>
 		<key>savedFrame</key>
-		<string>0 60 1440 818 0 0 1440 878 </string>
+		<string>242 122 1516 1220 0 0 2560 1418 </string>
 		<key>selectedTabView</key>
 		<string>result</string>
 	</dict>

@@ -7,7 +7,7 @@
 # http://girlintroverted.wordpress.com
 #
 # version: 3.2b
-# Mon. Jan 27, 2014
+# Sun. Jun 1, 2014
 # -----------------------------------------------------------------------
 
 # define default directories to function
@@ -191,6 +191,10 @@ android_studio_check () {
         echo $bgreen"This process will create a file with the paths to the SDK tools,"
         echo $bgreen"and copy it into your /etc/paths.d directory, to make sure the"
         echo $bgreen"tools are always available from any command line/shell."
+        echo ""
+        echo $bred"If you have manually downloaded & installed the Android SDK"
+        echo $bred"please select NO, and you will be able to manually add the path"
+        echo $bred"to the required directories & tools in the next step."
         echo ""
         echo $bred"THIS WILL REQUIRE YOU ENTER YOUR ADMINISTRATOR PASSWORD."
         echo ""
